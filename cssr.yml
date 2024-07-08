@@ -1,0 +1,18 @@
+name: cssr
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+ - pip
+ - python
+ - scikit-learn
+ - dash
+ - dash-bootstrap-components
+ - dash-bootstrap-templates
+ - matplotlib
+ - numpy
+ - pandas
+ - plotly
+ - nbformat>=4.2.0
+ - pip:
+    - npd-data

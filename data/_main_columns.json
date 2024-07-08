@@ -1,0 +1,274 @@
+{
+ "#": [
+  "",
+  "#"
+ ],
+ "field": [
+  "",
+  "field"
+ ],
+ "sea": [
+  "overview",
+  "sea"
+ ],
+ "status": [
+  "overview",
+  "status"
+ ],
+ "HC type": [
+  "overview",
+  "HC type"
+ ],
+ "PL/BAA": [
+  "overview",
+  "PL/BAA"
+ ],
+ "operator": [
+  "overview",
+  "operator"
+ ],
+ "HPHT": [
+  "overview",
+  "HPHT"
+ ],
+ "rec. oil": [
+  "initial reserves",
+  "oil (Msm3)"
+ ],
+ "rec. gas": [
+  "initial reserves",
+  "gas (Bsm3)"
+ ],
+ "rec. ass. liq.": [
+  "initial reserves",
+  "ass. liq. (Bsm3)"
+ ],
+ "rec. OE": [
+  "initial reserves",
+  "OE (Msm3)"
+ ],
+ "rem. oil": [
+  "remaining reserves",
+  "oil (Msm3)"
+ ],
+ "rem. gas": [
+  "remaining reserves",
+  "gas (Bsm3)"
+ ],
+ "rem. ass. liq.": [
+  "remaining reserves",
+  "ass. liq. (Msm3)"
+ ],
+ "rem. OE": [
+  "remaining reserves",
+  "OE (Msm3)"
+ ],
+ "rem. OE prod. years": [
+  "remaining reserves",
+  "years"
+ ],
+ "STOIIP": [
+  "initial in-place volumes",
+  "oil (Msm3)"
+ ],
+ "GIIP": [
+  "initial in-place volumes",
+  "gas (Bsm3)"
+ ],
+ "in-place ass. liquid": [
+  "initial in-place volumes",
+  "oil (Msm3)"
+ ],
+ "in-place ass. gas": [
+  "initial in-place volumes",
+  "ass. gas (Bsm3)"
+ ],
+ "in-place free gas": [
+  "initial in-place volumes",
+  "free gas (Bsm3)"
+ ],
+ "in-place OE": [
+  "initial in-place volumes",
+  "OE (Msm3)"
+ ],
+ "in-place liq./OE ratio": [
+  "initial in-place volumes",
+  "liquids/OE"
+ ],
+ "RF oil": [
+  "recovery factor",
+  "oil"
+ ],
+ "RF liq.": [
+  "recovery factor",
+  "liq."
+ ],
+ "RF gas": [
+  "recovery factor",
+  "gas"
+ ],
+ "maturity oil": [
+  "maturity",
+  "oil"
+ ],
+ "maturity gas": [
+  "maturity",
+  "gas"
+ ],
+ "maturity liq.": [
+  "maturity",
+  "liq."
+ ],
+ "maturity OE": [
+  "maturity",
+  "OE"
+ ],
+ "res. quality": [
+  "",
+  "reservoir quality"
+ ],
+ "faulted": [
+  "",
+  "faulted"
+ ],
+ "reservoir": [
+  "description",
+  "reservoir"
+ ],
+ "recovery": [
+  "description",
+  "recovery strategy"
+ ],
+ "peak year": [
+  "peak yearly production",
+  "year"
+ ],
+ "net oil yearly pr.": [
+  "peak yearly production",
+  "oil (Msm3)"
+ ],
+ "net gas yearly pr.": [
+  "peak yearly production",
+  "gas (Bsm3)"
+ ],
+ "net OE yearly pr.": [
+  "peak yearly production",
+  "OE (Msm3)"
+ ],
+ "water yearly pr.": [
+  "peak yearly production",
+  "water (Msm3)"
+ ],
+ "well num": [
+  "wells",
+  "sum"
+ ],
+ "prod. num": [
+  "wells",
+  "prod."
+ ],
+ "inj. num": [
+  "wells",
+  "inj."
+ ],
+ "obs. num": [
+  "wells",
+  "obs."
+ ],
+ "lat": [
+  "coordinates",
+  "lat"
+ ],
+ "lon": [
+  "coordinates",
+  "lon"
+ ],
+ "depth min": [
+  "depth (m)",
+  "min"
+ ],
+ "depth mean": [
+  "depth (m)",
+  "mean"
+ ],
+ "depth median": [
+  "depth (m)",
+  "median"
+ ],
+ "depth max": [
+  "depth (m)",
+  "max"
+ ],
+ "water depth": [
+  "water",
+  "depth"
+ ],
+ "depth": [
+  "estimates",
+  "depth (m)"
+ ],
+ "p_h": [
+  "estimates",
+  "p (bar)"
+ ],
+ "temp": [
+  "estimates",
+  "T (degC)"
+ ],
+ "GOR": [
+  "estimates",
+  "GOR"
+ ],
+ "oil FVF": [
+  "estimates",
+  "oil FVF"
+ ],
+ "gas FVF": [
+  "estimates",
+  "gas FVF"
+ ],
+ "oil PV0": [
+  "initial PV",
+  "oil"
+ ],
+ "gas PV0": [
+  "initial PV",
+  "gas"
+ ],
+ "HCPV0": [
+  "initial PV",
+  "HC"
+ ],
+ "gas/HC PV0": [
+  "initial PV",
+  "gas/HC"
+ ],
+ "produced oil PV": [
+  "released PV0 (Mm3)",
+  "oil"
+ ],
+ "produced gas PV": [
+  "released PV0 (Mm3)",
+  "gas"
+ ],
+ "produced HCPV": [
+  "released PV0 (Mm3)",
+  "HCPV"
+ ],
+ "CO2 SC indicator": [
+  "SC indicators",
+  "CO2 (Mt)"
+ ],
+ "H2 SC indicator": [
+  "SC indicators",
+  "H2 (Mt)"
+ ],
+ "CO2 SC/well num": [
+  "CO2 SC/well num",
+  ""
+ ],
+ "total score": [
+  "scores",
+  "total"
+ ]
+}
