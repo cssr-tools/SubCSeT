@@ -82,7 +82,7 @@ app = Dash(
 
 c_inp_fldr = dbc.Input(
     id='inp_fldr', type='text',
-    value=r'C:\Users\alkh\OneDrive - NORCE\CSSR\screening\codes\data\_main.csv'
+    value=r'./data/_main.csv'
 )
 
 c_mtable = DataTable(id='mtable', data=[], selected_rows=[])
@@ -186,7 +186,7 @@ app.layout = html.Div([
 )
 def initial_setup(path2csv):
 
-    with open(r'.\data\_main_columns.json', 'r') as f:
+    with open(r'./data/_main_columns.json', 'r') as f:
         FANCY_CLMNS = json.load(f)
 
     df = pd.read_csv(path2csv)

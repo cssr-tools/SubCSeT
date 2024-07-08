@@ -1,10 +1,10 @@
 .vscode/
 .ipynb_checkpoints/
 figures/
+__pycache__/
 
-playgroung.py
-for_testing.py
-pyrestoolbox_test.ipynb
+*test*.ipynb
+*test*.py
 
 *.xlsx
 *.html

@@ -5,7 +5,7 @@ import npd_wraper as npd
 import colorsys
 
 def get_production_monthly(update=False, use_npd_wraper=False):
-    p = r'.\data\production_monthly.csv'
+    p = r'./data/production_monthly.csv'
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:
@@ -23,7 +23,7 @@ def get_production_monthly(update=False, use_npd_wraper=False):
     return df
 
 def get_production_yearly(update=False, use_npd_wraper=False):
-    p = r'.\data\production_yearly.csv'
+    p = r'./data/production_yearly.csv'
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:
@@ -38,7 +38,7 @@ def get_production_yearly(update=False, use_npd_wraper=False):
     return df
 
 def get_field_inplace_volumes(update=False, use_npd_wraper=False):
-    p = r'.\data\inplace_volumes.csv'
+    p = r'./data/inplace_volumes.csv'
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:
@@ -52,7 +52,7 @@ def get_field_inplace_volumes(update=False, use_npd_wraper=False):
     return df
 
 def get_field_reserves(update=False, use_npd_wraper=False):
-    p = r'.\data\reserves.csv'
+    p = r'./data/reserves.csv'
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:
@@ -67,7 +67,7 @@ def get_field_reserves(update=False, use_npd_wraper=False):
 
 
 def get_all_wells(update=False):
-    p = r'.\data\wells_all.csv'
+    p = r'./data/wells_all.csv'
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:
@@ -77,7 +77,7 @@ def get_all_wells(update=False):
     return df
 
 def get_development_wells(update=False, use_npd_wraper=False):
-    p = r'.\data\wells_dev.csv'
+    p = r'./data/wells_dev.csv'
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:
@@ -91,7 +91,7 @@ def get_development_wells(update=False, use_npd_wraper=False):
     return df
 
 def get_exploration_wells(update=False, use_npd_wraper=False):
-    p = r'.\data\exploration_wells.csv'
+    p = r'./data/exploration_wells.csv'
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:
@@ -104,7 +104,7 @@ def get_exploration_wells(update=False, use_npd_wraper=False):
     return df
 
 def get_wells_with_dst(update=False, use_npd_wraper=False):
-    p = r'.\data\wells_with_dst.csv'
+    p = r'./data/wells_with_dst.csv'
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:
@@ -117,7 +117,7 @@ def get_wells_with_dst(update=False, use_npd_wraper=False):
     return df 
 
 def get_field_status(update=False):
-    p = r'.\data\field_status.csv'
+    p = r'./data/field_status.csv'
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:    
@@ -127,7 +127,7 @@ def get_field_status(update=False):
     return df
 
 def get_field_overview(update=False):
-    p = r'.\data\field_overview.csv'
+    p = r'./data/field_overview.csv'
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:    
@@ -137,7 +137,7 @@ def get_field_overview(update=False):
     return df
 
 def get_field_description(update=False):
-    p = r'.\data\field_description.csv'
+    p = r'./data/field_description.csv'
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:
