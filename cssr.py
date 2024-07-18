@@ -15,9 +15,9 @@ def get_production_monthly(update=False, use_npd_wraper=False):
             # runs MUCH faster!!!
             # generic way to import
             # monthly by field saleable
-            pp=r"https://factpages.npd.no/ReportServer_npdpublic?/FactPages/tableview/field_production_monthly&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false"
+            pp=r"https://factpages.sodir.no/public?/Factpages/external/tableview/field_production_monthly&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false"
             # sum wellbores monthly by field
-            # pp = r"https://factpages.npd.no/ReportServer_npdpublic?/FactPages/tableview/field_production_gross_monthly&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false"
+            # pp = r"https://factpages.sodir.no/public?/Factpages/external/tableview/field_production_gross_monthly&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false"
             df = pd.read_csv(pp)
         df.to_csv(p)
     return df
@@ -32,7 +32,7 @@ def get_production_yearly(update=False, use_npd_wraper=False):
             df.to_csv(p)
         else:
             # runs MUCH faster!!!  
-            pp=r"https://factpages.npd.no/ReportServer_npdpublic?/FactPages/tableview/field_production_yearly&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false"
+            pp=r"https://factpages.sodir.no/public?/Factpages/external/tableview/field_production_yearly&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false"
             df = pd.read_csv(pp)
         df.to_csv(p)
     return df
@@ -46,7 +46,7 @@ def get_field_inplace_volumes(update=False, use_npd_wraper=False):
             df = npd.field().get_field_inplace_volume()
             df.to_csv(p)
         else:
-            pp=r"https://factpages.npd.no/ReportServer_npdpublic?/FactPages/tableview/field_in_place_volumes&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false"
+            pp=r"https://factpages.sodir.no/public?/Factpages/external/tableview/field_in_place_volumes&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false"
             df = pd.read_csv(pp)
         df.to_csv(p)            
     return df
@@ -60,7 +60,7 @@ def get_field_reserves(update=False, use_npd_wraper=False):
             df = npd.field().get_field_reserves()
             df.to_csv(p)
         else:
-            pp=r"https://factpages.npd.no/ReportServer_npdpublic?/FactPages/tableview/field_reserves&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false"
+            pp=r"https://factpages.sodir.no/public?/Factpages/external/tableview/field_reserves&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false"
             df = pd.read_csv(pp)
         df.to_csv(p) 
     return df
@@ -85,7 +85,7 @@ def get_development_wells(update=False, use_npd_wraper=False):
             df = npd.well_data().get_development_wells()
             df.to_csv(p)
         else: 
-            pp=r"https://factpages.npd.no/ReportServer_npdpublic?/FactPages/tableview/wellbore_development_all&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false"
+            pp=r"https://factpages.sodir.no/public?/Factpages/external/tableview/wellbore_development_all&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false"
             df = pd.read_csv(pp)
         df.to_csv(p) 
     return df
@@ -98,7 +98,7 @@ def get_exploration_wells(update=False, use_npd_wraper=False):
         if use_npd_wraper:  
             df = npd.well_data().get_exploration_wells()
         else:
-            pp=r"https://factpages.npd.no/ReportServer_npdpublic?/FactPages/tableview/wellbore_exploration_all&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false"
+            pp=r"https://factpages.sodir.no/public?/Factpages/external/tableview/wellbore_exploration_all&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false"
             df = pd.read_csv(pp)
         df.to_csv(p)
     return df
@@ -111,7 +111,7 @@ def get_wells_with_dst(update=False, use_npd_wraper=False):
         if use_npd_wraper:  
             df = npd.well_data().get_wells_with_dst()
         else:
-            pp=r"https://factpages.npd.no/ReportServer_npdpublic?/FactPages/tableview/wellbore_dst&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false"            
+            pp=r"https://factpages.sodir.no/public?/Factpages/external/tableview/wellbore_dst&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false"            
             df = pd.read_csv(pp)
         df.to_csv(p)
     return df 
@@ -121,7 +121,7 @@ def get_field_status(update=False):
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:    
-        pp = r'https://factpages.npd.no/ReportServer_npdpublic?/FactPages/tableview/field_activity_status_hst&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false'
+        pp = r'https://factpages.sodir.no/public?/Factpages/external/tableview/field_activity_status_hst&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false'
         df = pd.read_csv(pp)
         df.to_csv(p)
     return df
@@ -141,7 +141,7 @@ def get_field_description(update=False):
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:
-        pp = r'https://factpages.npd.no/ReportServer_npdpublic?/FactPages/tableview/field_description&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false'
+        pp = r'https://factpages.sodir.no/public?/Factpages/external/tableview/field_description&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false'
         df = pd.read_csv(pp)
         df.to_csv(p)
     return df
