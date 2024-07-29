@@ -10,6 +10,7 @@ __pycache__/
 
 *.xlsx
 *.html
+temp.csv
 
 #  temporarily
 data/
