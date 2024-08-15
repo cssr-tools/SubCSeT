@@ -98,7 +98,7 @@ c_wtable = html.Div(c_wtable, id='wtable_div')
 map = dcc.Graph(
     id='map',
     style={
-        'height': '99.5vh',
+        'height': '90vh',
         'padding': '0.25vw'
     },
     config={'displayModeBar': True}
@@ -152,6 +152,16 @@ c_toolbar = dbc.Stack([
     direction="horizontal"
 )
 
+c_tabs = dbc.Tabs([
+    dbc.Tab(map, label='MAP', 
+            active_tab_style={"fontWeight": "bold"},
+            style={"flex": "1", "height": "100%"}
+            ),
+    dbc.Tab(label='SCATTER', 
+            active_tab_style={"fontWeight": "bold"})
+], 
+# style={"flex": "1", "height": "100%"}
+)
 
 app.layout = html.Div([
     dbc.Row([
@@ -159,15 +169,17 @@ app.layout = html.Div([
                  c_wtable,
                  c_toolbar, 
                  c_mtable], width=6),
-        dbc.Col(map, width=6)
+        dbc.Col(c_tabs, width=6)
     ],
-        className="g-0"
+        className="g-0",
+        # style={"flex": "1", "height": "100%"}
     ),
     dcc.Store(id='store'),
 ],
-    style={'display': 'grid', 'width': '100vw',
+    style={'display': 'grid', 
            # to account for scrollbars
-           # 'width': 'calc(100vw - (100vw - 100%))'
+           'width': 'calc(100vw - (100vw - 100%))',
+           'height': 'calc(100vh - (100vh - 100%))',
            },
     className="dbc"
 )
@@ -262,11 +274,12 @@ def initial_setup(path2csv):
         page_action="native", page_current=0,
         hidden_columns=[
             '#','FactPageUrl', 'reservoir', 
-            'reservoir quality','faulted',
+            'res. quality','faulted',
             'recovery', 'fldID', 'GOR'
             'size', 'lat', 'lon',
-            'depth min',  'depth mean', 'depth median', 'depth max'
+            'depth min',  'depth mean', 'depth median', 'depth max',
             'year',
+            'field',
             'net oil yearly pr.',
             'net gas yearly pr.'
             'net NGL yearly pr.',
@@ -277,7 +290,8 @@ def initial_setup(path2csv):
             ],
 
         style_table={
-            'height': '60vh',
+            # 'height': '60vh',
+            'height': '55vh',
             # 'height': 'auto',
             # 'width': 'auto',
             'width': '50vw', 
@@ -473,6 +487,6 @@ def update(n, color, size, invert, sel_rows, records, records2):
 
 if __name__ == '__main__':
     app.title = 'CSSR screening'
-    # app.run_server(debug=True)
-    app.run_server(debug=False)  # should be False for deployment
+    app.run_server(debug=True)
+    # app.run_server(debug=False)  # should be False for deployment
 # %%
