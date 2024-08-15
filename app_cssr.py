@@ -155,7 +155,7 @@ c_toolbar = dbc.Stack([
 c_tabs = dbc.Tabs([
     dbc.Tab(map, label='MAP', 
             active_tab_style={"fontWeight": "bold"},
-            style={"flex": "1", "height": "100%"}
+            # style={"flex": "1", "height": "100%"}
             ),
     dbc.Tab(label='SCATTER', 
             active_tab_style={"fontWeight": "bold"})
