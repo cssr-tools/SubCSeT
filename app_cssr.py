@@ -92,6 +92,7 @@ c_mtable = html.Div(c_mtable, id='mtable_div')
 
 c_wtable = DataTable(id='wtable', columns=[], data=[], editable=True)
 c_wtable = html.Div(c_wtable, id='wtable_div')
+# c_wtable = dbc.Collapse(c_wtable, id='wtable_div')
 
 
 # %%
@@ -107,6 +108,13 @@ c_b_save = dbc.Button(
     'save selected', id='save_button', n_clicks=0,
     className="me-1", size='md',
 )
+
+# c_wtable_show = dbc.Button(
+#     'show weight table', id='update', n_clicks=0,
+#     color='danger',
+#     className="me-1", size='md',
+#     # style={'width': '30%'}
+# )
 
 c_b_update = dbc.Button(
     'update', id='update', n_clicks=0,
@@ -164,18 +172,18 @@ c_tabs = dbc.Tabs([
     dbc.Tab(c_map_tab, 
             label='MAP', 
             active_tab_style={"fontWeight": "bold"},
-            # style={"flex": "1", "height": "100%"}
             ),
-    dbc.Tab(label='SCATTER', 
+    dbc.Tab(label='SCATTER PLOT', 
+            active_tab_style={"fontWeight": "bold"}),
+    dbc.Tab(c_wtable, label='SCORING RULES',
             active_tab_style={"fontWeight": "bold"})
-], 
+    ], 
 # style={"flex": "1", "height": "100%"}
 )
 
 app.layout = html.Div([
     dbc.Row([
-        dbc.Col([c_wtable,
-                 c_toolbar, 
+        dbc.Col([c_toolbar, 
                  c_mtable], width=6),
         dbc.Col(c_tabs, width=6)
     ],
@@ -287,7 +295,7 @@ def initial_setup(path2csv):
             'size', 'lat', 'lon',
             'depth min',  'depth mean', 'depth median', 'depth max',
             'year',
-            'field',
+            # 'field',
             'net oil yearly pr.',
             'net gas yearly pr.'
             'net NGL yearly pr.',
@@ -298,8 +306,7 @@ def initial_setup(path2csv):
             ],
 
         style_table={
-            # 'height': '60vh',
-            'height': '55vh',
+            'height': '90vh',
             # 'height': 'auto',
             # 'width': 'auto',
             'width': '50vw', 
@@ -320,7 +327,9 @@ def initial_setup(path2csv):
         #         'color': 'black'
         #     }
         # ],        
-        style_cell={'fontSize': 14, 'whiteSpace': 'normal'}
+        style_cell={'fontSize': 14, 
+                    'textAlign': 'center',
+                    'whiteSpace': 'normal'}
     )
 
 
@@ -339,8 +348,6 @@ def initial_setup(path2csv):
         data=[{'parameter': None, 'weight': None}]*5,
         dropdown=dropdowns, editable=True
     )
-
-
     return mtable, wtable, 1, clmn_names, 'CO2 SC indicator', clmn_names, 'field'
 
 
