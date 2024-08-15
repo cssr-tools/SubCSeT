@@ -155,6 +155,7 @@ c_toolbar = dbc.Stack([
     dbc.Tooltip('add all filtered rows to selection', target='select'),
     dbc.Tooltip('deselect all', target='deselect'),
     dbc.Tooltip('reopen chart in new tab', target='reopen'),
+    c_inp_fldr
 ],
     direction="horizontal"
 )
@@ -173,8 +174,7 @@ c_tabs = dbc.Tabs([
 
 app.layout = html.Div([
     dbc.Row([
-        dbc.Col([c_inp_fldr, 
-                 c_wtable,
+        dbc.Col([c_wtable,
                  c_toolbar, 
                  c_mtable], width=6),
         dbc.Col(c_tabs, width=6)
