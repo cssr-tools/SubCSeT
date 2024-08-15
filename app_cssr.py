@@ -95,11 +95,10 @@ c_wtable = html.Div(c_wtable, id='wtable_div')
 
 
 # %%
-map = dcc.Graph(
+c_map = dcc.Graph(
     id='map',
     style={
         'height': '90vh',
-        'padding': '0.25vw'
     },
     config={'displayModeBar': True}
 )
@@ -129,22 +128,30 @@ c_toolbar = dbc.ButtonGroup([
                ),
 ])
 
-# c_toolbar = dbc.Card(c_toolbar)
+c_map_tab = html.Div([
+# dbc.Stack([
+    # controls
+    dbc.Stack([
+        c_b_update,
+        dbc.InputGroup([
+            dbc.InputGroupText('size'),
+            dbc.Select(id='dd_size'),
+            ], style={'width': '30%'}),
+        dbc.InputGroup([
+            dbc.InputGroupText('color'),
+            dbc.Select(id='dd_color'),
+            ], style={'width': '30%'}
+            ),
+        dbc.Checkbox(id='chbx_invert', 
+                     label="invert", 
+                     value=False)
+        ], direction="horizontal"),
+    c_map, # map itself
+])
+
 
 c_toolbar = dbc.Stack([
-    c_toolbar,
-    c_b_update,
-    dbc.InputGroup([
-        dbc.InputGroupText('size'),
-        dbc.Select(id='dd_size'),
-    ], style={'width': '30%'}),
-    dbc.InputGroup([
-        dbc.InputGroupText('color'),
-        dbc.Select(id='dd_color'),
-    ],
-        style={'width': '30%'}
-    ),
-    dbc.Checkbox(id='chbx_invert', label="invert", value=False),
+    c_toolbar,    
     dbc.Tooltip('add all filtered rows to selection', target='select'),
     dbc.Tooltip('deselect all', target='deselect'),
     dbc.Tooltip('reopen chart in new tab', target='reopen'),
@@ -153,7 +160,8 @@ c_toolbar = dbc.Stack([
 )
 
 c_tabs = dbc.Tabs([
-    dbc.Tab(map, label='MAP', 
+    dbc.Tab(c_map_tab, 
+            label='MAP', 
             active_tab_style={"fontWeight": "bold"},
             # style={"flex": "1", "height": "100%"}
             ),
