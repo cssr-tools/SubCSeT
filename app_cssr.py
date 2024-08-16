@@ -25,6 +25,7 @@ from datetime import datetime, timedelta
 import json
 import warnings
 import cssr
+import webbrowser
 
 # %% constants
 themes_templates =\
@@ -120,7 +121,7 @@ c_map_b_update = dbc.Button(
     'update', id='update_map', n_clicks=0,
     color='danger',
     className="me-1", size='md',
-    style={'width': '10%'}
+    # style={'width': '10%'}
 )
 
 c_toolbar = dbc.ButtonGroup([
@@ -141,17 +142,21 @@ c_map_tab = html.Div([
         c_map_b_update,
         dbc.InputGroup([
             dbc.InputGroupText('size'),
-            dbc.Select(id='map_dd_size'),
+            dbc.Select(id='map_dd_size', value='CO2 SC'),
+            dbc.Button(html.I(className="bi bi-x-square"),
+                       size='md', outline=True, id='map_size_reset'),
             ], style={'width': '30%'}),
         dbc.InputGroup([
             dbc.InputGroupText('color'),
-            dbc.Select(id='map_dd_color'),
+            dbc.Select(id='map_dd_color', value='field'),
+            # dbc.Button(html.I(className="bi bi-x-square"),
+            #            size='md', outline=True, id='map_color_reset'),            
             ], style={'width': '30%'}
             ),
         dbc.Checkbox(id='map_chbx_invert', 
-                     label="invert", 
+                     label="invert", style={'alignSelf': 'center'},
                      value=False)
-        ], direction="horizontal"),
+        ], gap=3, direction="horizontal"),
     c_map, # map itself
 ])
 
@@ -198,14 +203,18 @@ c_sc_tab = html.Div([
         dbc.InputGroup([
             dbc.InputGroupText('size'),
             dbc.Select(id='sc_dd_size',value='CO2 SC'),
+            dbc.Button(html.I(className="bi bi-x-square"),
+                       size='md', outline=True, id='sc_size_reset'),            
             ], 
-            style={'width': '20%'}
+            style={'width': '25%'}
             ),
         dbc.InputGroup([
             dbc.InputGroupText('color'),
             dbc.Select(id='sc_dd_color',value='q_resv'),
+            dbc.Button(html.I(className="bi bi-x-square"),
+                       size='md', outline=True, id='sc_color_reset'),
             ], 
-            style={'width': '20%'}
+            style={'width': '25%'}
             ),
         # dbc.Checkbox(id='sc_chbx_invert', 
         #              label="invert", 
@@ -238,6 +247,7 @@ app.layout = html.Div([
         # style={"flex": "1", "height": "100%"}
     ),
     dcc.Store(id='store'),
+    html.Div(id='dummy_output', hidden=True)
 ],
     style={'display': 'grid', 
            # to account for scrollbars
@@ -253,9 +263,9 @@ app.layout = html.Div([
     Output('wtable_div', 'children'),
     Output('update_map', 'n_clicks'),
     Output('map_dd_size', 'options'),
-    Output('map_dd_size', 'value'),
+    # Output('map_dd_size', 'value'),
     Output('map_dd_color', 'options'),
-    Output('map_dd_color', 'value'),
+    # Output('map_dd_color', 'value'),
     
     Output('sc_dd_x', 'options'),
     Output('sc_dd_y', 'options'),
@@ -279,6 +289,12 @@ def initial_setup(path2csv):
 
     all_clmns = {i: ["", i, ""] for i in df.columns}
     all_clmns = {**all_clmns, **FANCY_CLMNS}
+
+    # enumerating columns
+    for n,i in enumerate(all_clmns):
+        foo = all_clmns[i]
+        if len(foo)==2: foo.append("") 
+        foo.append(str(n+1))
 
     # # Determine which DataFrame columns are not in the priority list
     # priority_columns = [i for i in FANCY_CLMNS if i in df.columns]     
@@ -346,7 +362,6 @@ def initial_setup(path2csv):
             'size', 'lat', 'lon',
             'depth min',  'depth mean', 'depth median', 'depth max',
             'year',
-            # 'field',
             'net oil yearly pr.',
             'net gas yearly pr.'
             'net NGL yearly pr.',
@@ -404,11 +419,9 @@ def initial_setup(path2csv):
     num_clmns = df.select_dtypes(include=['number','bool']).columns
 
     return mtable, wtable, 1, \
-        num_clmns, 'CO2 SC', all_clmns, 'field',\
+        num_clmns, all_clmns, \
         num_clmns, num_clmns, num_clmns, all_clmns #
         
-
-
 # %% select/deselect
 @app.callback(
     Output('mtable', 'selected_rows'),
@@ -502,29 +515,29 @@ def update_map(n, color, size, invert, sel_rows, records, records2):
             ind = df[color] == i
             df.loc[ind, 'color'] = clr
 
-    df['size'] = df[size]**0.5
-    df['size'] = 5 + 95*(df['size'] - df['size'].min())/(df['size'].max())
+    if size is None:
+        df['size'] = 10
+    else:
+        df['size'] = df[size]**0.5
+        df['size'] = 5 + 95*(df['size'] - df['size'].min())/(df['size'].max())
 
     for i in df.index:
         row = df.loc[i, :]
         url=row['FactPageUrl']
+        sz = f"{size}: {row[size]}<br>" if size is not None else ""
         fig.add_trace(
             go.Scattermapbox(
-                lat=[row['lat']],
-                lon=[row['lon']],
-                mode='markers',
-                name=row['field'],
-                # text=f"{row[color]}</b>{size}: {row[size]}"+\
-                #     f"</b>{color}:{row[color]}",
-                legendgroup='fields',
-                legendgrouptitle_text='fields',
-                # hoverinfo=['name',color,size],
-                # hoverinfo='text',
+                lat=[row['lat']], lon=[row['lon']],
+                mode='markers', name=row['field'],
+                legendgroup='fields', legendgrouptitle_text='fields',
+                customdata=[url],
                 hovertemplate=  # f"%{name}<br>"+
                 f"{row['field']}<br>" +
-                f"{size}: {row[size]}<br>" +
+                sz +
                 f"{color}: {row[color]}<br>" +
-                # rf"URL:  {url}"+
+                "click to open<br>"+
+                "field's page on<br>"+
+                "sodir.no<br>"+
                 "<extra></extra>",
                 marker={'size': row['size'], 'opacity': .5,
                         'symbol': 'circle',
@@ -579,20 +592,68 @@ def update_sc(n, x, y, color, size, sel_rows, records):
     
     df = df.loc[sel_rows, :]
 
-    df['s'] = 1
-    df['s'] = df[size]#.copy()
-    df.s = df.s**0.5
-    # df.s = 1 + 95*(df.s - df.s.min())/(df.s.max())
-    df.s = df.s.round(2)
+    size_max = 10
+    if size is not None:  
+        df['s'] = 1
+        df['s'] = df[size]
+        df.s = df.s**0.5
+        # df.s = 1 + 95*(df.s - df.s.min())/(df.s.max())
+        df.s = df.s.round(2)
+        size_max = 50
+        size = df.s
 
     fig=px.scatter(
-        df, x=x, y=y, color=color, size='s', size_max=50,
+        df, x=x, y=y, color=color, size=size, size_max=size_max,
         template='plotly_white', color_continuous_scale='rainbow',
-        hover_data=['field', x, y, color, size, 's']
+        hover_data=['field', x, y, color, size]
         )    
 
     return fig
 
+@app.callback(
+    Output('map_dd_size', 'value'),
+    Input('map_size_reset', 'n_clicks'),
+    prevent_initial_call=True
+)
+def map_size_reset(n):
+    return None
+
+# @app.callback(
+#     Output('map_dd_color', 'value'),
+#     Input('map_color_reset', 'n_clicks'),
+#     prevent_initial_call=True
+# )
+# def map_color_reset(n):
+#     return None
+
+@app.callback(
+    Output('sc_dd_size', 'value'),
+    Input('sc_size_reset', 'n_clicks'),
+    prevent_initial_call=True
+)
+def sc_size_reset(n):
+    return None
+
+@app.callback(
+    Output('sc_dd_color', 'value'),
+    Input('sc_color_reset', 'n_clicks'),
+    prevent_initial_call=True
+)
+def sc_color_reset(n):
+    return None
+
+
+# opens sodir.no field page on click
+@app.callback(
+    Output('dummy_output', 'children'), # dummy output
+    Input('map', 'clickData'),
+    prevent_initial_call=True
+)
+def mlp_copy_clickData(clickData):
+    # print(clickData)
+    if clickData is not None:
+        webbrowser.open(clickData['points'][0]['customdata'])
+    return ""
 
 if __name__ == '__main__':
     app.title = 'CSSR screening'
