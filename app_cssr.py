@@ -16,6 +16,7 @@ import dash_bootstrap_components as dbc
 from dash import callback_context
 from dash import dcc
 from dash import Dash
+from copy import deepcopy
 import time
 import pandas as pd
 import os
@@ -94,7 +95,6 @@ c_wtable = DataTable(id='wtable', columns=[], data=[], editable=True)
 c_wtable = html.Div(c_wtable, id='wtable_div')
 # c_wtable = dbc.Collapse(c_wtable, id='wtable_div')
 
-
 # %%
 c_map = dcc.Graph(
     id='map',
@@ -116,11 +116,11 @@ c_b_save = dbc.Button(
 #     # style={'width': '30%'}
 # )
 
-c_b_update = dbc.Button(
-    'update', id='update', n_clicks=0,
+c_map_b_update = dbc.Button(
+    'update', id='update_map', n_clicks=0,
     color='danger',
     className="me-1", size='md',
-    # style={'width': '30%'}
+    style={'width': '10%'}
 )
 
 c_toolbar = dbc.ButtonGroup([
@@ -137,20 +137,18 @@ c_toolbar = dbc.ButtonGroup([
 ])
 
 c_map_tab = html.Div([
-# dbc.Stack([
-    # controls
     dbc.Stack([
-        c_b_update,
+        c_map_b_update,
         dbc.InputGroup([
             dbc.InputGroupText('size'),
-            dbc.Select(id='dd_size'),
+            dbc.Select(id='map_dd_size'),
             ], style={'width': '30%'}),
         dbc.InputGroup([
             dbc.InputGroupText('color'),
-            dbc.Select(id='dd_color'),
+            dbc.Select(id='map_dd_color'),
             ], style={'width': '30%'}
             ),
-        dbc.Checkbox(id='chbx_invert', 
+        dbc.Checkbox(id='map_chbx_invert', 
                      label="invert", 
                      value=False)
         ], direction="horizontal"),
@@ -167,13 +165,62 @@ c_toolbar = dbc.Stack([
 ],
     direction="horizontal"
 )
+#%% scatter plot
+c_sc_b_update = dbc.Button(
+    'update', id='update_sc', n_clicks=0,
+    color='danger', className="me-1", size='md',
+    style={'width': '10%'}
+)
 
+c_sc = dcc.Graph(
+    id='sc',
+    style={
+        'height': '90vh',
+    },
+    config={'displayModeBar': True}
+)
+
+c_sc_tab = html.Div([
+    dbc.Stack([
+        c_sc_b_update,
+        dbc.InputGroup([
+            dbc.InputGroupText('X'),
+            dbc.Select(id='sc_dd_x',value='lon'),
+            ], 
+            style={'width': '20%'}
+            ),  
+        dbc.InputGroup([
+            dbc.InputGroupText('Y'),
+            dbc.Select(id='sc_dd_y',value='lat'),
+            ], 
+            style={'width': '20%'}
+            ),              
+        dbc.InputGroup([
+            dbc.InputGroupText('size'),
+            dbc.Select(id='sc_dd_size',value='CO2 SC'),
+            ], 
+            style={'width': '20%'}
+            ),
+        dbc.InputGroup([
+            dbc.InputGroupText('color'),
+            dbc.Select(id='sc_dd_color',value='q_resv'),
+            ], 
+            style={'width': '20%'}
+            ),
+        # dbc.Checkbox(id='sc_chbx_invert', 
+        #              label="invert", 
+        #              value=False)
+        ], direction="horizontal"),
+    c_sc
+])
+
+#%%
 c_tabs = dbc.Tabs([
     dbc.Tab(c_map_tab, 
             label='MAP', 
             active_tab_style={"fontWeight": "bold"},
             ),
-    dbc.Tab(label='SCATTER PLOT', 
+    dbc.Tab(c_sc_tab, label='SCATTER PLOT', 
             active_tab_style={"fontWeight": "bold"}),
     dbc.Tab(c_wtable, label='SCORING RULES',
             active_tab_style={"fontWeight": "bold"})
@@ -204,11 +251,17 @@ app.layout = html.Div([
 @app.callback(
     Output('mtable_div', 'children'),
     Output('wtable_div', 'children'),
-    Output('update', 'n_clicks'),
-    Output('dd_size', 'options'),
-    Output('dd_size', 'value'),
-    Output('dd_color', 'options'),
-    Output('dd_color', 'value'),
+    Output('update_map', 'n_clicks'),
+    Output('map_dd_size', 'options'),
+    Output('map_dd_size', 'value'),
+    Output('map_dd_color', 'options'),
+    Output('map_dd_color', 'value'),
+    
+    Output('sc_dd_x', 'options'),
+    Output('sc_dd_y', 'options'),
+    Output('sc_dd_size', 'options'),
+    Output('sc_dd_color', 'options'),
+    
     Input('inp_fldr', 'value'),  # ! temp
     # prevent_initial_call=True
 )
@@ -247,9 +300,9 @@ def initial_setup(path2csv):
                 'rem. NGL', 'rem. cond.',
                 'RF oil', 'RF gas', 'gas FVF', 'oil FVF',
                 'maturity oil', 'maturity gas', 'inj. score',
-                'CO2 SC indicator', 'H2 SC indicator', 
+                'CO2 SC', 'H2 SC', 
                 'produced oil PV', 'produced gas PV',
-                'produced HCPV', 'CO2 SC indicator', 'H2 SC indicator'
+                'produced HCPV', 'CO2 SC', 'H2 SC'
                 ]:
         
         if not col in df.columns:
@@ -348,7 +401,9 @@ def initial_setup(path2csv):
         data=[{'parameter': None, 'weight': None}]*5,
         dropdown=dropdowns, editable=True
     )
-    return mtable, wtable, 1, clmn_names, 'CO2 SC indicator', clmn_names, 'field'
+    return mtable, wtable, 1, clmn_names, 'CO2 SC', clmn_names, 'field',\
+    clmn_names,clmn_names,clmn_names,clmn_names
+        
 
 
 # %% select/deselect
@@ -394,16 +449,16 @@ def reopen_current_chart(n, fig):
 @app.callback(
     Output('map', 'figure'),
     Output('mtable', 'data'),
-    Input('update', 'n_clicks'),
-    Input('dd_color', 'value'),
-    Input('dd_size', 'value'),
-    Input('chbx_invert', 'value'),    
+    Input('update_map', 'n_clicks'),
+    Input('map_dd_color', 'value'),
+    Input('map_dd_size', 'value'),
+    Input('map_chbx_invert', 'value'),    
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
     State('wtable', 'data'),
     # prevent_initial_call=True
 )
-def update(n, color, size, invert, sel_rows, records, records2):
+def update_map(n, color, size, invert, sel_rows, records, records2):
 
     fig = go.Figure()
     df = pd.DataFrame(data=records)
@@ -498,6 +553,42 @@ def update(n, color, size, invert, sel_rows, records, records2):
     fig.update_geos(fitbounds="locations")
 
     return fig, df0.to_dict('records')
+
+@app.callback(
+    Output('sc', 'figure'),
+    Input('update_sc', 'n_clicks'),
+    Input('sc_dd_x', 'value'),    
+    Input('sc_dd_y', 'value'),    
+    Input('sc_dd_color', 'value'),
+    Input('sc_dd_size', 'value'),
+    State('mtable', 'selected_rows'),
+    State('mtable', 'data'),
+    # State('wtable', 'data'),
+    prevent_initial_call=True
+)
+def update_sc(n, x, y, color, size, sel_rows, records):
+    
+    df = pd.DataFrame(data=records)
+
+    if sel_rows is None or sel_rows == []:
+        print('PreventUpdate!')
+        return go.Figure()
+    
+    df = df.loc[sel_rows, :]
+
+    df['s'] = 1
+    df['s'] = df[size]#.copy()
+    df.s = df.s**0.5
+    # df.s = 1 + 95*(df.s - df.s.min())/(df.s.max())
+    df.s = df.s.round(2)
+
+    fig=px.scatter(
+        df, x=x, y=y, color=color, size='s', size_max=50,
+        template='plotly_white', color_continuous_scale='rainbow',
+        hover_data=['field', x, y, color, size, 's']
+        )    
+
+    return fig
 
 
 if __name__ == '__main__':
