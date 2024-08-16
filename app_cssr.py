@@ -277,7 +277,7 @@ def initial_setup(path2csv):
     if 'total score' in df.columns:
         df['total score'] = None
 
-    all_clmns = {i: ["", i] for i in df.columns}
+    all_clmns = {i: ["", i, ""] for i in df.columns}
     all_clmns = {**all_clmns, **FANCY_CLMNS}
 
     # # Determine which DataFrame columns are not in the priority list
@@ -286,8 +286,6 @@ def initial_setup(path2csv):
     # # Combine the lists, with priority columns first, then others
     # new_column_order = priority_columns + other_columns
     # df = df[new_column_order]
-
-    clmn_names = list(all_clmns.keys())
 
     clmns = []
     for k, v in all_clmns.items():
@@ -362,7 +360,8 @@ def initial_setup(path2csv):
             'height': '90vh',
             # 'height': 'auto',
             # 'width': 'auto',
-            'width': '50vw', 
+            'width': '49.5vw', 
+            # 'width': 'calc(50vw - (50vw - 100%))',
             'overflowX': 'auto', 
             'overflowY': 'auto'
         },
@@ -385,7 +384,6 @@ def initial_setup(path2csv):
                     'whiteSpace': 'normal'}
     )
 
-
     clmns = [{'name': i, 'id': i} for i in ['parameter', 'weight']]
     clmns[0]['presentation'] = 'dropdown'
     clmns[1]['type'] = 'numeric'
@@ -401,8 +399,13 @@ def initial_setup(path2csv):
         data=[{'parameter': None, 'weight': None}]*5,
         dropdown=dropdowns, editable=True
     )
-    return mtable, wtable, 1, clmn_names, 'CO2 SC', clmn_names, 'field',\
-    clmn_names,clmn_names,clmn_names,clmn_names
+
+    all_clmns = list(df.columns)
+    num_clmns = df.select_dtypes(include=['number','bool']).columns
+
+    return mtable, wtable, 1, \
+        num_clmns, 'CO2 SC', all_clmns, 'field',\
+        num_clmns, num_clmns, num_clmns, all_clmns #
         
 
 
