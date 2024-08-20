@@ -127,15 +127,38 @@ c_map_b_update = dbc.Button(
 c_toolbar = dbc.ButtonGroup([
     dbc.Button(html.I(className="bi bi-check2-square"),
                #    outline=True,
-               size='md', id='select'),
+               size='md', id='b_select'),
     dbc.Button(html.I(className="bi bi-x-square"),
                #    outline=True,
-               size='md', id='deselect'),
+               size='md', id='b_deselect'),
     dbc.Button(html.I(className="bi bi-box-arrow-up-right"),
                #    outline=True,
-               id='reopen', size='md',
+               id='b_reopen', size='md',
                ),
+    dbc.Button(html.I(
+        className="bi bi-question-lg"
+        # className="bi bi-question-square"
+        ),
+        # outline=True, 
+        id='b_help', size='md'),               
 ])
+
+c_help=dbc.Modal([
+    # dbc.ModalHeader(dbc.ModalTitle('help')),
+    dbc.ModalBody(dcc.Markdown(id='help_markdown')),
+    ], id='help', is_open=False, size='lg', scrollable=True)
+
+c_help=dbc.Offcanvas(dcc.Markdown(id='help_markdown'),
+                     id='help', is_open=False, scrollable=True)
+
+
+@app.callback(
+    Output('help', 'is_open'),
+    Input('b_help', 'n_clicks'),
+    prevent_initial_call=True,
+)
+def open_import_saphir_help(n):
+    return True
 
 c_map_tab = html.Div([
     dbc.Stack([
@@ -163,10 +186,11 @@ c_map_tab = html.Div([
 
 c_toolbar = dbc.Stack([
     c_toolbar,    
-    dbc.Tooltip('add all filtered rows to selection', target='select'),
-    dbc.Tooltip('deselect all', target='deselect'),
-    dbc.Tooltip('reopen chart in new tab', target='reopen'),
-    c_inp_fldr
+    dbc.Tooltip('add all filtered rows to selection', target='b_select'),
+    dbc.Tooltip('deselect all', target='b_deselect'),
+    dbc.Tooltip('reopen chart in new tab', target='b_reopen'),
+    c_inp_fldr,
+    c_help
 ],
     direction="horizontal"
 )
@@ -263,22 +287,26 @@ app.layout = html.Div([
     Output('wtable_div', 'children'),
     Output('update_map', 'n_clicks'),
     Output('map_dd_size', 'options'),
-    # Output('map_dd_size', 'value'),
     Output('map_dd_color', 'options'),
-    # Output('map_dd_color', 'value'),
-    
     Output('sc_dd_x', 'options'),
     Output('sc_dd_y', 'options'),
     Output('sc_dd_size', 'options'),
     Output('sc_dd_color', 'options'),
-    
+    Output('help_markdown','children'),
+    #
     Input('inp_fldr', 'value'),  # ! temp
     # prevent_initial_call=True
 )
 def initial_setup(path2csv):
 
-    with open(r'./data/_main_columns.json', 'r') as f:
+    with open(r'./assets/_main_columns.json', 'r') as f:
         FANCY_CLMNS = json.load(f)
+
+    with open(r'./assets/_help_columns.json', 'r') as f:
+        HELP_CLMNS = json.load(f)
+    
+    with open(r'./assets/_help.md', 'r') as file:
+        markdown_help = file.read()        
 
     df = pd.read_csv(path2csv)
     
@@ -418,15 +446,22 @@ def initial_setup(path2csv):
     all_clmns = list(df.columns)
     num_clmns = df.select_dtypes(include=['number','bool']).columns
 
+    # markdown_help = '''# Glossary'''
+    # # generating markdown help
+    # for key, value in HELP_CLMNS.items():
+    #     markdown_help += f"**{key}**: {value}\n"    
+
     return mtable, wtable, 1, \
         num_clmns, all_clmns, \
-        num_clmns, num_clmns, num_clmns, all_clmns #
+        num_clmns, num_clmns, num_clmns, all_clmns,\
+        markdown_help
+
         
 # %% select/deselect
 @app.callback(
     Output('mtable', 'selected_rows'),
-    Input('deselect', 'n_clicks'),
-    Input('select', 'n_clicks'),    
+    Input('b_deselect', 'n_clicks'),
+    Input('b_select', 'n_clicks'),    
     State('mtable', 'selected_rows'),
     State('mtable', 'derived_virtual_data'),
     prevent_initial_call=True
@@ -434,9 +469,9 @@ def initial_setup(path2csv):
 def select_deselect(m, b, selected_rows, filtered_rows):
 
     changed_id = [p['prop_id'] for p in callback_context.triggered][0]
-    if 'deselect' in changed_id:
+    if 'b_deselect' in changed_id:
         selected_rows = []
-    elif 'select' in changed_id:
+    elif 'b_select' in changed_id:
         selected_rows += [row['#'] for row in filtered_rows]
         selected_rows.sort()
         selected_rows = list(set(selected_rows))  # adds to previous selection
@@ -448,8 +483,8 @@ def select_deselect(m, b, selected_rows, filtered_rows):
 
 
 @app.callback(
-    Output("reopen", "n_clicks"),
-    Input("reopen", "n_clicks"),
+    Output('b_reopen', "n_clicks"),
+    Input('b_reopen', "n_clicks"),
     State('map', 'figure'),
     prevent_initial_call=True
 )
@@ -587,7 +622,7 @@ def update_sc(n, x, y, color, size, sel_rows, records):
     df = pd.DataFrame(data=records)
 
     if sel_rows is None or sel_rows == []:
-        print('PreventUpdate!')
+        # print('PreventUpdate!')
         return go.Figure()
     
     df = df.loc[sel_rows, :]
@@ -608,6 +643,10 @@ def update_sc(n, x, y, color, size, sel_rows, records):
         hover_data=['field', x, y, color, size]
         )    
 
+    fig.update_layout(
+        modebar_add=['toggleHover', 'drawline', 'drawopenpath',
+                     'drawclosedpath', 'drawcircle', 'drawrect',
+                     'eraseshape', 'toggleSpikelines'])
     return fig
 
 @app.callback(
