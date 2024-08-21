@@ -63,9 +63,9 @@
 61. **gas PV0**: initial gas pore volume, million cubic meters (Mrm3)  
 62. **HCPV0**: initial hydrocarbon pore volume, million cubic meters (Mrm3)  
 63. **gas PV0/HC PV0**: estimated ratio of initial gas pore volume to total hydrocarbon pore volume  
-64. **produced oil PV**: pore volume of oil produced in million rm3  
-65. **produced gas PV**: pore volume of gas produced in million rm3  
-66. **produced HCPV**: pore volume of hydrocarbons produced in million rm3  
+64. **rec. oil PV**: recoverable oil pore volume (Mrm3)  
+65. **rec. gas PV**: recoverable gas pore volume (Mrm3)  
+66. **rec. HCPV**: recoverable hydrocarbon pore volume (Mrm3)  
 67. **CO2 SC**: CO2 storage capacity indicator in (million tonnes, Mt)  
 68. **H2 SC**: hydrogen storage capacity indicator (million tonnes, Mt)  
 69. **CO2 SC/well num**: CO2 storage capacity per well (Mt/well)  

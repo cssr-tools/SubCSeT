@@ -377,19 +377,19 @@
   "-",
   "63"
  ],
- "produced oil PV": [
+ "rec. oil PV": [
   "released PV0",
   "oil",
   "Mrm3",
   "64"
  ],
- "produced gas PV": [
+ "rec. gas PV": [
   "released PV0",
   "gas",
   "Mrm3",
   "65"
  ],
- "produced HCPV": [
+ "rec. HCPV": [
   "released PV0",
   "HCPV",
   "Mrm3",

@@ -522,8 +522,8 @@ def update_map(n, color, size, invert, sel_rows, records, records2):
     df0 = df.copy()
 
     if sel_rows is None or sel_rows == []:
-        print('PreventUpdate!')
-        # raise PreventUpdate
+        # print('PreventUpdate!')
+        raise PreventUpdate
         return fig
 
     df = df.loc[sel_rows, :]
@@ -544,15 +544,20 @@ def update_map(n, color, size, invert, sel_rows, records, records2):
             df.loc[ind, 'color'] = clr
 
     if size is None:
-        df['size'] = 10
+        df['size'] = 5
+        _size = size
+        size_max = 5
     else:
         size_min = 0.5
+        size_max = 50
         df['size'] = df[size]
         # df['size'] = df[size]**0.5
         df['size'] = size_min + (100-size_min)*(df['size']-df['size'].min())/\
             (df['size'].max())
         df['size'] = df['size'].round(2)
+        _size = "size"
 
+    # legacy block to be kept just in case
     # for i in df.index:
     #     row = df.loc[i, :]
     #     url=row['FactPageUrl']
@@ -579,10 +584,13 @@ def update_map(n, color, size, invert, sel_rows, records, records2):
     #     )
 
     fig=px.scatter_mapbox(
-        df, lat='lat', lon='lon',size='size', color=color,
+        df, lat='lat', lon='lon',size=_size, color=color,
         hover_data=['field','lat','lon',size,color,'size'],
-        size_max=50, custom_data=['FactPageUrl'],
-        color_continuous_scale='rainbow')
+        size_max=size_max, 
+        custom_data=['FactPageUrl'],
+        color_continuous_scale='rainbow',
+        color_discrete_sequence=px.colors.qualitative.G10,
+        )
 
     map_styles = ['open-street-map', 'carto-positron', 'carto-darkmatter']
     map_style = map_styles[1]
@@ -590,27 +598,23 @@ def update_map(n, color, size, invert, sel_rows, records, records2):
 
     fig.update_layout(
         mapbox={
-            # 'style': 'open-street-map',
-            # 'style': 'carto-positron', 
             'style': map_style,
             'center': go.layout.mapbox.Center(lat=ref_lat, lon=ref_lon),
-            # 'fitbounds': 'locations',
             'zoom': 5.5,
-            # 'maxzoom': 10, 'minzoom':
         },
-        # coloraxis_colorbar=dict(
-        #     x=1.0,  # Center of the figure in horizontal
-        #     y=1.0,  # Center of the figure in vertical
-        #     xanchor='right',  # Center the colorbar based on x
-        #     yanchor='top'  # Center the colorbar based on y
-        # ),     
-        legend=dict(
-            groupclick="toggleitem",
+        coloraxis_colorbar=dict(
             x=1.0,  # Center of the figure in horizontal
             y=1.0,  # Center of the figure in vertical
             xanchor='right',  # Center the colorbar based on x
             yanchor='top'  # Center the colorbar based on y
-            ),
+        ),     
+        # legend=dict(
+        #     groupclick="toggleitem",
+        #     x=1.0,  # Center of the figure in horizontal
+        #     y=1.0,  # Center of the figure in vertical
+        #     xanchor='right',  # Center the colorbar based on x
+        #     yanchor='top'  # Center the colorbar based on y
+        #     ),
         modebar_orientation='v',
         margin={"r": 25, "t": 10, "l": 0, "b": 0},
         modebar_add=['toggleHover', 'drawline', 'drawopenpath',
