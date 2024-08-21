@@ -176,9 +176,9 @@ c_map_tab = html.Div([
             #            size='md', outline=True, id='map_color_reset'),            
             ], style={'width': '30%'}
             ),
-        dbc.Checkbox(id='map_chbx_invert', 
-                     label="invert", style={'alignSelf': 'center'},
-                     value=False)
+        # dbc.Checkbox(id='map_chbx_invert', 
+        #              label="invert", style={'alignSelf': 'center'},
+        #              value=False)
         ], gap=3, direction="horizontal"),
     c_map, # map itself
 ])
@@ -240,9 +240,6 @@ c_sc_tab = html.Div([
             ], 
             style={'width': '25%'}
             ),
-        # dbc.Checkbox(id='sc_chbx_invert', 
-        #              label="invert", 
-        #              value=False)
         ], direction="horizontal"),
     c_sc
 ])
@@ -498,13 +495,15 @@ def reopen_current_chart(n, fig):
     Input('update_map', 'n_clicks'),
     Input('map_dd_color', 'value'),
     Input('map_dd_size', 'value'),
-    Input('map_chbx_invert', 'value'),    
+    # Input('map_chbx_invert', 'value'),    
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
     State('wtable', 'data'),
     # prevent_initial_call=True
 )
-def update_map(n, color, size, invert, sel_rows, records, records2):
+def update_map(n, color, size, 
+            #    invert, 
+               sel_rows, records, records2):
 
     fig = go.Figure()
     df = pd.DataFrame(data=records)
@@ -529,19 +528,20 @@ def update_map(n, color, size, invert, sel_rows, records, records2):
     df = df.loc[sel_rows, :]
     # df.reset_index(inplace=True)
 
-    df['color'] = 'grey'  # preallocating
-    if df[color].dtype in ['float', 'int64', 'int32', 'int16', 'int8']:
-        df = df.sort_values(by=color, ascending=False, kind='stable')
-        df['color']=cssr.generate_rainbow_colors(df[color]*(-1 if invert else 1))
-    else:
-        df = df.sort_values(by=color, ascending=True, kind='stable')
-        # all other datatypes are treated as categoricals
-        foo = df[color].unique()
-        clrs = cssr.generate_rainbow_colors(len(foo))
-        if invert: clrs = clrs[::-1]
-        for i, clr in zip(foo, clrs):
-            ind = df[color] == i
-            df.loc[ind, 'color'] = clr
+    # legacy block to be kept just in case
+    # df['color'] = 'grey'  # preallocating
+    # if df[color].dtype in ['float', 'int64', 'int32', 'int16', 'int8']:
+    #     df = df.sort_values(by=color, ascending=False, kind='stable')
+    #     df['color']=cssr.generate_rainbow_colors(df[color]*(-1 if invert else 1))
+    # else:
+    #     df = df.sort_values(by=color, ascending=True, kind='stable')
+    #     # all other datatypes are treated as categoricals
+    #     foo = df[color].unique()
+    #     clrs = cssr.generate_rainbow_colors(len(foo))
+    #     if invert: clrs = clrs[::-1]
+    #     for i, clr in zip(foo, clrs):
+    #         ind = df[color] == i
+    #         df.loc[ind, 'color'] = clr
 
     if size is None:
         df['size'] = 5
