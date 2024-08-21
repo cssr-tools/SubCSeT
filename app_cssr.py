@@ -100,7 +100,7 @@ c_wtable = html.Div(c_wtable, id='wtable_div')
 c_map = dcc.Graph(
     id='map',
     style={
-        'height': '90vh',
+        'height': '87vh',
     },
     config={'displayModeBar': True}
 )
@@ -175,13 +175,18 @@ c_map_tab = html.Div([
             # dbc.Button(html.I(className="bi bi-x-square"),
             #            size='md', outline=True, id='map_color_reset'),            
             ], style={'width': '30%'}
-            ),
+            ),         
         # dbc.Checkbox(id='map_chbx_invert', 
         #              label="invert", style={'alignSelf': 'center'},
         #              value=False)
         ], gap=3, direction="horizontal"),
     c_map, # map itself
 ])
+
+dbc.Checkbox(id='map_chbx', 
+             label="open the field's page on factpages.sodir.no/en", 
+             style={'alignSelf': 'center'},
+             value=False) 
 
 
 c_toolbar = dbc.Stack([
@@ -204,7 +209,7 @@ c_sc_b_update = dbc.Button(
 c_sc = dcc.Graph(
     id='sc',
     style={
-        'height': '90vh',
+        'height': '87vh',
     },
     config={'displayModeBar': True}
 )
@@ -528,7 +533,7 @@ def update_map(n, color, size,
     df = df.loc[sel_rows, :]
     # df.reset_index(inplace=True)
 
-    # legacy block to be kept just in case
+    # legacy block kept just in case
     # df['color'] = 'grey'  # preallocating
     # if df[color].dtype in ['float', 'int64', 'int32', 'int16', 'int8']:
     #     df = df.sort_values(by=color, ascending=False, kind='stable')
@@ -542,6 +547,11 @@ def update_map(n, color, size,
     #     for i, clr in zip(foo, clrs):
     #         ind = df[color] == i
     #         df.loc[ind, 'color'] = clr
+
+    if df[color].dtype in ['float', 'int64', 'int32', 'int16', 'int8']:
+        pass
+    else:
+        df = df.sort_values(by=color, ascending=True, kind='stable')
 
     if size is None:
         df['size'] = 5
@@ -557,7 +567,7 @@ def update_map(n, color, size,
         df['size'] = df['size'].round(2)
         _size = "size"
 
-    # legacy block to be kept just in case
+    # legacy block kept just in case
     # for i in df.index:
     #     row = df.loc[i, :]
     #     url=row['FactPageUrl']
@@ -602,21 +612,16 @@ def update_map(n, color, size,
             'center': go.layout.mapbox.Center(lat=ref_lat, lon=ref_lon),
             'zoom': 5.5,
         },
-        coloraxis_colorbar=dict(
-            x=1.0,  # Center of the figure in horizontal
-            y=1.0,  # Center of the figure in vertical
-            xanchor='right',  # Center the colorbar based on x
-            yanchor='top'  # Center the colorbar based on y
-        ),     
-        # legend=dict(
-        #     groupclick="toggleitem",
-        #     x=1.0,  # Center of the figure in horizontal
-        #     y=1.0,  # Center of the figure in vertical
-        #     xanchor='right',  # Center the colorbar based on x
-        #     yanchor='top'  # Center the colorbar based on y
-        #     ),
+        # colorbar to the left
+        coloraxis_colorbar=dict(x=0.0,  y=1.0, xanchor='left', yanchor='top'),
+        #  top-right legend
+        legend=dict(groupclick="toggleitem", 
+                    x=1.0, y=1.0, xanchor='right', yanchor='top'),
+        # lower-left legend 
+        # legend=dict(groupclick="toggleitem", 
+        #             x=0.0, y=0.0, xanchor='left', yanchor='bottom'),                    
         modebar_orientation='v',
-        margin={"r": 25, "t": 10, "l": 0, "b": 0},
+        margin={"r": 30, "t": 0, "l": 0, "b": 0},
         modebar_add=['toggleHover', 'drawline', 'drawopenpath',
                      'drawclosedpath', 'drawcircle', 'drawrect',
                      'eraseshape', 'toggleSpikelines'],
