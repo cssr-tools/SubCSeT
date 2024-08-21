@@ -723,7 +723,7 @@ def open_FactPageUrl(clickData):
     return ""
 
 if __name__ == '__main__':
-    app.title = 'CSSR screening'
+    app.title = 'CCS screening tool for NCS'
     app.run_server(debug=True)
     # app.run_server(debug=False)  # should be False for deployment
 # %%
