@@ -369,6 +369,10 @@ def initial_setup(path2csv):
         for column in df.columns} for i in df.index
     ]    
 
+    tooltip_header = deepcopy(HELP_CLMNS)
+    for k in HELP_CLMNS:
+        tooltip_header[k] = ['',tooltip_header[k], '']
+
     mtable = DataTable(
         id='mtable', columns=clmns,
         data=df.to_dict('records'),
@@ -381,6 +385,7 @@ def initial_setup(path2csv):
         selected_columns=[],
         selected_rows=preselected_rows,
         tooltip_data=tooltip_data, 
+        tooltip_header=tooltip_header,
         # fixed_columns={'headers': True, 'data': 1},
         page_action="native", page_current=0,
         hidden_columns=[
@@ -389,14 +394,9 @@ def initial_setup(path2csv):
             'recovery', 'fldID', 'GOR'
             'size', 'lat', 'lon',
             'depth min',  'depth mean', 'depth median', 'depth max',
-            'year',
-            'net oil yearly pr.',
-            'net gas yearly pr.'
-            'net NGL yearly pr.',
-            'net condensate yearly pr.',
-            'net OE yearly pr.',
-            'water yearly pr.',
-            # 'inj. score'
+            'net oil yearly pr.', 'net gas yearly pr.'
+            'net NGL yearly pr.', 'net condensate yearly pr.',
+            'net OE yearly pr.',  'water yearly pr.',
             ],
 
         style_table={
@@ -445,11 +445,6 @@ def initial_setup(path2csv):
 
     all_clmns = list(df.columns)
     num_clmns = df.select_dtypes(include=['number','bool']).columns
-
-    # markdown_help = '''# Glossary'''
-    # # generating markdown help
-    # for key, value in HELP_CLMNS.items():
-    #     markdown_help += f"**{key}**: {value}\n"    
 
     return mtable, wtable, 1, \
         num_clmns, all_clmns, \
@@ -516,8 +511,6 @@ def update_map(n, color, size, invert, sel_rows, records, records2):
     # df.set_index('index',inplace=True)
 
     df2 = pd.DataFrame(data=records2)
-
-    # print(df2)
 
     df['total score'] = 0
     for i in df2.index:
@@ -615,7 +608,7 @@ def update_map(n, color, size, invert, sel_rows, records, records2):
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
     # State('wtable', 'data'),
-    prevent_initial_call=True
+    # prevent_initial_call=True
 )
 def update_sc(n, x, y, color, size, sel_rows, records):
     

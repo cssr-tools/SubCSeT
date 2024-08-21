@@ -5,7 +5,7 @@
     "status": "current status of the field: producing, shut-down, or approved for production",
     "HC type": "type of hydrocarbons",
     "PL/BAA": "production license or block area agreement",
-    "operator": "operator of the field",
+    "operator": "company operating the field",
     "HPHT": "indicates if the field is high pressure/high temperature",
     "rec. oil": "initial recoverable oil, million standard cubic meters (Msm3)",
     "rec. gas": "initial recoverable gas, billion standard cubic meters (Bsm3)",
