@@ -301,7 +301,7 @@ app.layout = html.Div([
 def initial_setup(path2csv):
 
     with open(r'./assets/_main_columns.json', 'r') as f:
-        all_clmns = json.load(f)
+        CLMNS = json.load(f)
 
     with open(r'./assets/_help_columns.json', 'r') as f:
         HELP_CLMNS = json.load(f)
@@ -319,7 +319,7 @@ def initial_setup(path2csv):
     # df = df[new_column_order]
 
     clmns = []
-    for k, v in all_clmns.items():
+    for k, v in CLMNS.items():
         clmns.append({"name": v, "id": k, 'hideable': True,
                       #   'selectable': True
                       })
@@ -430,14 +430,27 @@ def initial_setup(path2csv):
         dropdown=dropdowns, editable=True
     )
 
+    # all columns
     all_clmns = list(df.columns)
+
+    for v in ['reservoir', 'FactPageUrl']:
+        all_clmns.remove(v)
+
+    # only numerical columns
     num_clmns = df.select_dtypes(include=['number','bool']).columns
 
-    return mtable, wtable, 1, 1, \
-        num_clmns, all_clmns, \
-        num_clmns, num_clmns, num_clmns, all_clmns,\
-        markdown_help
-
+    out = (
+        mtable, wtable, #
+        1, 1, # initializes the map and scatter plots
+        num_clmns,  # options for map's size dropdown
+        all_clmns,  # options for map's color dropdown
+        num_clmns, # options for scatter's X dropdown
+        num_clmns, # options for scatter's Y dropdown
+        num_clmns, # options for scatter's size dropdown
+        all_clmns, # options for scatter's color dropdown
+        markdown_help  # help text
+    )
+    return out
         
 # %% select/deselect
 @app.callback(
@@ -533,50 +546,73 @@ def update_map(n, color, size, invert, sel_rows, records, records2):
     if size is None:
         df['size'] = 10
     else:
-        df['size'] = df[size]**0.5
-        df['size'] = 5 + 95*(df['size'] - df['size'].min())/(df['size'].max())
+        size_min = 0.5
+        df['size'] = df[size]
+        # df['size'] = df[size]**0.5
+        df['size'] = size_min + (100-size_min)*(df['size']-df['size'].min())/\
+            (df['size'].max())
+        df['size'] = df['size'].round(2)
 
-    for i in df.index:
-        row = df.loc[i, :]
-        url=row['FactPageUrl']
-        sz = f"{size}: {row[size]}<br>" if size is not None else ""
-        fig.add_trace(
-            go.Scattermapbox(
-                lat=[row['lat']], lon=[row['lon']],
-                mode='markers', name=row['field'],
-                legendgroup='fields', legendgrouptitle_text='fields',
-                customdata=[url],
-                hovertemplate=  # f"%{name}<br>"+
-                f"{row['field']}<br>" +
-                sz +
-                f"{color}: {row[color]}<br>" +
-                "click to open<br>"+
-                "field's page on<br>"+
-                "sodir.no<br>"+
-                "<extra></extra>",
-                marker={'size': row['size'], 'opacity': .5,
-                        'symbol': 'circle',
-                        # 'line': {'color': 'black'},
-                        'color': row['color']}
-            )
-        )
+    # for i in df.index:
+    #     row = df.loc[i, :]
+    #     url=row['FactPageUrl']
+    #     sz = f"{size}: {row[size]}<br>" if size is not None else ""
+    #     fig.add_trace(
+    #         go.Scattermapbox(
+    #             lat=[row['lat']], lon=[row['lon']],
+    #             mode='markers', name=row['field'],
+    #             legendgroup='fields', legendgrouptitle_text='fields',
+    #             customdata=[url],
+    #             hovertemplate=  # f"%{name}<br>"+
+    #             f"{row['field']}<br>" +
+    #             sz +
+    #             f"{color}: {row[color]}<br>" +
+    #             "click to open<br>"+
+    #             "field's page on<br>"+
+    #             "sodir.no<br>"+
+    #             "<extra></extra>",
+    #             marker={'size': row['size'], 'opacity': .5,
+    #                     'symbol': 'circle',
+    #                     # 'line': {'color': 'black'},
+    #                     'color': row['color']}
+    #         )
+    #     )
 
-    styles = ['open-street-map', 'carto-positron', 'carto-darkmatter']
+    fig=px.scatter_mapbox(
+        df, lat='lat', lon='lon',size='size', color=color,
+        hover_data=['field','lat','lon',size,color,'size'],
+        size_max=50, custom_data=['FactPageUrl'],
+        color_continuous_scale='rainbow')
+
+    map_styles = ['open-street-map', 'carto-positron', 'carto-darkmatter']
+    map_style = map_styles[1]
     ref_lat, ref_lon = df.loc[:, ['lat', 'lon']].mean().values
 
     fig.update_layout(
         mapbox={
             # 'style': 'open-street-map',
             # 'style': 'carto-positron', 
-            'style': 'carto-darkmatter',
+            'style': map_style,
             'center': go.layout.mapbox.Center(lat=ref_lat, lon=ref_lon),
             # 'fitbounds': 'locations',
             'zoom': 5.5,
             # 'maxzoom': 10, 'minzoom':
         },
-        legend=dict(groupclick="toggleitem"),
+        # coloraxis_colorbar=dict(
+        #     x=1.0,  # Center of the figure in horizontal
+        #     y=1.0,  # Center of the figure in vertical
+        #     xanchor='right',  # Center the colorbar based on x
+        #     yanchor='top'  # Center the colorbar based on y
+        # ),     
+        legend=dict(
+            groupclick="toggleitem",
+            x=1.0,  # Center of the figure in horizontal
+            y=1.0,  # Center of the figure in vertical
+            xanchor='right',  # Center the colorbar based on x
+            yanchor='top'  # Center the colorbar based on y
+            ),
         modebar_orientation='v',
-        margin={"r": 10, "t": 0, "l": 0, "b": 0},
+        margin={"r": 25, "t": 10, "l": 0, "b": 0},
         modebar_add=['toggleHover', 'drawline', 'drawopenpath',
                      'drawclosedpath', 'drawcircle', 'drawrect',
                      'eraseshape', 'toggleSpikelines'],
@@ -668,10 +704,13 @@ def sc_color_reset(n):
     Input('map', 'clickData'),
     prevent_initial_call=True
 )
-def mlp_copy_clickData(clickData):
+def open_FactPageUrl(clickData):
+    "open the field's page on factpages.sodir.no/en"
     # print(clickData)
     if clickData is not None:
-        webbrowser.open(clickData['points'][0]['customdata'])
+        url=clickData['points'][0]['customdata'][0]
+        url = url[0] if isinstance(url,list) else url
+        webbrowser.open(url)
     return ""
 
 if __name__ == '__main__':
