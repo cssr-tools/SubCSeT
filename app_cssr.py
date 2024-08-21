@@ -286,6 +286,7 @@ app.layout = html.Div([
     Output('mtable_div', 'children'),
     Output('wtable_div', 'children'),
     Output('update_map', 'n_clicks'),
+    Output('update_sc', 'n_clicks'),
     Output('map_dd_size', 'options'),
     Output('map_dd_color', 'options'),
     Output('sc_dd_x', 'options'),
@@ -300,7 +301,7 @@ app.layout = html.Div([
 def initial_setup(path2csv):
 
     with open(r'./assets/_main_columns.json', 'r') as f:
-        FANCY_CLMNS = json.load(f)
+        all_clmns = json.load(f)
 
     with open(r'./assets/_help_columns.json', 'r') as f:
         HELP_CLMNS = json.load(f)
@@ -309,20 +310,6 @@ def initial_setup(path2csv):
         markdown_help = file.read()        
 
     df = pd.read_csv(path2csv)
-    
-    df['#'] = range(df.shape[0])
-    # df = df.drop(columns={'reservoir','recovery','in-place liq./OE ratio'})
-    if 'total score' in df.columns:
-        df['total score'] = None
-
-    all_clmns = {i: ["", i, ""] for i in df.columns}
-    all_clmns = {**all_clmns, **FANCY_CLMNS}
-
-    # enumerating columns
-    for n,i in enumerate(all_clmns):
-        foo = all_clmns[i]
-        if len(foo)==2: foo.append("") 
-        foo.append(str(n+1))
 
     # # Determine which DataFrame columns are not in the priority list
     # priority_columns = [i for i in FANCY_CLMNS if i in df.columns]     
@@ -446,7 +433,7 @@ def initial_setup(path2csv):
     all_clmns = list(df.columns)
     num_clmns = df.select_dtypes(include=['number','bool']).columns
 
-    return mtable, wtable, 1, \
+    return mtable, wtable, 1, 1, \
         num_clmns, all_clmns, \
         num_clmns, num_clmns, num_clmns, all_clmns,\
         markdown_help
