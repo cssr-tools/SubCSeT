@@ -51,7 +51,7 @@ c_theme = ThemeChangerAIO(
     },
     offcanvas_props={"placement": "start",
                      "scrollable": True,
-                     #  'style': {'width': '50vw'}
+                      'style': {'width': '50vw'}
                      }
 )
 
@@ -149,8 +149,9 @@ c_help=dbc.Modal([
     ], id='help', is_open=False, size='lg', scrollable=True)
 
 c_help=dbc.Offcanvas(dcc.Markdown(id='help_markdown'),
-                     id='help', is_open=False, scrollable=True)
-
+                     id='help', is_open=False, scrollable=True,
+                     style={'width': '33vw'}
+                     )
 
 @app.callback(
     Output('help', 'is_open'),

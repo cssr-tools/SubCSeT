@@ -1,5 +1,24 @@
-# HELP
-## Glossary
+
+# About
+This is a web application for screening petroleum reservoirs on the Norwegian Continental Shelf (NCS) for purposes of CO2 storage. 
+The app was developed in [the Centre for Sustainable Subsurface Resources (CSSR)](https://cssr.no/).  
+Contact developer: [LinkedIn](https://www.linkedin.com/in/alexey-khrulenko-8021a64a/)
+Repository: **[link to GitHub]**  
+Paper: **[link to the paper]**  
+
+# Quick start
+The large table in the left half presents data for the NCS fields:
+1. retrieved from [FactPages of the Norwegian Offshore Directorate] (https://factpages.sodir.no/), 
+2. retrieved from [Public portal of DISKOS database [https://www.diskos.com/]
+3. indicators derived to assess the field suitability for CO2 storage. 
+More information on the table columns is to be found below in the "Glossary".
+Refer **[link to Github notebook]** If you would like to know more about data handling and processing.
+Details of the screening framework are to be found in **paper link**.
+The tabs in the right half contain:  
++ a map and a scatter plot to visualize the table data
++ an editor that allows to combine multiple features into *total score*
+
+# Glossary
 1. **field**: field name  
 2. **#**: entry number  
 3. **sea**: sea where the field is located: North, Norwegian, or Barents  
