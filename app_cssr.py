@@ -150,7 +150,7 @@ c_help=dbc.Modal([
 
 c_help=dbc.Offcanvas(dcc.Markdown(id='help_markdown'),
                      id='help', is_open=False, scrollable=True,
-                     style={'width': '33vw'}
+                     style={'width': '40vw'}
                      )
 
 @app.callback(
