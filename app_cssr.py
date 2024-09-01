@@ -260,7 +260,7 @@ c_tabs = dbc.Tabs([
             active_tab_style={"fontWeight": "bold"}),
     dbc.Tab(c_wtable, label='SCORING RULES',
             active_tab_style={"fontWeight": "bold"})
-    ], 
+    ], id='all_tabs'
 # style={"flex": "1", "height": "100%"}
 )
 
@@ -483,14 +483,32 @@ def select_deselect(m, b, selected_rows, filtered_rows):
 @app.callback(
     Output('b_reopen', "n_clicks"),
     Input('b_reopen', "n_clicks"),
+    State("all_tabs", 'active_tab'),
     State('map', 'figure'),
+    State('sc', 'figure'),    
     prevent_initial_call=True
 )
-def reopen_current_chart(n, fig):
 
-    if fig is not None:
+def reopen_current_chart(n, active_tab, fig_map, fig_sc):
+
+    fig = None
+    print('active tab:', active_tab)
+    if active_tab == 'tab-0':
+        fig=fig_map
+    elif active_tab == 'tab-1':
+        fig=fig_sc   
+    else:
+        pass   
+
+    if fig is not None: 
+        # Stranglely enough Plotly refuses to render None values in fig
+        # here is a temp. fix which replaces None values with "grey"
+        # Maybe not so efficient ...
+        clrs = fig['data'][0]['marker']['color'] 
+        clrs = ['grey' if x is None else x for x in clrs]
+        fig['data'][0]['marker']['color'] = clrs     
         fig = go.Figure(fig)
-        fig.show(renderer='browser')
+        fig.show(renderer='browser', validate=False)   
 
     return n
 
