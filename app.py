@@ -31,12 +31,17 @@ themes_templates =\
      "pulse", "quartz", "sandstone", "simplex", "sketchy", "slate",
      "solar", "spacelab", "superhero", "united", "vapor", "yeti", "zephyr"]
 
+themes_templates = \
+    [{'label': i, 'value': eval('dbc.themes.'+i.upper())} for i in themes_templates]
+
 THEME0 = "cosmo"  # sets the theme
 THEME0 = THEME0.upper()
 # %% Button to change the themes
 c_theme = ThemeChangerAIO(
     aio_id="theme",
-    radio_props={"value": eval('dbc.themes.'+THEME0)},
+    radio_props={"value": eval('dbc.themes.'+THEME0),
+                #  "options": themes_templates
+                 },
     button_props={
         "children": html.I(className="bi bi-palette"),
         'outline': True, "color": "dark",
@@ -44,12 +49,19 @@ c_theme = ThemeChangerAIO(
         'style': {'width': '100%'}
     },
     offcanvas_props={
-        "placement": "start", "scrollable": True, 'style': {'width': '15vw'}
+        "placement": "start", "scrollable": True, 'style': {'width': '12vw'}
         }
 )
 
 # %%  
-# def replace_none_colors(fig,color='grey'):
+def replace_none_colors(fig,color='grey'):
+    '''replaces None values in FIG dict with the COLOR'''
+    for trace in fig['data']:
+        clrs = trace['marker']['color'] 
+        if isinstance(clrs,list):
+            clrs = [color if x is None else x for x in clrs] 
+            fig['data'][0]['marker']['color'] = clrs  
+    return fig
 
 # %% app layout ----------------------------------------------------------------
 # %%
@@ -473,9 +485,7 @@ def reopen_current_chart(n, active_tab, fig_map, fig_sc):
         # Stranglely enough Plotly refuses to render None values in fig
         # here is a temp. fix which replaces None values with "grey"
         # Maybe not so efficient ...
-        clrs = fig['data'][0]['marker']['color'] 
-        clrs = ['grey' if x is None else x for x in clrs]
-        fig['data'][0]['marker']['color'] = clrs     
+        fig = replace_none_colors(fig) 
         fig = go.Figure(fig)
         fig.show(renderer='browser', validate=False)   
 
@@ -713,18 +723,11 @@ def update_theme(theme_url, fig_map, fig_sc):
     # print('theme:',theme_str)
     # print('theme URL:',theme_url)    
 
-    clrs = fig_map['data'][0]['marker']['color'] 
-    if isinstance(clrs,list):
-        clrs = ['grey' if x is None else x for x in clrs]
-        fig_map['data'][0]['marker']['color'] = clrs   
-        
-    fig_map=go.Figure(fig_map)
-    fig_map=fig_map.update_layout(template=theme_str)
+    fig_map = replace_none_colors(fig_map)
+    fig_map = go.Figure(fig_map).update_layout(template=theme_str)
 
-    clrs = fig_sc['data'][0]['marker']['color'] 
-    clrs = ['grey' if x is None else x for x in clrs]
-    fig_sc['data'][0]['marker']['color'] = clrs   
-    fig_sc=go.Figure(fig_sc).update_layout(template=theme_str)
+    fig_sc = replace_none_colors(fig_sc)
+    fig_sc = go.Figure(fig_sc).update_layout(template=theme_str)
 
     return theme_str, fig_map, fig_sc
 
