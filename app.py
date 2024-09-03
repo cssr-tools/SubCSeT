@@ -1,12 +1,10 @@
 import pandas as pd
 import numpy as np
-import npd_wraper as npd
 # plotly & dash
 import plotly.express as px
 from plotly.io import write_html, to_json, from_json
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output, State
-# from flask_caching import Cache
 from dash.exceptions import PreventUpdate
 from dash.dash_table.Format import Format, Scheme
 from dash.dash_table import DataTable
@@ -18,13 +16,11 @@ from dash import dcc
 from dash import Dash
 from copy import deepcopy
 import time
-import pandas as pd
 import os
-import numpy as np
 from datetime import datetime, timedelta
 import json
-import warnings
-import utils
+# import warnings
+# import utils
 import webbrowser
 
 # %% constants
@@ -68,20 +64,6 @@ app = Dash(
     ],
     suppress_callback_exceptions=True)
 
-# cache = Cache(app.server, config={
-#     'CACHE_TYPE': 'filesystem',
-#     'CACHE_DIR': 'cache-directory'
-# })
-
-# layout = [
-#     dbc.Tabs([
-#         dbc.Tab([dbc.Container(table_rv)], id='tab_table', label='overview'),
-#         dbc.Tab([], id='tab_map', label='map'),
-#     ])
-#     # html.H1('CSSR screening'),
-#     # html.P(id='text_output', children='placeholder'),
-# ]
-
 c_inp_fldr = dbc.Input(
     id='inp_fldr', type='text',
     value=r'./data/_main.csv'
@@ -109,13 +91,6 @@ c_b_save = dbc.Button(
     'save selected', id='save_button', n_clicks=0,
     className="me-1", size='md',
 )
-
-# c_wtable_show = dbc.Button(
-#     'show weight table', id='update', n_clicks=0,
-#     color='danger',
-#     className="me-1", size='md',
-#     # style={'width': '30%'}
-# )
 
 c_map_b_update = dbc.Button(
     'update', id='update_map', n_clicks=0,
@@ -745,4 +720,3 @@ if __name__ == '__main__':
     app.title = 'CCS screening tool for NCS'
     app.run_server(debug=True)
     # app.run_server(debug=False)  # should be False for deployment
-# %%
