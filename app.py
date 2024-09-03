@@ -9,7 +9,8 @@ from dash.exceptions import PreventUpdate
 from dash.dash_table.Format import Format, Scheme
 from dash.dash_table import DataTable
 from dash import html
-from dash_bootstrap_templates import load_figure_template, ThemeChangerAIO, template_from_url
+from dash_bootstrap_templates import \
+    load_figure_template, ThemeChangerAIO, template_from_url
 import dash_bootstrap_components as dbc
 from dash import callback_context
 from dash import dcc
@@ -30,28 +31,28 @@ themes_templates =\
      "pulse", "quartz", "sandstone", "simplex", "sketchy", "slate",
      "solar", "spacelab", "superhero", "united", "vapor", "yeti", "zephyr"]
 
-# THEME0 = np.random.choice(themes_templates)
-THEME0 = "yeti"
-# THEME0 = "cyborg"
+THEME0 = "cosmo"  # sets the theme
 THEME0 = THEME0.upper()
 # %% Button to change the themes
 c_theme = ThemeChangerAIO(
     aio_id="theme",
     radio_props={"value": eval('dbc.themes.'+THEME0)},
     button_props={
-        # "color": "danger",
         "children": html.I(className="bi bi-palette"),
-        'outline': True,
+        'outline': True, "color": "dark",
         'size': 'md',
         'style': {'width': '100%'}
     },
-    offcanvas_props={"placement": "start",
-                     "scrollable": True,
-                      'style': {'width': '50vw'}
-                     }
+    offcanvas_props={
+        "placement": "start", "scrollable": True, 'style': {'width': '15vw'}
+        }
 )
 
+# %%  
+# def replace_none_colors(fig,color='grey'):
+
 # %% app layout ----------------------------------------------------------------
+# %%
 dbc_css = (
     "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates@V1.0.2/dbc.min.css")
 
@@ -101,21 +102,22 @@ c_map_b_update = dbc.Button(
 
 c_toolbar = dbc.ButtonGroup([
     dbc.Button(html.I(className="bi bi-check2-square"),
-               #    outline=True,
-               size='md', id='b_select'),
-    dbc.Button(html.I(className="bi bi-x-square"),
-               #    outline=True,
-               size='md', id='b_deselect'),
-    dbc.Button(html.I(className="bi bi-box-arrow-up-right"),
-               #    outline=True,
-               id='b_reopen', size='md',
+               size='md', id='b_select',
+               outline=True, color="dark",
                ),
-    dbc.Button(html.I(
-        className="bi bi-question-lg"
-        # className="bi bi-question-square"
-        ),
-        # outline=True, 
-        id='b_help', size='md'),               
+    dbc.Button(html.I(className="bi bi-x-square"),
+               size='md', id='b_deselect',
+               outline=True, color="dark",
+               ),
+    dbc.Button(html.I(className="bi bi-box-arrow-up-right"),
+               id='b_reopen', size='md',
+               outline=True, color="dark",
+               ),
+    dbc.Button(html.I(className="bi bi-question-lg"),
+               outline=True, color="dark",
+               id='b_help', size='md',
+               ),  
+    c_theme
 ])
 
 c_help=dbc.Modal([
@@ -196,31 +198,23 @@ c_sc_tab = html.Div([
         dbc.InputGroup([
             dbc.InputGroupText('X'),
             dbc.Select(id='sc_dd_x',value='lon'),
-            ], 
-            style={'width': '20%'}
-            ),  
+            ], style={'width': '20%'}),  
         dbc.InputGroup([
             dbc.InputGroupText('Y'),
             dbc.Select(id='sc_dd_y',value='lat'),
-            ], 
-            style={'width': '20%'}
-            ),              
+            ], style={'width': '20%'}),              
         dbc.InputGroup([
             dbc.InputGroupText('size'),
             dbc.Select(id='sc_dd_size',value='CO2 SC'),
             dbc.Button(html.I(className="bi bi-x-square"),
                        size='md', outline=True, id='sc_size_reset'),            
-            ], 
-            style={'width': '25%'}
-            ),
+            ], style={'width': '25%'}),
         dbc.InputGroup([
             dbc.InputGroupText('color'),
             dbc.Select(id='sc_dd_color',value='q_resv'),
             dbc.Button(html.I(className="bi bi-x-square"),
                        size='md', outline=True, id='sc_color_reset'),
-            ], 
-            style={'width': '25%'}
-            ),
+            ], style={'width': '25%'}),
         ], direction="horizontal"),
     c_sc
 ])
@@ -248,7 +242,7 @@ app.layout = html.Div([
         className="g-0",
         # style={"flex": "1", "height": "100%"}
     ),
-    dcc.Store(id='store'),
+    dcc.Store(id='store_theme'),
     html.Div(id='dummy_output', hidden=True)
 ],
     style={'display': 'grid', 
@@ -700,6 +694,39 @@ def sc_size_reset(n):
 def sc_color_reset(n):
     return None
 
+#%% Theme change callback
+@app.callback(
+    Output('store_theme', 'data'),
+    Output('map', 'figure',allow_duplicate=True),
+    Output('sc', 'figure', allow_duplicate=True),         
+
+    Input(ThemeChangerAIO.ids.radio("theme"), "value"),
+    State('map', 'figure'),
+    State('sc', 'figure'),      
+    prevent_initial_call=True
+)
+def update_theme(theme_url, fig_map, fig_sc):
+
+    theme_str = template_from_url(theme_url)
+    load_figure_template(theme_str)
+
+    # print('theme:',theme_str)
+    # print('theme URL:',theme_url)    
+
+    clrs = fig_map['data'][0]['marker']['color'] 
+    if isinstance(clrs,list):
+        clrs = ['grey' if x is None else x for x in clrs]
+        fig_map['data'][0]['marker']['color'] = clrs   
+        
+    fig_map=go.Figure(fig_map)
+    fig_map=fig_map.update_layout(template=theme_str)
+
+    clrs = fig_sc['data'][0]['marker']['color'] 
+    clrs = ['grey' if x is None else x for x in clrs]
+    fig_sc['data'][0]['marker']['color'] = clrs   
+    fig_sc=go.Figure(fig_sc).update_layout(template=theme_str)
+
+    return theme_str, fig_map, fig_sc
 
 # opens sodir.no field page on click
 @app.callback(
