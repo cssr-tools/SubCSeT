@@ -1,8 +1,7 @@
 # About
 This is a web application for screening petroleum reservoirs on the Norwegian Continental Shelf (NCS) for purposes of CO2 storage, developed in [the Centre for Sustainable Subsurface Resources (CSSR)](https://cssr.no/) hosted by the Norwegian Research Centre (NORCE).  
-Contact developer: [LinkedIn](https://www.linkedin.com/in/alexey-khrulenko-8021a64a/)  
-Repository: **[link to GitHub]**  
-Paper: **[link to the paper]**  
+[**Contact the developer via LinkedIn**](https://www.linkedin.com/in/alexey-khrulenko-8021a64a/)  
+[**GitHub Repository**](https://github.com/cssr-tools/SubCSeT)  
 
 # Quick start
 The large table in the left half presents data for the NCS fields:  
