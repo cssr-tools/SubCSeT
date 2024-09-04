@@ -32,10 +32,13 @@ themes_templates =\
      "solar", "spacelab", "superhero", "united", "vapor", "yeti", "zephyr"]
 
 themes_templates = \
-    [{'label': i, 'value': eval('dbc.themes.'+i.upper())} for i in themes_templates]
+    [{'label': i, 'value': eval('dbc.themes.'+i.upper())} \
+     for i in themes_templates]
 
-THEME0 = "cosmo"  # sets the theme
+# THEME0 = "cosmo"  # sets the theme
+THEME0 = "darkly"  # sets the theme
 THEME0 = THEME0.upper()
+load_figure_template(THEME0)
 # %% Button to change the themes
 c_theme = ThemeChangerAIO(
     aio_id="theme",
@@ -49,7 +52,7 @@ c_theme = ThemeChangerAIO(
         'style': {'width': '100%'}
     },
     offcanvas_props={
-        "placement": "start", "scrollable": True, 'style': {'width': '12vw'}
+        "placement": "start", "scrollable": True, 'style': {'width': '15vw'}
         }
 )
 
@@ -254,7 +257,7 @@ app.layout = html.Div([
         className="g-0",
         # style={"flex": "1", "height": "100%"}
     ),
-    dcc.Store(id='store_theme'),
+    dcc.Store(id='store_theme', data=THEME0),
     html.Div(id='dummy_output', hidden=True)
 ],
     style={'display': 'grid', 
@@ -502,11 +505,10 @@ def reopen_current_chart(n, active_tab, fig_map, fig_sc):
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
     State('wtable', 'data'),
+    State('store_theme', 'data'),
     # prevent_initial_call=True
 )
-def update_map(n, color, size, 
-            #    invert, 
-               sel_rows, records, records2):
+def update_map(n, color, size, sel_rows, records, records2, theme):
 
     fig = go.Figure()
     df = pd.DataFrame(data=records)
@@ -605,6 +607,7 @@ def update_map(n, color, size,
     ref_lat, ref_lon = df.loc[:, ['lat', 'lon']].mean().values
 
     fig.update_layout(
+        template=theme,
         mapbox={
             'style': map_style,
             'center': go.layout.mapbox.Center(lat=ref_lat, lon=ref_lon),
@@ -637,10 +640,10 @@ def update_map(n, color, size,
     Input('sc_dd_size', 'value'),
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
-    # State('wtable', 'data'),
+    State('store_theme', 'data')
     # prevent_initial_call=True
 )
-def update_sc(n, x, y, color, size, sel_rows, records):
+def update_sc(n, x, y, color, size, sel_rows, records, theme):
     
     df = pd.DataFrame(data=records)
 
@@ -667,6 +670,7 @@ def update_sc(n, x, y, color, size, sel_rows, records):
         )    
 
     fig.update_layout(
+        template=theme,
         modebar_add=['toggleHover', 'drawline', 'drawopenpath',
                      'drawclosedpath', 'drawcircle', 'drawrect',
                      'eraseshape', 'toggleSpikelines'])

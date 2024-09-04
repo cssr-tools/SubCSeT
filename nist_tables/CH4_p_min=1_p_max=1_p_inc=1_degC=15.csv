@@ -1,2 +1,0 @@
-Temperature (C),Pressure (bar),Density (kg/m3),Volume (m3/kg),Internal Energy (kJ/kg),Enthalpy (kJ/kg),Entropy (J/g*K),Cv (J/g*K),Cp (J/g*K),Sound Spd. (m/s),Joule-Thomson (K/bar),Viscosity (cP),Therm. Cond. (W/m*K),Phase
-15.0,1.0,0.67093,1.4905,738.71,887.76,6.6056,1.6864,2.2099,441.51,0.46944,0.01075,0.03259,vapor
