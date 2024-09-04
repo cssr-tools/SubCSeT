@@ -7,7 +7,7 @@ Paper: **[link to the paper]**
 # Quick start
 The large table in the left half presents data for the NCS fields:  
 1. retrieved from [FactPages of the Norwegian Offshore Directorate] (https://factpages.sodir.no/)  
-2. retrieved from [Public portal of DISKOS database [https://www.diskos.com/]  
+2. retrieved from [Public portal of DISKOS database](https://www.diskos.com/)
 3. indicators derived to assess the field suitability for CO2 storage.  
 
 Quick reference on the table columns is given below in the "Glossary".
