@@ -317,10 +317,12 @@ app.layout = html.Div([
     Output('sc_dd_color', 'options'),
     Output('help_markdown','children'),
     #
-    Input('inp_fldr', 'value'),  # ! temp
+    Input('inp_fldr', 'value'),  
+    State(ThemeChangerAIO.ids.radio("theme"), "value"), 
+
     # prevent_initial_call=True
 )
-def initial_setup(path2csv):
+def initial_setup(path2csv, theme_url):
 
     with open(r'./assets/_main_columns.json', 'r') as f:
         CLMNS = json.load(f)
@@ -335,7 +337,8 @@ def initial_setup(path2csv):
 
     # loading the themes for charts
     t0=time.time()
-    load_figure_template(theme0)
+    theme  = template_from_url(theme_url)
+    load_figure_template(theme)
     # load_figure_template(themes)
     t1=time.time()
     print(f'load template(s): {t1-t0:.3f} s')    
