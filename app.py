@@ -24,7 +24,7 @@ import json
 # import warnings
 # import utils
 import webbrowser
-
+# microchange to test the fork
 # %% constants
 themes = [
     "bootstrap", "cerulean", "cosmo", "cyborg", "darkly", "flatly",
@@ -810,5 +810,4 @@ def open_FactPageUrl(clickData, open):
 
 if __name__ == '__main__':
     app.title = 'CCS screening tool for NCS'
-    # app.run_server(debug=True)
     app.run(debug=False)  # should be False for deployment
