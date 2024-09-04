@@ -329,9 +329,6 @@ def initial_setup(path2csv, theme_url):
 
     with open(r'./assets/_help_columns.json', 'r') as f:
         HELP_CLMNS = json.load(f)
-    
-    with open(r'./assets/_help.md', 'r') as file:
-        markdown_help = file.read()        
 
     df = pd.read_csv(path2csv)
 
@@ -470,6 +467,14 @@ def initial_setup(path2csv, theme_url):
 
     # only numerical columns
     num_clmns = df.select_dtypes(include=['number','bool']).columns
+
+    # loading ...
+    with open(r'./assets/_help.md', 'r') as file:
+        markdown_help = file.read()  
+    # ... adding columns to Glossary
+    for key, value in HELP_CLMNS.items():
+        nn = CLMNS[key][-1]
+        markdown_help += f"{nn}. **{key}**: {value}  \n" 
 
     out = (
         mtable, wtable, #
@@ -802,5 +807,5 @@ def open_FactPageUrl(clickData, open):
 
 if __name__ == '__main__':
     app.title = 'CCS screening tool for NCS'
-    app.run_server(debug=True)
-    # app.run_server(debug=False)  # should be False for deployment
+    # app.run_server(debug=True)
+    app.run_server(debug=False)  # should be False for deployment
