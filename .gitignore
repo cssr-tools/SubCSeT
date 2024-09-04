@@ -13,6 +13,7 @@ __pycache__/
 temp.csv
 
 #  temporarily
-data/
+data/*
+!data/_main.csv
 nist_tables/
 *.ipynb
