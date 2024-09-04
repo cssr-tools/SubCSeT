@@ -24,7 +24,7 @@ import json
 # import warnings
 # import utils
 import webbrowser
-# microchange to test the fork
+# microchange2 to test the fork
 # %% constants
 themes = [
     "bootstrap", "cerulean", "cosmo", "cyborg", "darkly", "flatly",
