@@ -1,7 +1,6 @@
 
 # About
-This is a web application for screening petroleum reservoirs on the Norwegian Continental Shelf (NCS) for purposes of CO2 storage,  
-developed in [the Centre for Sustainable Subsurface Resources (CSSR)](https://cssr.no/).  
+This is a web application for screening petroleum reservoirs on the Norwegian Continental Shelf (NCS) for purposes of CO2 storage, developed in [the Centre for Sustainable Subsurface Resources (CSSR)](https://cssr.no/).  
 Contact developer: [LinkedIn](https://www.linkedin.com/in/alexey-khrulenko-8021a64a/)  
 Repository: **[link to GitHub]**  
 Paper: **[link to the paper]**  

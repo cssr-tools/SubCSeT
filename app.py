@@ -17,6 +17,7 @@ from dash import dcc
 from dash import Dash
 from copy import deepcopy
 import time
+import timeit
 import os
 from datetime import datetime, timedelta
 import json
@@ -25,28 +26,29 @@ import json
 import webbrowser
 
 # %% constants
-themes_templates =\
-    ["bootstrap", "cerulean", "cosmo", "cyborg", "darkly", "flatly",
-     "journal", "litera", "lumen", "lux", "materia", "minty", "morph",
-     "pulse", "quartz", "sandstone", "simplex", "sketchy", "slate",
-     "solar", "spacelab", "superhero", "united", "vapor", "yeti", "zephyr"]
+themes = [
+    "bootstrap", "cerulean", "cosmo", "cyborg", "darkly", "flatly",
+    "journal", "litera", "lumen", "lux", "materia", "minty", "morph",
+    "pulse", "quartz", "sandstone", "simplex", "sketchy", "slate",
+    "solar", "spacelab", "superhero", "united", "vapor", "yeti", "zephyr"]
 
-themes_templates = \
-    [{'label': i, 'value': eval('dbc.themes.'+i.upper())} \
-     for i in themes_templates]
+themes_options=[{'label': i, 'value': eval('dbc.themes.'+i.upper())} \
+                for i in themes]
 
-# THEME0 = "cosmo"  # sets the theme
-THEME0 = "darkly"  # sets the theme
-THEME0 = THEME0.upper()
-load_figure_template(THEME0)
+# theme0 = "cosmo"  # sets the theme
+# theme0 = "bootstrap"  # sets the theme
+theme0 = "journal"  # sets the theme
+THEME0 = theme0.upper()
+
 # %% Button to change the themes
 c_theme = ThemeChangerAIO(
     aio_id="theme",
-    radio_props={"value": eval('dbc.themes.'+THEME0),
-                #  "options": themes_templates
-                 },
+    radio_props={
+        "value": eval('dbc.themes.'+THEME0),
+        # "options": themes_options
+             },
     button_props={
-        "children": html.I(className="bi bi-palette"),
+        "children": [html.I(className="bi bi-palette"),'change theme'],
         'outline': True, "color": "dark",
         'size': 'md',
         'style': {'width': '100%'}
@@ -128,11 +130,14 @@ c_toolbar = dbc.ButtonGroup([
                id='b_reopen', size='md',
                outline=True, color="dark",
                ),
+    dbc.Button(html.I(className="bi bi-gear-fill"),
+               outline=True, color="dark",
+               id='b_settings', size='md',
+               ),  
     dbc.Button(html.I(className="bi bi-question-lg"),
                outline=True, color="dark",
                id='b_help', size='md',
-               ),  
-    c_theme
+               ),                 
 ])
 
 c_help=dbc.Modal([
@@ -140,17 +145,52 @@ c_help=dbc.Modal([
     dbc.ModalBody(dcc.Markdown(id='help_markdown')),
     ], id='help', is_open=False, size='lg', scrollable=True)
 
-c_help=dbc.Offcanvas(dcc.Markdown(id='help_markdown'),
-                     id='help', is_open=False, scrollable=True,
-                     style={'width': '40vw'}
-                     )
+c_help=dbc.Offcanvas(
+    dcc.Markdown(id='help_markdown'),
+    id='help', is_open=False, scrollable=True,
+    style={'width': '40vw'}
+    )
+
+c_settings=dbc.Offcanvas(
+    dbc.Stack([
+        html.H1('Settings'),
+        c_theme,
+        dbc.InputGroup([
+            dbc.InputGroupText("continious colorscale", style={'width': '50%'}),
+            dbc.Select(
+                id='select_colorscale', value='Portland',
+                options=['rainbow','hot','jet','RdBu','Bluered','Portland']
+                )]),
+        dbc.InputGroup([
+            dbc.InputGroupText("map style",style={'width': '50%'}),
+            dbc.Select(
+                id='select_map_style', value='carto-positron',
+                options=['open-street-map', 'carto-positron', 'carto-darkmatter']
+                )]),                
+        dbc.Checkbox(
+            id='checkbox_URL', 
+            label="click on a field to open its page on factpages.sodir.no/", 
+            # style={'alignSelf': 'center'},
+            value=False)             
+    ]),
+    id='settings', is_open=False, scrollable=True,
+    style={'width': '30vw'}
+    )
 
 @app.callback(
     Output('help', 'is_open'),
     Input('b_help', 'n_clicks'),
     prevent_initial_call=True,
 )
-def open_import_saphir_help(n):
+def open_import_help(n):
+    return True
+
+@app.callback(
+    Output('settings', 'is_open'),
+    Input('b_settings', 'n_clicks'),
+    prevent_initial_call=True,
+)
+def open_import_opensettings(n):
     return True
 
 c_map_tab = html.Div([
@@ -176,19 +216,14 @@ c_map_tab = html.Div([
     c_map, # map itself
 ])
 
-dbc.Checkbox(id='map_chbx', 
-             label="open the field's page on factpages.sodir.no/en", 
-             style={'alignSelf': 'center'},
-             value=False) 
-
-
 c_toolbar = dbc.Stack([
     c_toolbar,    
     dbc.Tooltip('add all filtered rows to selection', target='b_select'),
     dbc.Tooltip('deselect all', target='b_deselect'),
     dbc.Tooltip('reopen chart in new tab', target='b_reopen'),
     c_inp_fldr,
-    c_help
+    c_help,
+    c_settings
 ],
     direction="horizontal"
 )
@@ -257,7 +292,7 @@ app.layout = html.Div([
         className="g-0",
         # style={"flex": "1", "height": "100%"}
     ),
-    dcc.Store(id='store_theme', data=THEME0),
+    dcc.Store(id='store_theme', data=theme0),
     html.Div(id='dummy_output', hidden=True)
 ],
     style={'display': 'grid', 
@@ -297,6 +332,13 @@ def initial_setup(path2csv):
         markdown_help = file.read()        
 
     df = pd.read_csv(path2csv)
+
+    # loading the themes for charts
+    t0=time.time()
+    load_figure_template(theme0)
+    # load_figure_template(themes)
+    t1=time.time()
+    print(f'load template(s): {t1-t0:.3f} s')    
 
     # # Determine which DataFrame columns are not in the priority list
     # priority_columns = [i for i in FANCY_CLMNS if i in df.columns]     
@@ -501,14 +543,16 @@ def reopen_current_chart(n, active_tab, fig_map, fig_sc):
     Input('update_map', 'n_clicks'),
     Input('map_dd_color', 'value'),
     Input('map_dd_size', 'value'),
-    # Input('map_chbx_invert', 'value'),    
+    Input('select_colorscale', 'value'),      
+    Input('select_map_style', 'value'),      
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
     State('wtable', 'data'),
     State('store_theme', 'data'),
     # prevent_initial_call=True
 )
-def update_map(n, color, size, sel_rows, records, records2, theme):
+def update_map(n, color, size, colorscale, map_style,
+               sel_rows, records, records2, theme):
 
     fig = go.Figure()
     df = pd.DataFrame(data=records)
@@ -598,12 +642,10 @@ def update_map(n, color, size, sel_rows, records, records2, theme):
         hover_data=['field','lat','lon',size,color,'size'],
         size_max=size_max, 
         custom_data=['FactPageUrl'],
-        color_continuous_scale='rainbow',
+        color_continuous_scale=colorscale,
         color_discrete_sequence=px.colors.qualitative.G10,
         )
 
-    map_styles = ['open-street-map', 'carto-positron', 'carto-darkmatter']
-    map_style = map_styles[1]
     ref_lat, ref_lon = df.loc[:, ['lat', 'lon']].mean().values
 
     fig.update_layout(
@@ -638,12 +680,14 @@ def update_map(n, color, size, sel_rows, records, records2, theme):
     Input('sc_dd_y', 'value'),    
     Input('sc_dd_color', 'value'),
     Input('sc_dd_size', 'value'),
+    Input('select_colorscale', 'value'),    
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
     State('store_theme', 'data')
     # prevent_initial_call=True
 )
-def update_sc(n, x, y, color, size, sel_rows, records, theme):
+def update_sc(n, x, y, color, size, colorscale,
+              sel_rows, records, theme):
     
     df = pd.DataFrame(data=records)
 
@@ -665,7 +709,7 @@ def update_sc(n, x, y, color, size, sel_rows, records, theme):
 
     fig=px.scatter(
         df, x=x, y=y, color=color, size=size, size_max=size_max,
-        template='plotly_white', color_continuous_scale='rainbow',
+        template='plotly_white', color_continuous_scale=colorscale,
         hover_data=['field', x, y, color, size]
         )    
 
@@ -722,10 +766,12 @@ def sc_color_reset(n):
 def update_theme(theme_url, fig_map, fig_sc):
 
     theme_str = template_from_url(theme_url)
-    load_figure_template(theme_str)
 
-    # print('theme:',theme_str)
-    # print('theme URL:',theme_url)    
+    t0=time.time()
+    load_figure_template(theme0)
+    # load_figure_template(themes)
+    t1=time.time()
+    print(f'load template(s): {t1-t0:.3f} s')  
 
     fig_map = replace_none_colors(fig_map)
     fig_map = go.Figure(fig_map).update_layout(template=theme_str)
@@ -739,12 +785,13 @@ def update_theme(theme_url, fig_map, fig_sc):
 @app.callback(
     Output('dummy_output', 'children'), # dummy output
     Input('map', 'clickData'),
+    State('checkbox_URL','value'),
     prevent_initial_call=True
 )
-def open_FactPageUrl(clickData):
+def open_FactPageUrl(clickData, open):
     "open the field's page on factpages.sodir.no/en"
     # print(clickData)
-    if clickData is not None:
+    if clickData is not None and open==True:
         url=clickData['points'][0]['customdata'][0]
         url = url[0] if isinstance(url,list) else url
         webbrowser.open(url)
