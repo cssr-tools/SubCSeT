@@ -48,7 +48,8 @@ c_theme = ThemeChangerAIO(
         # "options": themes_options
              },
     button_props={
-        "children": [html.I(className="bi bi-palette"),'change theme'],
+        # "children": [html.I(className="bi bi-palette"),'change theme'],
+        "children": [html.Img(src="/assets/palette.svg"),'change theme'],
         'outline': True, "color": "dark",
         'size': 'md',
         'style': {'width': '100%'}
@@ -147,7 +148,7 @@ c_help=dbc.Modal([
 
 c_help=dbc.Offcanvas(
     dcc.Markdown(id='help_markdown'),
-    id='help', is_open=False, scrollable=True,
+    id='help', is_open=True, scrollable=True,
     style={'width': '40vw'}
     )
 
@@ -218,9 +219,9 @@ c_map_tab = html.Div([
 
 c_toolbar = dbc.Stack([
     c_toolbar,    
-    dbc.Tooltip('add all filtered rows to selection', target='b_select'),
-    dbc.Tooltip('deselect all', target='b_deselect'),
-    dbc.Tooltip('reopen chart in new tab', target='b_reopen'),
+    # dbc.Tooltip('add all filtered rows to selection', target='b_select'),
+    # dbc.Tooltip('deselect all', target='b_deselect'),
+    # dbc.Tooltip('reopen chart in new tab', target='b_reopen'),
     c_inp_fldr,
     c_help,
     c_settings
@@ -807,5 +808,5 @@ def open_FactPageUrl(clickData, open):
 
 if __name__ == '__main__':
     app.title = 'CCS screening tool for NCS'
-    # app.run_server(debug=True)
-    app.run_server(debug=False)  # should be False for deployment
+    app.run_server(debug=True)
+    # app.run_server(debug=False)  # should be False for deployment
