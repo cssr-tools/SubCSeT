@@ -144,42 +144,77 @@ c_toolbar = dbc.ButtonGroup([
                ),                 
 ])
 
-c_help=dbc.Modal([
-    # dbc.ModalHeader(dbc.ModalTitle('help')),
-    dbc.ModalBody(dcc.Markdown(id='help_markdown')),
-    ], id='help', is_open=False, size='lg', scrollable=True)
-
 c_help=dbc.Offcanvas(
     dcc.Markdown(id='help_markdown'),
-    id='help', is_open=True, scrollable=True,
-    style={'width': '40vw'}
+    id='help', is_open=True, scrollable=True, style={'width': '40vw'}
     )
+# alternative help component
+# c_help=dbc.Modal([
+#     dbc.ModalBody(dcc.Markdown(id='help_markdown')),
+#     ], id='help', is_open=True, size='lg', scrollable=True)
+
+COLORSCALES=['rainbow','hot','jet','RdBu','Bluered','Portland','PuOr','Temps']
 
 c_settings=dbc.Offcanvas(
     dbc.Stack([
         html.H1('Settings'),
         c_theme,
-        dbc.InputGroup([
-            dbc.InputGroupText("continious colorscale", style={'width': '50%'}),
-            dbc.Select(
-                id='select_colorscale', value='Portland',
-                options=['rainbow','hot','jet','RdBu','Bluered','Portland']
-                )]),
-        dbc.InputGroup([
-            dbc.InputGroupText("map style",style={'width': '50%'}),
-            dbc.Select(
-                id='select_map_style', value='carto-positron',
-                options=['open-street-map', 'carto-positron', 'carto-darkmatter']
-                )]),                
+        dbc.Row([
+            dbc.Col(
+                dbc.InputGroup([
+                    dbc.InputGroupText("map colorscale", 
+                                       style={'width': '45%'}),
+                    dbc.Select(
+                        id='select_map_colorscale', value='Portland',
+                        options=COLORSCALES
+                        )
+                ]),
+            width=9),
+            dbc.Col(
+                dbc.Switch(id='switch_reverse_map_cs', 
+                           label="reverse", value=False),
+            width=3),
+        ]),     
+        dbc.Row([
+            dbc.Col(
+                dbc.InputGroup([
+                    dbc.InputGroupText("scatter colorscale", 
+                                       style={'width': '45%'}),
+                    dbc.Select(
+                        id='select_sc_colorscale', value='Portland',
+                        options=COLORSCALES
+                        )
+                ]),
+            width=9),
+            dbc.Col(
+                dbc.Switch(id='switch_reverse_sc_cs', 
+                           label="reverse", value=False),
+            width=3),
+        ]), 
+        dbc.Row([
+            dbc.Col(
+                dbc.InputGroup([
+                    dbc.InputGroupText("map style",style={'width': '45%'}),
+                    dbc.Select(
+                        id='select_map_style', value='carto-positron',
+                        options=['open-street-map', 
+                                'carto-positron', 
+                                'carto-darkmatter']
+                        )]
+                ), width=9
+            ),
+            dbc.Col([],width=3),            
+        ]),     
         dbc.Checkbox(
             id='checkbox_URL', 
-            label="click on a field to open its page on factpages.sodir.no/", 
+            label="click on a field to open its page on factpages.sodir.no "+\
+                "(may not work in the cloud)", 
             # style={'alignSelf': 'center'},
-            value=False)             
+            value=False)  
     ]),
     id='settings', is_open=False, scrollable=True,
     style={'width': '30vw'}
-    )
+)
 
 @app.callback(
     Output('help', 'is_open'),
@@ -204,7 +239,8 @@ c_map_tab = html.Div([
             dbc.InputGroupText('size'),
             dbc.Select(id='map_dd_size', value='CO2 SC'),
             dbc.Button(html.I(className="bi bi-x-square"),
-                       size='md', outline=True, id='map_size_reset'),
+                       size='md', outline=True, color="dark",
+                       id='map_size_reset'),
             ], style={'width': '30%'}),
         dbc.InputGroup([
             dbc.InputGroupText('color'),
@@ -213,9 +249,6 @@ c_map_tab = html.Div([
             #            size='md', outline=True, id='map_color_reset'),            
             ], style={'width': '30%'}
             ),         
-        # dbc.Checkbox(id='map_chbx_invert', 
-        #              label="invert", style={'alignSelf': 'center'},
-        #              value=False)
         ], gap=3, direction="horizontal"),
     c_map, # map itself
 ])
@@ -235,7 +268,7 @@ c_toolbar = dbc.Stack([
 c_sc_b_update = dbc.Button(
     'update', id='update_sc', n_clicks=0,
     color='danger', className="me-1", size='md',
-    style={'width': '10%'}
+    # style={'width': '10%'}
 )
 
 c_sc = dcc.Graph(
@@ -260,14 +293,14 @@ c_sc_tab = html.Div([
         dbc.InputGroup([
             dbc.InputGroupText('size'),
             dbc.Select(id='sc_dd_size',value='CO2 SC'),
-            dbc.Button(html.I(className="bi bi-x-square"),
-                       size='md', outline=True, id='sc_size_reset'),            
+            dbc.Button(html.I(className="bi bi-x-square"), size='md', 
+                       outline=True, color="dark", id='sc_size_reset'),            
             ], style={'width': '25%'}),
         dbc.InputGroup([
             dbc.InputGroupText('color'),
             dbc.Select(id='sc_dd_color',value='q_resv'),
-            dbc.Button(html.I(className="bi bi-x-square"),
-                       size='md', outline=True, id='sc_color_reset'),
+            dbc.Button(html.I(className="bi bi-x-square"), size='md', 
+                       outline=True, color="dark", id='sc_color_reset'),
             ], style={'width': '25%'}),
         ], direction="horizontal"),
     c_sc
@@ -460,7 +493,7 @@ def initial_setup(path2csv, theme_url):
     wtable = DataTable(
         id='wtable', columns=clmns, 
         data=[{'parameter': None, 'weight': None}]*5,
-        dropdown=dropdowns, editable=True
+        dropdown=dropdowns, editable=True,
     )
 
     # all columns
@@ -555,7 +588,8 @@ def reopen_current_chart(n, active_tab, fig_map, fig_sc):
     Input('update_map', 'n_clicks'),
     Input('map_dd_color', 'value'),
     Input('map_dd_size', 'value'),
-    Input('select_colorscale', 'value'),      
+    Input('select_map_colorscale', 'value'),  
+    Input('switch_reverse_map_cs', 'value'),  
     Input('select_map_style', 'value'),      
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
@@ -563,12 +597,12 @@ def reopen_current_chart(n, active_tab, fig_map, fig_sc):
     State('store_theme', 'data'),
     # prevent_initial_call=True
 )
-def update_map(n, color, size, colorscale, map_style,
+def update_map(n, color, size, colorscale, reverse_colorscale, map_style,
                sel_rows, records, records2, theme):
 
     fig = go.Figure()
     df = pd.DataFrame(data=records)
-    # df.set_index('index',inplace=True)
+    if reverse_colorscale: colorscale += "_r"
 
     df2 = pd.DataFrame(data=records2)
 
@@ -692,16 +726,18 @@ def update_map(n, color, size, colorscale, map_style,
     Input('sc_dd_y', 'value'),    
     Input('sc_dd_color', 'value'),
     Input('sc_dd_size', 'value'),
-    Input('select_colorscale', 'value'),    
+    Input('select_sc_colorscale', 'value'),    
+    Input('switch_reverse_sc_cs', 'value'),      
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
     State('store_theme', 'data')
     # prevent_initial_call=True
 )
-def update_sc(n, x, y, color, size, colorscale,
+def update_sc(n, x, y, color, size, colorscale, reverse_colorscale,
               sel_rows, records, theme):
     
     df = pd.DataFrame(data=records)
+    if reverse_colorscale: colorscale += "_r"
 
     if sel_rows is None or sel_rows == []:
         # print('PreventUpdate!')
@@ -811,3 +847,4 @@ def open_FactPageUrl(clickData, open):
 
 if __name__ == '__main__':
     app.run(debug=False)  # should be False for deployment
+    # app.run(debug=True)  # should be False for deployment
