@@ -83,6 +83,7 @@ app = Dash(
     ],
     suppress_callback_exceptions=True)
 
+app.title = 'CCS screening tool for NCS'
 server = app.server
 
 c_inp_fldr = dbc.Input(
@@ -809,5 +810,4 @@ def open_FactPageUrl(clickData, open):
     return ""
 
 if __name__ == '__main__':
-    app.title = 'CCS screening tool for NCS'
     app.run(debug=False)  # should be False for deployment
