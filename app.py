@@ -94,12 +94,6 @@ c_inp_fldr = dbc.Input(
 c_mtable = DataTable(id='mtable', data=[], selected_rows=[])
 c_mtable = html.Div(c_mtable, id='mtable_div')
 
-# %% table with weights
-
-c_wtable = DataTable(id='wtable', columns=[], data=[], editable=True)
-c_wtable = html.Div(c_wtable, id='wtable_div')
-# c_wtable = dbc.Collapse(c_wtable, id='wtable_div')
-
 # %%
 c_map = dcc.Graph(
     id='map',
@@ -112,13 +106,6 @@ c_map = dcc.Graph(
 c_b_save = dbc.Button(
     'save selected', id='save_button', n_clicks=0,
     className="me-1", size='md',
-)
-
-c_map_b_update = dbc.Button(
-    'update', id='update_map', n_clicks=0,
-    color='danger',
-    className="me-1", size='md',
-    # style={'width': '10%'}
 )
 
 c_toolbar = dbc.ButtonGroup([
@@ -146,7 +133,7 @@ c_toolbar = dbc.ButtonGroup([
 
 c_help=dbc.Offcanvas(
     dcc.Markdown(id='help_markdown'),
-    id='help', is_open=True, scrollable=True, style={'width': '40vw'}
+    id='help', is_open=False, scrollable=True, style={'width': '40vw'}
     )
 # alternative help component
 # c_help=dbc.Modal([
@@ -225,30 +212,44 @@ def open_import_help(n):
     return True
 
 @app.callback(
+    Output('wtable_div', 'is_open'),
+    Input('hide_para_table', 'n_clicks'),
+    State('wtable_div', 'is_open'),
+    prevent_initial_call=True,
+)
+def collapse_para_table(n, is_open):
+    return not is_open
+
+@app.callback(
     Output('settings', 'is_open'),
     Input('b_settings', 'n_clicks'),
     prevent_initial_call=True,
 )
-def open_import_opensettings(n):
+def open_settings(n):
     return True
 
 c_map_tab = html.Div([
     dbc.Stack([
-        c_map_b_update,
+        dbc.Button(
+            'update', id='update_map', n_clicks=0,
+            color='danger',
+            className="me-1", size='md',
+        ),
         dbc.InputGroup([
             dbc.InputGroupText('size'),
             dbc.Select(id='map_dd_size', value='CO2 SC'),
             dbc.Button(html.I(className="bi bi-x-square"),
                        size='md', outline=True, color="dark",
                        id='map_size_reset'),
-            ], style={'width': '30%'}),
+            ], style={'width': '30%'}
+        ),
         dbc.InputGroup([
             dbc.InputGroupText('color'),
             dbc.Select(id='map_dd_color', value='field'),
             # dbc.Button(html.I(className="bi bi-x-square"),
             #            size='md', outline=True, id='map_color_reset'),            
             ], style={'width': '30%'}
-            ),         
+        ),         
         ], gap=3, direction="horizontal"),
     c_map, # map itself
 ])
@@ -305,18 +306,51 @@ c_sc_tab = html.Div([
         ], direction="horizontal"),
     c_sc
 ])
+#%% Parallel plot
+
+# c_wtable = DataTable(id='wtable', columns=[], data=[], editable=True)
+c_wtable_div = dbc.Collapse([], id='wtable_div',is_open=True)
+
+c_para_tab = html.Div([
+    dbc.Stack([
+        dbc.Button(
+            'update', id='update_para', n_clicks=0,
+            color='danger',
+            className="me-1", size='md',
+        ),
+        dbc.InputGroup([
+            dbc.InputGroupText('color'),
+            dbc.Select(id='para_dd_color', value='field'),
+            dbc.Button(html.I(className="bi bi-x-square"),
+                        size='md', outline=True, color="dark",
+                        id='para_color_reset'),
+        ],  style={'width': '40%'}),
+        dbc.Button(
+            ['+/-', html.I(className="bi bi-table")], 
+            id='hide_para_table', n_clicks=0,
+            # color='danger',
+            className="me-1", size='md',
+        ),        
+    ], direction="horizontal", gap=3
+    ),
+    c_wtable_div,
+    dcc.Graph(
+        id='para',
+        # style={'height': '87vh'},
+        config={'displayModeBar': True})
+])
 
 #%%
 c_tabs = dbc.Tabs([
     dbc.Tab(c_map_tab, 
-            label='MAP', 
+            label='MAP', tab_id='tab_map',
             active_tab_style={"fontWeight": "bold"},
             ),
-    dbc.Tab(c_sc_tab, label='SCATTER PLOT', 
+    dbc.Tab(c_sc_tab, label='SCATTER PLOT', tab_id='tab_sc',
             active_tab_style={"fontWeight": "bold"}),
-    dbc.Tab(c_wtable, label='SCORING RULES',
+    dbc.Tab(c_para_tab, label='PARA-PLOT', tab_id='tab_para',
             active_tab_style={"fontWeight": "bold"})
-    ], id='all_tabs'
+    ], id='all_tabs', active_tab='tab_para'
 # style={"flex": "1", "height": "100%"}
 )
 
@@ -352,6 +386,7 @@ app.layout = html.Div([
     Output('sc_dd_y', 'options'),
     Output('sc_dd_size', 'options'),
     Output('sc_dd_color', 'options'),
+    Output('para_dd_color','options'),
     Output('help_markdown','children'),
     #
     Input('inp_fldr', 'value'),  
@@ -368,14 +403,22 @@ def initial_setup(path2csv, theme_url):
         HELP_CLMNS = json.load(f)
 
     df = pd.read_csv(path2csv)
+    
+    # all columns
+    all_clmns = list(df.columns)
+
+    for v in ['reservoir', 'FactPageUrl']: all_clmns.remove(v)
+
+    # only numerical columns
+    num_clmns = df.select_dtypes(include=['number','bool']).columns
 
     # loading the themes for charts
-    t0=time.time()
+    # t0=time.time()
     theme  = template_from_url(theme_url)
     load_figure_template(theme)
     # load_figure_template(themes)
-    t1=time.time()
-    print(f'load template(s): {t1-t0:.3f} s')    
+    # t1=time.time()
+    # print(f'load template(s): {t1-t0:.3f} s')    
 
     # # Determine which DataFrame columns are not in the priority list
     # priority_columns = [i for i in FANCY_CLMNS if i in df.columns]     
@@ -480,30 +523,44 @@ def initial_setup(path2csv, theme_url):
                     'whiteSpace': 'normal'}
     )
 
-    clmns = [{'name': i, 'id': i} for i in ['parameter', 'weight']]
-    clmns[0]['presentation'] = 'dropdown'
-    clmns[1]['type'] = 'numeric'
+    # table 2
+    clmns = [{'name': i, 'id': i} \
+             for i in ['#','parameter','normalize','log10','reverse']]
+    clmns[0]['type'] = 'numeric'
+    clmns[1]['presentation'] = 'dropdown'
+    clmns[2]['presentation'] = 'dropdown'
+    clmns[3]['presentation'] = 'dropdown'
+    clmns[4]['presentation'] = 'dropdown'
 
-    sel_columns = df.columns
     dropdowns = {}
     dropdowns['parameter']={}
     dropdowns['parameter']['options']=\
-        [{'label': i, 'value': i} for i in sel_columns]
+        [{'label': i, 'value': i} for i in num_clmns]
+    
+    dropdowns['normalize']={}
+    dropdowns['normalize']['options']=\
+        [{'label': i, 'value': i} for i in ['median','mean',
+                                            'z-score','min-max']]  
+    
+    dropdowns['log10']={}
+    dropdowns['log10']['options']=\
+        [{'label': 'Yes', 'value': True}, {'label': 'No', 'value': False}]    
+    
+    dropdowns['reverse']={}
+    dropdowns['reverse']['options']=\
+        [{'label': 'Yes', 'value': True}, {'label': 'No', 'value': False}]
 
     wtable = DataTable(
         id='wtable', columns=clmns, 
-        data=[{'parameter': None, 'weight': None}]*5,
+        data=[{'#': i+1,
+               'parameter': None, 
+               'normalize to': None,
+               'log10': False,
+               'reverse': False
+               } for i in range(5)],
         dropdown=dropdowns, editable=True,
+        style_table={'width': '45vw'},
     )
-
-    # all columns
-    all_clmns = list(df.columns)
-
-    for v in ['reservoir', 'FactPageUrl']:
-        all_clmns.remove(v)
-
-    # only numerical columns
-    num_clmns = df.select_dtypes(include=['number','bool']).columns
 
     # loading ...
     with open(r'./assets/_help.md', 'r') as file:
@@ -522,6 +579,7 @@ def initial_setup(path2csv, theme_url):
         num_clmns, # options for scatter's Y dropdown
         num_clmns, # options for scatter's size dropdown
         all_clmns, # options for scatter's color dropdown
+        all_clmns, # options for para's color dropdown        
         markdown_help  # help text
     )
     return out
@@ -819,7 +877,7 @@ def update_theme(theme_url, fig_map, fig_sc):
     load_figure_template(theme0)
     # load_figure_template(themes)
     t1=time.time()
-    print(f'load template(s): {t1-t0:.3f} s')  
+    # print(f'load template(s): {t1-t0:.3f} s')  
 
     fig_map = replace_none_colors(fig_map)
     fig_map = go.Figure(fig_map).update_layout(template=theme_str)
@@ -846,5 +904,5 @@ def open_FactPageUrl(clickData, open):
     return ""
 
 if __name__ == '__main__':
-    app.run(debug=False)  # should be False for deployment
-    # app.run(debug=True)  # should be False for deployment
+    # app.run(debug=False)  # should be False for deployment
+    app.run(debug=True)  # should be False for deployment
