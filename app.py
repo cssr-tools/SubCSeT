@@ -59,7 +59,7 @@ c_theme = ThemeChangerAIO(
         }
 )
 
-# %%  
+# %% Utilities
 def replace_none_colors(fig,color='grey'):
     '''replaces None values in FIG dict with the COLOR'''
     for trace in fig['data']:
@@ -68,6 +68,11 @@ def replace_none_colors(fig,color='grey'):
             clrs = [color if x is None else x for x in clrs] 
             fig['data'][0]['marker']['color'] = clrs  
     return fig
+
+
+def round_to_sign_digits(x, sig_digits=3):
+    '''Custom function to round to significant digits'''
+    return np.format_float_scientific(x, precision=sig_digits-1)
 
 # %% app layout ----------------------------------------------------------------
 # %%
@@ -96,9 +101,9 @@ c_mtable = html.Div(c_mtable, id='mtable_div')
 
 # %%
 c_map = dcc.Graph(
-    id='map',
+    id='map_fig',
     style={
-        'height': '87vh',
+        'height': '89vh',
     },
     config={'displayModeBar': True}
 )
@@ -212,9 +217,9 @@ def open_import_help(n):
     return True
 
 @app.callback(
-    Output('wtable_div', 'is_open'),
+    Output('ptable_div', 'is_open'),
     Input('hide_para_table', 'n_clicks'),
-    State('wtable_div', 'is_open'),
+    State('ptable_div', 'is_open'),
     prevent_initial_call=True,
 )
 def collapse_para_table(n, is_open):
@@ -263,7 +268,7 @@ c_toolbar = dbc.Stack([
     c_help,
     c_settings
 ],
-    direction="horizontal"
+    direction="horizontal", gap=1
 )
 #%% scatter plot
 c_sc_b_update = dbc.Button(
@@ -273,7 +278,7 @@ c_sc_b_update = dbc.Button(
 )
 
 c_sc = dcc.Graph(
-    id='sc',
+    id='sc_fig',
     style={
         'height': '87vh',
     },
@@ -308,15 +313,14 @@ c_sc_tab = html.Div([
 ])
 #%% Parallel plot
 
-# c_wtable = DataTable(id='wtable', columns=[], data=[], editable=True)
-c_wtable_div = dbc.Collapse([], id='wtable_div',is_open=True)
+# c_ptable = DataTable(id='ptable', columns=[], data=[], editable=True)
+c_ptable_div = dbc.Collapse([], id='ptable_div',is_open=True)
 
 c_para_tab = html.Div([
     dbc.Stack([
         dbc.Button(
             'update', id='update_para', n_clicks=0,
-            color='danger',
-            className="me-1", size='md',
+            color='danger', className="me-1", size='md',
         ),
         dbc.InputGroup([
             dbc.InputGroupText('color'),
@@ -326,58 +330,86 @@ c_para_tab = html.Div([
                         id='para_color_reset'),
         ],  style={'width': '40%'}),
         dbc.Button(
-            ['+/-', html.I(className="bi bi-table")], 
+            ['+/- ', html.I(className="bi bi-table")], 
             id='hide_para_table', n_clicks=0,
             # color='danger',
             className="me-1", size='md',
         ),        
     ], direction="horizontal", gap=3
     ),
-    c_wtable_div,
+    c_ptable_div,
     dcc.Graph(
-        id='para',
+        id='para_fig',
         # style={'height': '87vh'},
         config={'displayModeBar': True})
 ])
+#%% total score
+
+c_wtable = DataTable(id='wtable', columns=[], data=[], editable=True)
+c_wtable_div = html.Div(c_wtable, id='wtable_div')
+
+c_w_tab=html.Div([
+    dbc.Button(
+        'update', id='update_ts', n_clicks=0,
+        color='danger', className="me-1", size='md',
+    ),    
+    c_wtable_div,
+    dcc.Graph(id='ts_fig')
+], 
+# style={'display': 'grid'}
+)
+
 
 #%%
 c_tabs = dbc.Tabs([
-    dbc.Tab(c_map_tab, 
-            label='MAP', tab_id='tab_map',
-            active_tab_style={"fontWeight": "bold"},
-            ),
-    dbc.Tab(c_sc_tab, label='SCATTER PLOT', tab_id='tab_sc',
-            active_tab_style={"fontWeight": "bold"}),
-    dbc.Tab(c_para_tab, label='PARA-PLOT', tab_id='tab_para',
-            active_tab_style={"fontWeight": "bold"})
+    dbc.Tab(
+        c_map_tab, 
+        label='MAP', tab_id='tab_map',
+        active_tab_style={"fontWeight": "bold"},
+        ),
+    dbc.Tab(
+        c_sc_tab, label='SCATTER PLOT', tab_id='tab_sc',
+        active_tab_style={"fontWeight": "bold"}
+        ),
+    dbc.Tab(
+        c_para_tab, label='PARA-PLOT', tab_id='tab_para',
+        active_tab_style={"fontWeight": "bold"}
+        ),
+    dbc.Tab(
+        c_w_tab, label='TOTAL SCORE', tab_id='tab_ts',
+        active_tab_style={"fontWeight": "bold"}
+        ) 
     ], id='all_tabs', active_tab='tab_para'
-# style={"flex": "1", "height": "100%"}
 )
 
 app.layout = html.Div([
     dbc.Row([
-        dbc.Col([c_toolbar, 
-                 c_mtable], width=6),
-        dbc.Col(c_tabs, width=6)
-    ],
+        dbc.Col([c_toolbar, c_mtable], width=6,
+                style={'padding-right': '0.5vw'}
+                ),
+        dbc.Col(c_tabs, width=6,
+                # style={'padding-left': '0.25vw'}
+                )
+    ], 
         className="g-0",
-        # style={"flex": "1", "height": "100%"}
     ),
     dcc.Store(id='store_theme', data=theme0),
     html.Div(id='dummy_output', hidden=True)
 ],
-    style={'display': 'grid', 
-           # to account for scrollbars
-           'width': 'calc(100vw - (100vw - 100%))',
-           'height': 'calc(100vh - (100vh - 100%))',
-           },
-    className="dbc"
+style={
+    # 'display': 'grid', 
+    # to account for scrollbars
+    'width': 'calc(100vw - (100vw - 100%))',
+    'height': 'calc(100vh - (100vh - 100%))',
+    },
+className="dbc"
 )
 
 
 @app.callback(
     Output('mtable_div', 'children'),
-    Output('wtable_div', 'children'),
+    Output('ptable_div', 'children'),
+    Output('wtable_div', 'children'),    
     Output('update_map', 'n_clicks'),
     Output('update_sc', 'n_clicks'),
     Output('map_dd_size', 'options'),
@@ -391,8 +423,6 @@ app.layout = html.Div([
     #
     Input('inp_fldr', 'value'),  
     State(ThemeChangerAIO.ids.radio("theme"), "value"), 
-
-    # prevent_initial_call=True
 )
 def initial_setup(path2csv, theme_url):
 
@@ -412,6 +442,10 @@ def initial_setup(path2csv, theme_url):
     # only numerical columns
     num_clmns = df.select_dtypes(include=['number','bool']).columns
 
+    # adding another field column in the end to improve readability
+    df['field2'] = df['field']
+    CLMNS['field2']=deepcopy(CLMNS['field'])
+
     # loading the themes for charts
     # t0=time.time()
     theme  = template_from_url(theme_url)
@@ -427,6 +461,7 @@ def initial_setup(path2csv, theme_url):
     # new_column_order = priority_columns + other_columns
     # df = df[new_column_order]
 
+    #%% mtable
     clmns = []
     for k, v in CLMNS.items():
         clmns.append({"name": v, "id": k, 'hideable': True,
@@ -503,30 +538,16 @@ def initial_setup(path2csv, theme_url):
             # 'width': 'calc(50vw - (50vw - 100%))',
             'overflowX': 'auto', 
             'overflowY': 'auto'
-        },
-        # style_data_conditional=[
-        #     # Highlighting the 'Name' column
-        #     {
-        #         'if': {'column_id': 'Name'},
-        #         'backgroundColor': '#FFD2D2',
-        #         'color': 'black'
-        #     },
-        #     # Highlighting the 'Age' column
-        #     {
-        #         'if': {'column_id': 'Age'},
-        #         'backgroundColor': '#D2F0FF',
-        #         'color': 'black'
-        #     }
-        # ],        
+        },   
         style_cell={'fontSize': 14, 
                     'textAlign': 'center',
                     'whiteSpace': 'normal'}
     )
-
-    # table 2
+    #%% ptable
     clmns = [{'name': i, 'id': i} \
-             for i in ['#','parameter','normalize','log10','reverse']]
+             for i in ['#','parameter','log10','normalize','reverse']]
     clmns[0]['type'] = 'numeric'
+    clmns[0]['editable'] = False
     clmns[1]['presentation'] = 'dropdown'
     clmns[2]['presentation'] = 'dropdown'
     clmns[3]['presentation'] = 'dropdown'
@@ -539,8 +560,8 @@ def initial_setup(path2csv, theme_url):
     
     dropdowns['normalize']={}
     dropdowns['normalize']['options']=\
-        [{'label': i, 'value': i} for i in ['median','mean',
-                                            'z-score','min-max']]  
+        [{'label': i, 'value': i} for i in ['min-max','median',
+                                            'mean', 'z-score']]  
     
     dropdowns['log10']={}
     dropdowns['log10']['options']=\
@@ -550,18 +571,74 @@ def initial_setup(path2csv, theme_url):
     dropdowns['reverse']['options']=\
         [{'label': 'Yes', 'value': True}, {'label': 'No', 'value': False}]
 
-    wtable = DataTable(
-        id='wtable', columns=clmns, 
-        data=[{'#': i+1,
-               'parameter': None, 
-               'normalize to': None,
-               'log10': False,
-               'reverse': False
-               } for i in range(5)],
+    pdata=[\
+        {'#': 1, 'parameter': 'CO2 SC','normalize to': None, 'log10': True,
+         'reverse': False}, 
+        {'#': 2, 'parameter': 'q_resv','normalize to': None, 'log10': True,
+         'reverse': False}, 
+        {'#': 3, 'parameter': 'depth', 'normalize to': None, 'log10': False,
+         'reverse': True},          
+        {'#': 4, 'parameter': None, 'normalize to': None, 'log10': False,
+         'reverse': True},  
+        {'#': 5, 'parameter': None, 'normalize to': None, 'log10': False,
+         'reverse': True},             
+        ]
+
+    ptable = DataTable(
+        id='ptable', columns=clmns, data=pdata,
         dropdown=dropdowns, editable=True,
         style_table={'width': '45vw'},
+        style_cell={'fontSize': 14, 
+                    'textAlign': 'center',
+                    'whiteSpace': 'normal'} 
     )
 
+    #%% total score table
+    clmns = [{'name': i, 'id': i} \
+             for i in ['#','parameter','log10','normalize','weight']]
+    clmns[0]['type'] = 'numeric'
+    clmns[0]['editable'] = False
+    clmns[1]['presentation'] = 'dropdown'
+    clmns[2]['presentation'] = 'dropdown'
+    clmns[3]['presentation'] = 'dropdown'
+    clmns[4]['type'] = 'numeric'
+
+    dropdowns = {}
+    dropdowns['parameter']={}
+    dropdowns['parameter']['options']=\
+        [{'label': i, 'value': i} for i in num_clmns]
+    
+    dropdowns['normalize']={}
+    dropdowns['normalize']['options']=\
+        [{'label': i, 'value': i} for i in ['min-max','median',
+                                            'mean', 'z-score']]  
+    
+    dropdowns['log10']={}
+    dropdowns['log10']['options']=\
+        [{'label': 'Yes', 'value': True}, {'label': 'No', 'value': False}]    
+
+    wdata=[\
+        {'#': 1, 'parameter': 'CO2 SC','normalize': 'min-max', 'log10': True,
+         'weight': 5}, 
+        {'#': 2, 'parameter': 'q_resv','normalize': 'min-max', 'log10': True,
+         'weight': 1}, 
+        {'#': 3, 'parameter': 'depth', 'normalize': 'min-max', 'log10': False,
+         'weight': -1},          
+        {'#': 4, 'parameter': None, 'normalize': 'min-max', 'log10': False,
+         'weight': 1},  
+        {'#': 5, 'parameter': None, 'normalize': 'min-max', 'log10': False,
+         'weight': 1},   
+        ]
+
+    wtable = DataTable(
+        id='wtable', columns=clmns, data=wdata,
+        dropdown=dropdowns, editable=True,
+        style_table={'width': '45vw'},
+        style_cell={'fontSize': 14, 
+                    'textAlign': 'center',
+                    'whiteSpace': 'normal'} 
+    ) 
+    #%% preparing help content
     # loading ...
     with open(r'./assets/_help.md', 'r') as file:
         markdown_help = file.read()  
@@ -571,7 +648,7 @@ def initial_setup(path2csv, theme_url):
         markdown_help += f"{nn}. **{key}**: {value}  \n" 
 
     out = (
-        mtable, wtable, #
+        mtable, ptable, wtable,  #
         1, 1, # initializes the map and scatter plots
         num_clmns,  # options for map's size dropdown
         all_clmns,  # options for map's color dropdown
@@ -613,8 +690,8 @@ def select_deselect(m, b, selected_rows, filtered_rows):
     Output('b_reopen', "n_clicks"),
     Input('b_reopen', "n_clicks"),
     State("all_tabs", 'active_tab'),
-    State('map', 'figure'),
-    State('sc', 'figure'),    
+    State('map_fig', 'figure'),
+    State('sc_fig', 'figure'),    
     prevent_initial_call=True
 )
 
@@ -641,8 +718,7 @@ def reopen_current_chart(n, active_tab, fig_map, fig_sc):
 
 
 @app.callback(
-    Output('map', 'figure'),
-    Output('mtable', 'data'),
+    Output('map_fig', 'figure'),
     Input('update_map', 'n_clicks'),
     Input('map_dd_color', 'value'),
     Input('map_dd_size', 'value'),
@@ -651,27 +727,15 @@ def reopen_current_chart(n, active_tab, fig_map, fig_sc):
     Input('select_map_style', 'value'),      
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
-    State('wtable', 'data'),
     State('store_theme', 'data'),
     # prevent_initial_call=True
 )
 def update_map(n, color, size, colorscale, reverse_colorscale, map_style,
-               sel_rows, records, records2, theme):
+               sel_rows, records, theme):
 
     fig = go.Figure()
     df = pd.DataFrame(data=records)
     if reverse_colorscale: colorscale += "_r"
-
-    df2 = pd.DataFrame(data=records2)
-
-    df['total score'] = 0
-    for i in df2.index:
-        column = df2.loc[i, 'parameter']
-        if column is None: continue
-        weight = df2.loc[i, 'weight']
-        df['total score'] += weight*df[column]
-    
-    df0 = df.copy()
 
     if sel_rows is None or sel_rows == []:
         # print('PreventUpdate!')
@@ -775,10 +839,10 @@ def update_map(n, color, size, colorscale, reverse_colorscale, map_style,
     )
     fig.update_geos(fitbounds="locations")
 
-    return fig, df0.to_dict('records')
+    return fig
 
 @app.callback(
-    Output('sc', 'figure'),
+    Output('sc_fig', 'figure'),
     Input('update_sc', 'n_clicks'),
     Input('sc_dd_x', 'value'),    
     Input('sc_dd_y', 'value'),    
@@ -834,14 +898,6 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale,
 def map_size_reset(n):
     return None
 
-# @app.callback(
-#     Output('map_dd_color', 'value'),
-#     Input('map_color_reset', 'n_clicks'),
-#     prevent_initial_call=True
-# )
-# def map_color_reset(n):
-#     return None
-
 @app.callback(
     Output('sc_dd_size', 'value'),
     Input('sc_size_reset', 'n_clicks'),
@@ -861,12 +917,12 @@ def sc_color_reset(n):
 #%% Theme change callback
 @app.callback(
     Output('store_theme', 'data'),
-    Output('map', 'figure',allow_duplicate=True),
-    Output('sc', 'figure', allow_duplicate=True),         
+    Output('map_fig', 'figure',allow_duplicate=True),
+    Output('sc_fig', 'figure', allow_duplicate=True),         
 
     Input(ThemeChangerAIO.ids.radio("theme"), "value"),
-    State('map', 'figure'),
-    State('sc', 'figure'),      
+    State('map_fig', 'figure'),
+    State('sc_fig', 'figure'),      
     prevent_initial_call=True
 )
 def update_theme(theme_url, fig_map, fig_sc):
@@ -890,7 +946,7 @@ def update_theme(theme_url, fig_map, fig_sc):
 # opens sodir.no field page on click
 @app.callback(
     Output('dummy_output', 'children'), # dummy output
-    Input('map', 'clickData'),
+    Input('map_fig', 'clickData'),
     State('checkbox_URL','value'),
     prevent_initial_call=True
 )
@@ -902,6 +958,71 @@ def open_FactPageUrl(clickData, open):
         url = url[0] if isinstance(url,list) else url
         webbrowser.open(url)
     return ""
+
+@app.callback(
+    Output('para_fig', 'figure'),
+    Input('update_para', 'n_clicks'),
+    State('ptable', 'data'),        
+    prevent_initial_call=True
+)
+def update_para(n, records):
+    df=pd.DataFrame(data=records)
+    print(df)
+    return None
+
+@app.callback(
+    Output('mtable', 'data'),
+    Output('ts_fig', 'figure'),    
+    Input('update_ts', 'n_clicks'),    
+    State('mtable', 'data'),
+    State('mtable', 'selected_rows'),    
+    State('wtable', 'data'),    
+    prevent_initial_call=True
+)
+def update_ts(n, records, selected_rows, wrecords):
+    '''calculates total score column, updates the chart'''
+    df = pd.DataFrame(data=records) # main df
+    wdf = pd.DataFrame(data=wrecords)  # weights etc.
+    wdf = wdf.dropna(subset='parameter')
+    cdf = df[['field']].copy() # to store contributions
+    print(wdf)
+    weight_sum=wdf['weight'].abs().sum()
+    params = wdf['parameter'].to_list()
+
+    df['total score'] = 0
+    for i in wdf.index:
+        col = wdf.loc[i, 'parameter']
+        if col is None: continue
+        weight = wdf.loc[i, 'weight']
+         # to correctly hangle weights<0, i.e. parameters to be minimized
+        x = df[col].copy()*np.sign(weight)
+        cdf[col] = 100*np.abs(weight)*(x - x.min())/(x.max()-x.min())/ weight_sum
+        cdf[col] = cdf[col].round(1)
+        df['total score'] += cdf[col]
+
+    # df['total score'] = df['total score'].apply(round_to_sign_digits)
+    df['total score'] = df['total score'].round(1)
+    fig = None
+    cdf['total score'] = df['total score'].round(1)
+    cdf = cdf.dropna()
+    cdf = cdf.sort_values(by='total score', ascending=False)
+    cdf = cdf[:15]
+
+    print(cdf)
+
+    fig = None
+    fig = px.bar(cdf, x=params, y="field", orientation='h',log_x=False,
+                 hover_data=['total score']
+                 )
+    fig.update_layout(
+        barmode='stack',
+        yaxis=dict(autorange='reversed'), 
+        xaxis=dict(title='total score and its components', side='top', 
+                   range=(0,100)),
+        )
+
+    return df.to_dict('records'), fig
+
 
 if __name__ == '__main__':
     # app.run(debug=False)  # should be False for deployment
