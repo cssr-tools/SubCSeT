@@ -63,11 +63,25 @@ c_theme = ThemeChangerAIO(
 def replace_none_colors(fig,color='grey'):
     '''replaces None values in FIG dict with the COLOR'''
     for trace in fig['data']:
+        if 'marker' not in trace: continue
         clrs = trace['marker']['color'] 
         if isinstance(clrs,list):
             clrs = [color if x is None else x for x in clrs] 
             fig['data'][0]['marker']['color'] = clrs  
     return fig
+
+def normalize_series(s, method='min-max'):
+    if method == 'min-max':
+        s_min,s_max = s.min(), s.max()
+        return (s - s_min)/(s_max - s_min)
+    elif method=='median':
+        return s/s.median()
+    elif method=='min':
+        return s/s.mean()
+    elif method=='z-score':
+        return (s - s.mean())/s.std()
+    else:
+        return s
 
 
 def round_to_sign_digits(x, sig_digits=3):
@@ -574,15 +588,15 @@ def initial_setup(path2csv, theme_url):
         [{'label': 'Yes', 'value': True}, {'label': 'No', 'value': False}]
 
     pdata=[\
-        {'#': 1, 'parameter': 'CO2 SC','normalize to': None, 'log10': True,
+        {'#': 1, 'parameter': 'CO2 SC','normalize': None, 'log10': True,
          'reverse': False}, 
-        {'#': 2, 'parameter': 'q_resv','normalize to': None, 'log10': True,
+        {'#': 2, 'parameter': 'q_resv','normalize': None, 'log10': True,
          'reverse': False}, 
-        {'#': 3, 'parameter': 'depth', 'normalize to': None, 'log10': False,
+        {'#': 3, 'parameter': 'depth', 'normalize': None, 'log10': False,
          'reverse': True},          
-        {'#': 4, 'parameter': None, 'normalize to': None, 'log10': False,
+        {'#': 4, 'parameter': None, 'normalize': None, 'log10': False,
          'reverse': True},  
-        {'#': 5, 'parameter': None, 'normalize to': None, 'log10': False,
+        {'#': 5, 'parameter': None, 'normalize': None, 'log10': False,
          'reverse': True},             
         ]
 
@@ -694,17 +708,20 @@ def select_deselect(m, b, selected_rows, filtered_rows):
     State("all_tabs", 'active_tab'),
     State('map_fig', 'figure'),
     State('sc_fig', 'figure'),    
+    State('para_fig', 'figure'),      
     prevent_initial_call=True
 )
 
-def reopen_current_chart(n, active_tab, fig_map, fig_sc):
+def reopen_current_chart(n, active_tab, fig_map, fig_sc, fig_para):
 
     fig = None
     print('active tab:', active_tab)
-    if active_tab == 'tab-0':
+    if active_tab == 'tab_map':
         fig=fig_map
-    elif active_tab == 'tab-1':
+    elif active_tab == 'tab_sc':
         fig=fig_sc   
+    elif active_tab == 'tab_para':
+        fig=fig_para           
     else:
         pass   
 
@@ -969,6 +986,7 @@ def open_FactPageUrl(clickData, open):
         webbrowser.open(url)
     return ""
 
+
 @app.callback(
     Output('para_fig', 'figure'),
     Input('update_para', 'n_clicks'),
@@ -978,14 +996,34 @@ def open_FactPageUrl(clickData, open):
     prevent_initial_call=True
 )
 def update_para(n, color, mrecords, precords):
-    df=pd.DataFrame(data=mrecords)
-    pdf=pd.DataFrame(data=precords)
+    df = pd.DataFrame(data=mrecords)
+    pdf = pd.DataFrame(data=precords)
     pdf = pdf.dropna(subset='parameter')
     params = pdf['parameter'].to_list()  
     df = df.dropna(subset=params)
     
+    new_params = []
+    for i in pdf.index:
+        p = pdf.loc[i, 'parameter']
+        p_new = p
+        if pdf.loc[i, 'log10']:  
+            df[p]=np.log10(df[p])
+            p_new = f"log10({p})" 
+            
+        if pdf.loc[i, 'reverse']:  
+            df[p] = -df[p]
+            p_new = '-' + p_new
+
+        if pdf.loc[i,'normalize']:
+            df[p]=normalize_series(df[p])
+            p_new += "*"
+
+        new_params.append(p_new)
+    
+    labels = dict(zip(params,new_params))
+
     fig = px.parallel_coordinates(
-        df, dimensions=params, color=color,
+        df, dimensions=params, labels=labels, color=color,
         color_continuous_scale='Portland',
         )
 
@@ -1012,14 +1050,23 @@ def update_ts(n, records, selected_rows, wrecords):
 
     df['total score'] = 0
     for i in wdf.index:
-        col = wdf.loc[i, 'parameter']
-        if col is None: continue
+        p = wdf.loc[i, 'parameter']
+        if p is None: continue
+        
+        x = df[p].copy()
         weight = wdf.loc[i, 'weight']
+
+        if wdf.loc[i, 'log10']:  
+            x=np.log10(x)
+
+        if wdf.loc[i,'normalize']:
+            x=normalize_series(x)
+            
          # to correctly hangle weights<0, i.e. parameters to be minimized
-        x = df[col].copy()*np.sign(weight)
-        cdf[col] = 100*np.abs(weight)*(x - x.min())/(x.max()-x.min())/ weight_sum
-        cdf[col] = cdf[col].round(1)
-        df['total score'] += cdf[col]
+        x = x*np.sign(weight)
+        cdf[p] = 100*np.abs(weight)*(x - x.min())/(x.max()-x.min())/ weight_sum
+        cdf[p] = cdf[p].round(1)
+        df['total score'] += cdf[p]
 
     # df['total score'] = df['total score'].apply(round_to_sign_digits)
     df['total score'] = df['total score'].round(1)
