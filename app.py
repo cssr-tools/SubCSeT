@@ -324,7 +324,7 @@ c_para_tab = html.Div([
         ),
         dbc.InputGroup([
             dbc.InputGroupText('color'),
-            dbc.Select(id='para_dd_color', value='field'),
+            dbc.Select(id='para_dd_color', value='p0'),
             dbc.Button(html.I(className="bi bi-x-square"),
                         size='md', outline=True, color="dark",
                         id='para_color_reset'),
@@ -412,6 +412,8 @@ className="dbc"
     Output('wtable_div', 'children'),    
     Output('update_map', 'n_clicks'),
     Output('update_sc', 'n_clicks'),
+    Output('update_para', 'n_clicks'),    
+    Output('update_ts', 'n_clicks'),    
     Output('map_dd_size', 'options'),
     Output('map_dd_color', 'options'),
     Output('sc_dd_x', 'options'),
@@ -649,7 +651,7 @@ def initial_setup(path2csv, theme_url):
 
     out = (
         mtable, ptable, wtable,  #
-        1, 1, # initializes the map and scatter plots
+        1, 1, 1, 1, # initializes the plots
         num_clmns,  # options for map's size dropdown
         all_clmns,  # options for map's color dropdown
         num_clmns, # options for scatter's X dropdown
@@ -907,6 +909,14 @@ def sc_size_reset(n):
     return None
 
 @app.callback(
+    Output('para_dd_color', 'value'),
+    Input('para_color_reset', 'n_clicks'),
+    prevent_initial_call=True
+)
+def para_color_reset(n):
+    return None
+
+@app.callback(
     Output('sc_dd_color', 'value'),
     Input('sc_color_reset', 'n_clicks'),
     prevent_initial_call=True
@@ -962,13 +972,24 @@ def open_FactPageUrl(clickData, open):
 @app.callback(
     Output('para_fig', 'figure'),
     Input('update_para', 'n_clicks'),
-    State('ptable', 'data'),        
+    Input('para_dd_color','value'),
+    State('mtable', 'data'),        
+    State('ptable', 'data'),  
     prevent_initial_call=True
 )
-def update_para(n, records):
-    df=pd.DataFrame(data=records)
-    print(df)
-    return None
+def update_para(n, color, mrecords, precords):
+    df=pd.DataFrame(data=mrecords)
+    pdf=pd.DataFrame(data=precords)
+    pdf = pdf.dropna(subset='parameter')
+    params = pdf['parameter'].to_list()  
+    df = df.dropna(subset=params)
+    
+    fig = px.parallel_coordinates(
+        df, dimensions=params, color=color,
+        color_continuous_scale='Portland',
+        )
+
+    return fig
 
 @app.callback(
     Output('mtable', 'data'),
@@ -1020,9 +1041,7 @@ def update_ts(n, records, selected_rows, wrecords):
         xaxis=dict(title='total score and its components', side='top', 
                    range=(0,100)),
         )
-
     return df.to_dict('records'), fig
-
 
 if __name__ == '__main__':
     # app.run(debug=False)  # should be False for deployment
