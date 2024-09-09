@@ -1118,8 +1118,13 @@ def display_selected_traces(n,restyleData, fig,  ranges, records):
 
         mask *= mask2
 
-    out = list(df[mask == True].index)
     out = f"selected: {out}"
+    # # "all-selected=>None-printed" way to treat
+    # if mask.all():
+    #     out = f"selected: ALL"
+    # else:
+    #     out = list(df[mask == True].index)
+    #     out = f"selected: {out}"
 
     return out, ranges
 
