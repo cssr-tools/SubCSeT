@@ -160,7 +160,8 @@ c_toolbar = dbc.ButtonGroup([
                id='b_settings', size='md',
                ),  
     dbc.Button(html.I(className="bi bi-question-lg"),
-               outline=True, color="dark",
+            #    outline=True, 
+               color="info",
                id='b_help', size='md',
                ),                 
 ])
