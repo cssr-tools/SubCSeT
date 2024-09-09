@@ -1,3 +1,5 @@
+DEBUG=False # switch for many parameters, should be False for deployment
+
 import pandas as pd
 import numpy as np
 # plotly & dash
@@ -164,7 +166,9 @@ c_toolbar = dbc.ButtonGroup([
 
 c_help=dbc.Offcanvas(
     dcc.Markdown(id='help_markdown'),
-    id='help', is_open=False, scrollable=True, style={'width': '40vw'}
+    id='help', 
+    is_open=not DEBUG, 
+    scrollable=True, style={'width': '40vw'}
     )
 # alternative help component
 # c_help=dbc.Modal([
@@ -1194,5 +1198,7 @@ def update_ts(n, records, sel_rows, wrecords):
     return df.to_dict('records'), fig
 
 if __name__ == '__main__':
-    app.run(debug=False)  # should be False for deployment
-    # app.run(debug=True)  # should be False for deployment
+    if DEBUG:
+        app.run(debug=True)  # should be False for deployment
+    else:
+        app.run(debug=False)  # should be False for deployment
