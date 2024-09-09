@@ -74,5 +74,6 @@
     "q_gas": "gas injectivity indicator (sm3/day)",
     "qi_gas": "initial gas injectivity indicator (sm3/day)",
     "q_gas2": "secondary gas injectivity indicator (sm3/day)",
-    "q_resv2": "secondary reservoir injectivity indicator (rm3/day)"
+    "q_resv2": "secondary reservoir injectivity indicator (rm3/day)",
+    "total score": "aggregated parameter, calculated as a weighted sum of other parameters in TOTAL SCORE tab (-)"
 }
