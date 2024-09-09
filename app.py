@@ -1,4 +1,5 @@
-DEBUG=False # switch for many parameters, should be False for deployment
+# DEBUG=False # switch for many parameters, should be False for deployment
+DEBUG=True
 
 import pandas as pd
 import numpy as np
@@ -927,12 +928,11 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale,
 
     fig=px.scatter(
         df, x=x, y=y, color=color, size=size, size_max=size_max,
-        template='plotly_white', color_continuous_scale=colorscale,
+        template=theme, color_continuous_scale=colorscale,
         hover_data=['field', x, y, color, size]
         )    
 
     fig.update_layout(
-        template=theme,
         modebar_add=['toggleHover', 'drawline', 'drawopenpath',
                      'drawclosedpath', 'drawcircle', 'drawrect',
                      'eraseshape', 'toggleSpikelines'])
@@ -974,14 +974,18 @@ def sc_color_reset(n):
 @app.callback(
     Output('theme_store', 'data'),
     Output('map_fig', 'figure',allow_duplicate=True),
-    Output('sc_fig', 'figure', allow_duplicate=True),         
+    Output('sc_fig', 'figure', allow_duplicate=True), 
+    Output('para_fig', 'figure', allow_duplicate=True),   
+    Output('ts_fig', 'figure', allow_duplicate=True),   
 
     Input(ThemeChangerAIO.ids.radio("theme"), "value"),
     State('map_fig', 'figure'),
-    State('sc_fig', 'figure'),      
+    State('sc_fig', 'figure'),  
+    State('para_fig', 'figure'), 
+    State('ts_fig', 'figure'), 
     prevent_initial_call=True
 )
-def update_theme(theme_url, fig_map, fig_sc):
+def update_theme(theme_url, fig_map, fig_sc, fig_para, fig_ts):
 
     theme_str = template_from_url(theme_url)
 
@@ -997,7 +1001,10 @@ def update_theme(theme_url, fig_map, fig_sc):
     fig_sc = replace_none_colors(fig_sc)
     fig_sc = go.Figure(fig_sc).update_layout(template=theme_str)
 
-    return theme_str, fig_map, fig_sc
+    fig_para = go.Figure(fig_para).update_layout(template=theme_str)
+    fig_ts = go.Figure(fig_ts).update_layout(template=theme_str)    
+
+    return theme_str, fig_map, fig_sc, fig_para, fig_ts
 
 # opens sodir.no field page on click
 @app.callback(
@@ -1026,10 +1033,11 @@ def open_FactPageUrl(clickData, open):
     State('mtable', 'selected_rows'),    
     State('mtable', 'data'),        
     State('ptable', 'data'),  
+    State('theme_store', 'data'),
     prevent_initial_call=True
 )
 def update_para(n, color, colorscale, reverse_colorscale, 
-                sel_rows, mrecords, precords):
+                sel_rows, mrecords, precords,  theme):
 
     if sel_rows is None or sel_rows == []: raise PreventUpdate
     df = pd.DataFrame(data=mrecords)
@@ -1067,7 +1075,7 @@ def update_para(n, color, colorscale, reverse_colorscale,
 
     fig = px.parallel_coordinates(
         df, dimensions=new_params, # labels=old_labels_dict, 
-        color=color, color_continuous_scale=colorscale,
+        color=color, color_continuous_scale=colorscale, template=theme
         )
     return fig, df.to_dict('records')
 
@@ -1139,9 +1147,10 @@ def display_selected_traces(n,restyleData, fig,  ranges, records):
     State('mtable', 'data'),
     State('mtable', 'selected_rows'),    
     State('wtable', 'data'),    
+    State('theme_store', 'data'),
     prevent_initial_call=True
 )
-def update_ts(n, records, sel_rows, wrecords):
+def update_ts(n, records, sel_rows, wrecords, theme):
     '''calculates total score column, updates the chart'''
     df = pd.DataFrame(data=records) # main df
 
@@ -1187,7 +1196,7 @@ def update_ts(n, records, sel_rows, wrecords):
 
     fig = None
     fig = px.bar(cdf, x=params, y="field", orientation='h',log_x=False,
-                 hover_data=['total score']
+                 hover_data=['total score'], template=theme
                  )
     fig.update_layout(
         barmode='stack',
