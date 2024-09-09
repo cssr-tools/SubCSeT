@@ -19,6 +19,7 @@ from copy import deepcopy
 import time
 import timeit
 import os
+import re
 from datetime import datetime, timedelta
 import json
 # import warnings
@@ -70,6 +71,7 @@ def replace_none_colors(fig,color='grey'):
             fig['data'][0]['marker']['color'] = clrs  
     return fig
 
+
 def normalize_series(s, method='min-max'):
     if method == 'min-max':
         s_min,s_max = s.min(), s.max()
@@ -87,6 +89,16 @@ def normalize_series(s, method='min-max'):
 def round_to_sign_digits(x, sig_digits=3):
     '''Custom function to round to significant digits'''
     return np.format_float_scientific(x, precision=sig_digits-1)
+
+
+def extract_number(text):
+    # Regular expression pattern to find digits enclosed in square brackets
+    pattern = r'\[(\d+)\]'
+    match = re.search(pattern, text)
+    if match:
+        return int(match.group(1))  # Convert the found number to an integer
+    else:
+        return None
 
 # %% app layout ----------------------------------------------------------------
 # %%
@@ -200,6 +212,22 @@ c_settings=dbc.Offcanvas(
         dbc.Row([
             dbc.Col(
                 dbc.InputGroup([
+                    dbc.InputGroupText("scatter colorscale", 
+                                       style={'width': '45%'}),
+                    dbc.Select(
+                        id='select_para_colorscale', value='Portland',
+                        options=COLORSCALES
+                        )
+                ]),
+            width=9),
+            dbc.Col(
+                dbc.Switch(id='switch_reverse_para_cs', 
+                           label="reverse", value=False),
+            width=3),
+        ]),         
+        dbc.Row([
+            dbc.Col(
+                dbc.InputGroup([
                     dbc.InputGroupText("map style",style={'width': '45%'}),
                     dbc.Select(
                         id='select_map_style', value='carto-positron',
@@ -209,7 +237,7 @@ c_settings=dbc.Offcanvas(
                         )]
                 ), width=9
             ),
-            dbc.Col([],width=3),            
+            dbc.Col([],width=3), 
         ]),     
         dbc.Checkbox(
             id='checkbox_URL', 
@@ -355,7 +383,8 @@ c_para_tab = html.Div([
     dcc.Graph(
         id='para_fig',
         # style={'height': '87vh'},
-        config={'displayModeBar': True})
+        config={'displayModeBar': True}),
+    html.Div(id='para_selected', style={'whiteSpace': 'pre-line'})
 ])
 #%% total score
 
@@ -407,7 +436,9 @@ app.layout = html.Div([
     ], 
         className="g-0",
     ),
-    dcc.Store(id='store_theme', data=theme0),
+    dcc.Store(id='theme_store', data=theme0),
+    dcc.Store(id='para_store_df', data={}),
+    dcc.Store(id='para_store_ranges', data={}),    
     html.Div(id='dummy_output', hidden=True)
 ],
 style={
@@ -545,7 +576,6 @@ def initial_setup(path2csv, theme_url):
             'net NGL yearly pr.', 'net condensate yearly pr.',
             'net OE yearly pr.',  'water yearly pr.',
             ],
-
         style_table={
             'height': '90vh',
             # 'height': 'auto',
@@ -594,7 +624,7 @@ def initial_setup(path2csv, theme_url):
          'reverse': False}, 
         {'#': 3, 'parameter': 'depth', 'normalize': None, 'log10': False,
          'reverse': True},          
-        {'#': 4, 'parameter': None, 'normalize': None, 'log10': False,
+        {'#': 4, 'parameter': 'peak year', 'normalize': None, 'log10': False,
          'reverse': True},  
         {'#': 5, 'parameter': None, 'normalize': None, 'log10': False,
          'reverse': True},             
@@ -640,8 +670,8 @@ def initial_setup(path2csv, theme_url):
          'weight': 1}, 
         {'#': 3, 'parameter': 'depth', 'normalize': 'min-max', 'log10': False,
          'weight': -1},          
-        {'#': 4, 'parameter': None, 'normalize': 'min-max', 'log10': False,
-         'weight': 1},  
+        {'#': 4, 'parameter': 'peak year', 'normalize': 'min-max', 'log10': False,
+         'weight': -1},  
         {'#': 5, 'parameter': None, 'normalize': 'min-max', 'log10': False,
          'weight': 1},   
         ]
@@ -715,7 +745,7 @@ def select_deselect(m, b, selected_rows, filtered_rows):
 def reopen_current_chart(n, active_tab, fig_map, fig_sc, fig_para):
 
     fig = None
-    print('active tab:', active_tab)
+    # print('active tab:', active_tab)
     if active_tab == 'tab_map':
         fig=fig_map
     elif active_tab == 'tab_sc':
@@ -746,7 +776,7 @@ def reopen_current_chart(n, active_tab, fig_map, fig_sc, fig_para):
     Input('select_map_style', 'value'),      
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
-    State('store_theme', 'data'),
+    State('theme_store', 'data'),
     # prevent_initial_call=True
 )
 def update_map(n, color, size, colorscale, reverse_colorscale, map_style,
@@ -871,7 +901,7 @@ def update_map(n, color, size, colorscale, reverse_colorscale, map_style,
     Input('switch_reverse_sc_cs', 'value'),      
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
-    State('store_theme', 'data')
+    State('theme_store', 'data')
     # prevent_initial_call=True
 )
 def update_sc(n, x, y, color, size, colorscale, reverse_colorscale,
@@ -881,7 +911,6 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale,
     if reverse_colorscale: colorscale += "_r"
 
     if sel_rows is None or sel_rows == []:
-        # print('PreventUpdate!')
         return go.Figure()
     
     df = df.loc[sel_rows, :]
@@ -943,7 +972,7 @@ def sc_color_reset(n):
 
 #%% Theme change callback
 @app.callback(
-    Output('store_theme', 'data'),
+    Output('theme_store', 'data'),
     Output('map_fig', 'figure',allow_duplicate=True),
     Output('sc_fig', 'figure', allow_duplicate=True),         
 
@@ -989,45 +1018,111 @@ def open_FactPageUrl(clickData, open):
 
 @app.callback(
     Output('para_fig', 'figure'),
+    Output('para_store_df', 'data'),   
     Input('update_para', 'n_clicks'),
     Input('para_dd_color','value'),
+    Input('select_para_colorscale','value'),
+    Input('switch_reverse_para_cs','value'),
     State('mtable', 'data'),        
     State('ptable', 'data'),  
     prevent_initial_call=True
 )
-def update_para(n, color, mrecords, precords):
+def update_para(n, color, colorscale, reverse_colorscale, mrecords, precords):
+
+    if reverse_colorscale: colorscale += "_r"
     df = pd.DataFrame(data=mrecords)
     pdf = pd.DataFrame(data=precords)
     pdf = pdf.dropna(subset='parameter')
     params = pdf['parameter'].to_list()  
     df = df.dropna(subset=params)
+    # sel_cols = ['#','field',color] + params
+    # df = df[sel_cols]
     
     new_params = []
     for i in pdf.index:
         p = pdf.loc[i, 'parameter']
         p_new = p
+        x = df[p].copy()
         if pdf.loc[i, 'log10']:  
-            df[p]=np.log10(df[p])
+            x=np.log10(x)
             p_new = f"log10({p})" 
             
         if pdf.loc[i, 'reverse']:  
-            df[p] = -df[p]
+            x = -x
             p_new = '-' + p_new
 
         if pdf.loc[i,'normalize']:
-            df[p]=normalize_series(df[p])
+            x=normalize_series(x)
             p_new += "*"
 
         new_params.append(p_new)
+        df[p_new] = x
     
-    labels = dict(zip(params,new_params))
+    # old_labels_dict = dict(zip(params,new_params))
+    # new_labels_dict = dict(zip(new_params,params))
+    # pstore['old_labels_dict'] = old_labels_dict
+    # pstore['new_labels_dict'] = new_labels_dict    
 
     fig = px.parallel_coordinates(
-        df, dimensions=params, labels=labels, color=color,
-        color_continuous_scale='Portland',
+        df, dimensions=new_params, # labels=old_labels_dict, 
+        color=color, color_continuous_scale=colorscale,
         )
+    return fig, df.to_dict('records')
 
-    return fig
+@app.callback(
+    Output("para_selected", "children"),  
+    Output("para_store_ranges", "data"),  
+    #
+    Input('update_para', 'n_clicks'),
+    Input("para_fig", "restyleData"),
+    Input("para_fig", "figure"),    
+    State("para_store_ranges", "data"),
+    State("para_store_df", "data"),
+    prevent_initial_call=True
+)
+def display_selected_traces(n,restyleData, fig,  ranges, records):
+
+    df = pd.DataFrame(data=records) 
+    df = df.set_index('field')
+    
+    # fetch axes' labels
+    labels = []
+    for i in fig['data'][0]['dimensions']:
+        labels.append(i['label'])
+
+    
+    # getting axes' selected ranges
+    if restyleData is None: return None, ranges 
+
+    key0 = list(restyleData[0].keys())[0]
+    nn = extract_number(key0)
+    # print('restyleData: ',restyleData)
+    if nn is not None:
+        ranges[labels[nn]] = restyleData[0][key0]
+    # print(ranges)
+    
+    mask = pd.Series(np.ones(df.shape[0], dtype=bool), index=df.index) 
+    for p,v in ranges.items():
+        # print(v)  
+        mask2 = pd.Series(np.zeros(df.shape[0], dtype=bool), index=df.index)          
+        if v is None: 
+            # mask *= mask2
+            continue
+        for lims in v: 
+            # lu = lower/upper boundaries
+            if isinstance(lims[0], list):
+                for lu in lims:
+                    mask2 += (df[p]>=lu[0]) * (df[p]<=lu[1])
+            else: 
+                mask2 += (df[p]>=lims[0]) * (df[p]<=lims[1])
+
+        mask *= mask2
+
+    out = list(df[mask == True].index)
+    out = f"selected: {out}"
+
+    return out, ranges
+
 
 @app.callback(
     Output('mtable', 'data'),
@@ -1038,13 +1133,14 @@ def update_para(n, color, mrecords, precords):
     State('wtable', 'data'),    
     prevent_initial_call=True
 )
-def update_ts(n, records, selected_rows, wrecords):
+def update_ts(n, records, sel_rows, wrecords):
     '''calculates total score column, updates the chart'''
     df = pd.DataFrame(data=records) # main df
+
     wdf = pd.DataFrame(data=wrecords)  # weights etc.
     wdf = wdf.dropna(subset='parameter')
     cdf = df[['field']].copy() # to store contributions
-    print(wdf)
+    # print(wdf)
     weight_sum=wdf['weight'].abs().sum()
     params = wdf['parameter'].to_list()
 
@@ -1070,13 +1166,17 @@ def update_ts(n, records, selected_rows, wrecords):
 
     # df['total score'] = df['total score'].apply(round_to_sign_digits)
     df['total score'] = df['total score'].round(1)
+    
+    if sel_rows is None or sel_rows == []:
+        raise PreventUpdate  
+    cdf = cdf.loc[sel_rows, :]
+
     fig = None
     cdf['total score'] = df['total score'].round(1)
     cdf = cdf.dropna()
     cdf = cdf.sort_values(by='total score', ascending=False)
-    cdf = cdf[:15]
-
-    print(cdf)
+    cdf = cdf[:min(15,cdf.shape[0])]
+    # print(cdf)
 
     fig = None
     fig = px.bar(cdf, x=params, y="field", orientation='h',log_x=False,
