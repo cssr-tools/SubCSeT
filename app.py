@@ -212,7 +212,7 @@ c_settings=dbc.Offcanvas(
         dbc.Row([
             dbc.Col(
                 dbc.InputGroup([
-                    dbc.InputGroupText("scatter colorscale", 
+                    dbc.InputGroupText("para-plot colorscale", 
                                        style={'width': '45%'}),
                     dbc.Select(
                         id='select_para_colorscale', value='Portland',
@@ -782,14 +782,10 @@ def reopen_current_chart(n, active_tab, fig_map, fig_sc, fig_para):
 def update_map(n, color, size, colorscale, reverse_colorscale, map_style,
                sel_rows, records, theme):
 
+    if sel_rows is None or sel_rows == []: raise PreventUpdate
     fig = go.Figure()
     df = pd.DataFrame(data=records)
     if reverse_colorscale: colorscale += "_r"
-
-    if sel_rows is None or sel_rows == []:
-        # print('PreventUpdate!')
-        raise PreventUpdate
-        return fig
 
     df = df.loc[sel_rows, :]
     # df.reset_index(inplace=True)
@@ -1023,21 +1019,23 @@ def open_FactPageUrl(clickData, open):
     Input('para_dd_color','value'),
     Input('select_para_colorscale','value'),
     Input('switch_reverse_para_cs','value'),
+    State('mtable', 'selected_rows'),    
     State('mtable', 'data'),        
     State('ptable', 'data'),  
     prevent_initial_call=True
 )
-def update_para(n, color, colorscale, reverse_colorscale, mrecords, precords):
+def update_para(n, color, colorscale, reverse_colorscale, 
+                sel_rows, mrecords, precords):
 
-    if reverse_colorscale: colorscale += "_r"
+    if sel_rows is None or sel_rows == []: raise PreventUpdate
     df = pd.DataFrame(data=mrecords)
+    df = df.loc[sel_rows,:]
     pdf = pd.DataFrame(data=precords)
     pdf = pdf.dropna(subset='parameter')
     params = pdf['parameter'].to_list()  
     df = df.dropna(subset=params)
-    # sel_cols = ['#','field',color] + params
-    # df = df[sel_cols]
-    
+    if reverse_colorscale: colorscale += "_r"
+
     new_params = []
     for i in pdf.index:
         p = pdf.loc[i, 'parameter']
@@ -1118,12 +1116,13 @@ def display_selected_traces(n,restyleData, fig,  ranges, records):
 
         mask *= mask2
 
+    out = list(df[mask == True].index)
     out = f"selected: {out}"
     # # "all-selected=>None-printed" way to treat
     # if mask.all():
     #     out = f"selected: ALL"
     # else:
-    #     out = list(df[mask == True].index)
+    #     
     #     out = f"selected: {out}"
 
     return out, ranges
@@ -1172,8 +1171,7 @@ def update_ts(n, records, sel_rows, wrecords):
     # df['total score'] = df['total score'].apply(round_to_sign_digits)
     df['total score'] = df['total score'].round(1)
     
-    if sel_rows is None or sel_rows == []:
-        raise PreventUpdate  
+    if sel_rows is None or sel_rows == []: raise PreventUpdate  
     cdf = cdf.loc[sel_rows, :]
 
     fig = None
@@ -1196,5 +1194,5 @@ def update_ts(n, records, sel_rows, wrecords):
     return df.to_dict('records'), fig
 
 if __name__ == '__main__':
-    # app.run(debug=False)  # should be False for deployment
-    app.run(debug=True)  # should be False for deployment
+    app.run(debug=False)  # should be False for deployment
+    # app.run(debug=True)  # should be False for deployment
