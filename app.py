@@ -426,7 +426,7 @@ c_tabs = dbc.Tabs([
         c_w_tab, label='TOTAL SCORE', tab_id='tab_ts',
         active_tab_style={"fontWeight": "bold"}
         ) 
-    ], id='all_tabs', active_tab='tab_para'
+    ], id='all_tabs', active_tab='tab_sc'
 )
 
 app.layout = html.Div([
