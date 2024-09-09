@@ -1,5 +1,5 @@
-# DEBUG=False # switch for many parameters, should be False for deployment
-DEBUG=True
+DEBUG=False # switch for many parameters, should be False for deployment
+# DEBUG=True
 
 import pandas as pd
 import numpy as np
@@ -328,7 +328,7 @@ c_sc_b_update = dbc.Button(
 c_sc = dcc.Graph(
     id='sc_fig',
     style={
-        'height': '87vh',
+        'height': '85vh',
     },
     config={'displayModeBar': True}
 )
@@ -336,27 +336,43 @@ c_sc = dcc.Graph(
 c_sc_tab = html.Div([
     dbc.Stack([
         c_sc_b_update,
-        dbc.InputGroup([
-            dbc.InputGroupText('X'),
-            dbc.Select(id='sc_dd_x',value='lon'),
-            ], style={'width': '20%'}),  
-        dbc.InputGroup([
-            dbc.InputGroupText('Y'),
-            dbc.Select(id='sc_dd_y',value='lat'),
-            ], style={'width': '20%'}),              
-        dbc.InputGroup([
-            dbc.InputGroupText('size'),
-            dbc.Select(id='sc_dd_size',value='CO2 SC'),
-            dbc.Button(html.I(className="bi bi-x-square"), size='md', 
-                       outline=True, color="dark", id='sc_size_reset'),            
-            ], style={'width': '25%'}),
-        dbc.InputGroup([
-            dbc.InputGroupText('color'),
-            dbc.Select(id='sc_dd_color',value='q_resv'),
-            dbc.Button(html.I(className="bi bi-x-square"), size='md', 
-                       outline=True, color="dark", id='sc_color_reset'),
-            ], style={'width': '25%'}),
-        ], direction="horizontal"),
+        dbc.Stack([
+            dbc.InputGroup([
+                dbc.InputGroupText('X'),
+                dbc.Select(id='sc_dd_x',value='CO2 SC'),
+                ], # style={'width': '20%'}
+            ),  
+            dbc.InputGroup([
+                dbc.InputGroupText('Y'),
+                dbc.Select(id='sc_dd_y',value='q_resv'),
+                ], #style={'width': '20%'}
+            ),  
+        ]),
+        dbc.Stack([
+            dbc.Switch(label='log10',value=True,id='sc_x_log10',
+                       style={'padding-top': '0.75vh'}
+                       ), 
+            dbc.Switch(label='log10',value=True,id='sc_y_log10',
+                    #    style={'padding-top': '0.5vh'}
+                       ),  
+        ]),
+        dbc.Stack([
+            dbc.InputGroup([
+                dbc.InputGroupText('size', style={'width': '20%'}),
+                dbc.Select(id='sc_dd_size',value='CO2 SC/well num'),
+                dbc.Button(html.I(className="bi bi-x-square"), size='md', 
+                        outline=True, color="dark", id='sc_size_reset'), 
+                ], #style={'width': '25%'}
+                ),
+            dbc.InputGroup([
+                dbc.InputGroupText('color', style={'width': '20%'}),
+                dbc.Select(id='sc_dd_color',value='gas PV0/HC PV0'),
+                dbc.Button(html.I(className="bi bi-x-square"), size='md', 
+                        outline=True, color="dark", id='sc_color_reset'),
+                ], #style={'width': '25%'}
+                ),   
+        ]),
+        ], gap=2, direction="horizontal"),
     c_sc
 ])
 #%% Parallel plot
@@ -904,13 +920,17 @@ def update_map(n, color, size, colorscale, reverse_colorscale, map_style,
     Input('sc_dd_color', 'value'),
     Input('sc_dd_size', 'value'),
     Input('select_sc_colorscale', 'value'),    
-    Input('switch_reverse_sc_cs', 'value'),      
+    Input('switch_reverse_sc_cs', 'value'),  
+    Input('sc_x_log10', 'value'),  
+    Input('sc_y_log10', 'value'),  
+    #
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
     State('theme_store', 'data')
     # prevent_initial_call=True
 )
 def update_sc(n, x, y, color, size, colorscale, reverse_colorscale,
+              log10_x, log10_y,
               sel_rows, records, theme):
     
     df = pd.DataFrame(data=records)
@@ -920,21 +940,24 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale,
         return go.Figure()
     
     df = df.loc[sel_rows, :]
-
     size_max = 10
+    _size = None
+    hover_data=['field', x, y, color, size]
     if size is not None:  
-        df['s'] = 1
+        hover_data += ['s']        
         df['s'] = df[size]
-        df.s = df.s**0.5
-        # df.s = 1 + 95*(df.s - df.s.min())/(df.s.max())
-        df.s = df.s.round(2)
+        # # df.s = df.s**0.5
+        s_max, s_min = df.s.max(), df.s.min()
+        df.s = 1+99*(df.s - s_min)/(s_max - s_min)
+        df.s = df.s.round(3)
         size_max = 50
-        size = df.s
+        _size = df.s        
 
     fig=px.scatter(
-        df, x=x, y=y, color=color, size=size, size_max=size_max,
+        df, x=x, y=y, color=color, size=_size, size_max=size_max,
         template=theme, color_continuous_scale=colorscale,
-        hover_data=['field', x, y, color, size]
+        hover_data = hover_data,
+        log_x=log10_x, log_y=log10_y,
         )    
 
     fig.update_layout(
