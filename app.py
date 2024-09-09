@@ -618,10 +618,12 @@ def initial_setup(path2csv, theme_url):
     dropdowns['log10']={}
     dropdowns['log10']['options']=\
         [{'label': 'Yes', 'value': True}, {'label': 'No', 'value': False}]    
+    dropdowns['log10']['clearable'] = False  
     
     dropdowns['reverse']={}
     dropdowns['reverse']['options']=\
         [{'label': 'Yes', 'value': True}, {'label': 'No', 'value': False}]
+    dropdowns['reverse']['clearable'] = False
 
     pdata=[\
         {'#': 1, 'parameter': 'CO2 SC','normalize': None, 'log10': True,
@@ -664,10 +666,12 @@ def initial_setup(path2csv, theme_url):
     dropdowns['normalize']['options']=\
         [{'label': i, 'value': i} for i in ['min-max','median',
                                             'mean', 'z-score']]  
+    dropdowns['normalize']['clearable'] = False
     
     dropdowns['log10']={}
     dropdowns['log10']['options']=\
-        [{'label': 'Yes', 'value': True}, {'label': 'No', 'value': False}]    
+        [{'label': 'Yes', 'value': True}, {'label': 'No', 'value': False}] 
+    dropdowns['log10']['clearable'] = False
 
     wdata=[\
         {'#': 1, 'parameter': 'CO2 SC','normalize': 'min-max', 'log10': True,
@@ -1062,8 +1066,9 @@ def update_para(n, color, colorscale, reverse_colorscale,
             x = -x
             p_new = '-' + p_new
 
-        if pdf.loc[i,'normalize']:
-            x=normalize_series(x)
+        norm_method = pdf.loc[i,'normalize']
+        if pdf.loc[i,'normalize'] is not None:
+            x=normalize_series(x, norm_method)
             p_new += "*"
 
         new_params.append(p_new)
@@ -1173,8 +1178,8 @@ def update_ts(n, records, sel_rows, wrecords, theme):
         if wdf.loc[i, 'log10']:  
             x=np.log10(x)
 
-        if wdf.loc[i,'normalize']:
-            x=normalize_series(x)
+        norm_method = wdf.loc[i,'normalize']
+        x=normalize_series(x, method=norm_method)
             
          # to correctly hangle weights<0, i.e. parameters to be minimized
         x = x*np.sign(weight)
@@ -1203,7 +1208,8 @@ def update_ts(n, records, sel_rows, wrecords, theme):
         barmode='stack',
         yaxis=dict(autorange='reversed'), 
         xaxis=dict(title='total score and its components', side='top', 
-                   range=(0,100)),
+                #    range=(0,100)
+                   ),
         )
     return df.to_dict('records'), fig
 
