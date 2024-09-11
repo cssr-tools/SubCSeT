@@ -1,5 +1,5 @@
-# DEBUG=False # switch for many parameters, should be False for deployment
-DEBUG=True
+DEBUG=False # switch for many parameters, should be False for deployment
+# DEBUG=True
 
 import pandas as pd
 import numpy as np
@@ -459,7 +459,7 @@ c_ts_tab=html.Div([
                ),
         ]),        
         dbc.Switch(label='only selected rows', value=True, id='ts_switch',
-                   style={'padding-top': '0.75vh'}),
+                   style={'padding-top': '0.5vh'}),
     ], direction='horizontal', gap=2,
     ),
     c_ts_table_div,
@@ -1007,6 +1007,7 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale,
         )    
 
     fig.update_layout(
+        font_size=14,
         modebar_add=['toggleHover', 'drawline', 'drawopenpath',
                      'drawclosedpath', 'drawcircle', 'drawrect',
                      'eraseshape', 'toggleSpikelines'])
@@ -1152,6 +1153,8 @@ def para_update(n, color, colorscale, reverse_colorscale,
         df, dimensions=new_params, # labels=old_labels_dict, 
         color=color, color_continuous_scale=colorscale, template=theme
         )
+    fig = fig.update_layout(font_size=16)
+
     return fig, df.to_dict('records')
 
 @app.callback(
@@ -1297,6 +1300,7 @@ def ts_update(n, use_only_selected,
                  )
     fig.update_layout(
         barmode='stack',
+        font_size=14,
         yaxis=dict(autorange='reversed'), 
         xaxis=dict(title='total score and its components', side='top')
         )
