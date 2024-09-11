@@ -1,5 +1,5 @@
-DEBUG=False # switch for many parameters, should be False for deployment
-# DEBUG=True
+# DEBUG=False # switch for many parameters, should be False for deployment
+DEBUG=True
 
 import pandas as pd
 import numpy as np
@@ -385,21 +385,41 @@ c_para_tab = html.Div([
         dbc.Button(
             'update', id='update_para', n_clicks=0,
             color='danger', className="me-1", size='md',
-        ),
+        ),   
+        dbc.ButtonGroup([
+            dbc.Button(
+                html.I(className="bi bi-plus"),
+                # html.I(className="bi bi-building-add"),
+                size='md', id='para_plus',
+                outline=True, color="dark",
+                # className="me-1",
+               ),
+            dbc.Button(
+                # ['+/- ', html.I(className="bi bi-table")], 
+                html.I(className="bi bi-table"),             
+                id='hide_para_table', n_clicks=0,
+                # color='danger',
+                color="dark", outline=True, 
+                # className="me-1", 
+                size='md',
+            ),  
+            dbc.Button(
+                html.I(className="bi bi-dash"), 
+                size='md', id='para_minus',
+                outline=True, color="dark",
+                # className="me-1",
+               ),
+        ]),
         dbc.InputGroup([
             dbc.InputGroupText('color'),
             dbc.Select(id='para_dd_color', value='p0'),
             dbc.Button(html.I(className="bi bi-x-square"),
                         size='md', outline=True, color="dark",
                         id='para_color_reset'),
-        ],  style={'width': '40%'}),
-        dbc.Button(
-            ['+/- ', html.I(className="bi bi-table")], 
-            id='hide_para_table', n_clicks=0,
-            # color='danger',
-            className="me-1", size='md',
-        ),        
-    ], direction="horizontal", gap=3
+        ], style={'width': '40%'}
+        ),
+        # ]),        
+    ], direction="horizontal", gap=2
     ),
     c_ptable_div,
     dcc.Graph(
@@ -449,7 +469,7 @@ c_tabs = dbc.Tabs([
         c_w_tab, label='TOTAL SCORE', tab_id='tab_ts',
         active_tab_style={"fontWeight": "bold"}
         ) 
-    ], id='all_tabs', active_tab='tab_sc',
+    ], id='all_tabs', active_tab='tab_para',
 )
 
 app.layout = html.Div([
@@ -655,10 +675,10 @@ def initial_setup(path2csv, theme_url):
          'reverse': False}, 
         {'#': 3, 'parameter': 'depth', 'normalize': None, 'log10': False,
          'reverse': True},          
-        {'#': 4, 'parameter': None, 'normalize': None, 'log10': False,
-         'reverse': True},  
-        {'#': 5, 'parameter': None, 'normalize': None, 'log10': False,
-         'reverse': True},             
+        # {'#': 4, 'parameter': None, 'normalize': None, 'log10': False,
+        #  'reverse': True},  
+        # {'#': 5, 'parameter': None, 'normalize': None, 'log10': False,
+        #  'reverse': True},             
         ]
 
     ptable = DataTable(
@@ -703,10 +723,10 @@ def initial_setup(path2csv, theme_url):
          'weight': 1}, 
         {'#': 3, 'parameter': 'depth', 'normalize': 'min-max', 'log10': False,
          'weight': -1},          
-        {'#': 4, 'parameter': None, 'normalize': 'min-max', 'log10': False,
-         'weight': 1},  
-        {'#': 5, 'parameter': None, 'normalize': 'min-max', 'log10': False,
-         'weight': 1},   
+        # {'#': 4, 'parameter': None, 'normalize': 'min-max', 'log10': False,
+        #  'weight': 1},  
+        # {'#': 5, 'parameter': None, 'normalize': 'min-max', 'log10': False,
+        #  'weight': 1},   
         ]
 
     wtable = DataTable(
@@ -1114,6 +1134,27 @@ def update_para(n, color, colorscale, reverse_colorscale,
         color=color, color_continuous_scale=colorscale, template=theme
         )
     return fig, df.to_dict('records')
+
+@app.callback(
+    Output('ptable', 'data'),    
+    Input('para_plus', 'n_clicks'),
+    Input('para_minus', 'n_clicks'),    
+    State('ptable', 'data'),   
+)
+def para_plus_minus(p,m, records):
+    '''adds/removes rows in para-table'''
+    nrows = len(records)
+    # print(nrows, p, m, p-m)
+    changed_id = [p['prop_id'] for p in callback_context.triggered][0]
+    if 'para_plus' in changed_id:
+        records.append({
+            '#': nrows+1, 'parameter': None, 'normalize': None, 'log10': False,
+            'reverse': False
+            })
+    if ('para_minus' in changed_id) and (nrows-1>=2): 
+        records=records[:-1]
+
+    return records
 
 @app.callback(
     Output("para_selected", "children"),  
