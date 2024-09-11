@@ -424,7 +424,10 @@ c_para_tab = html.Div([
         id='para_fig',
         style={'height': '65vh'},
         config={'displayModeBar': True}),
-    html.Div(id='para_selected', style={'whiteSpace': 'pre-line'})
+    # html.Div(id='para_selected', 
+    #          style={'whiteSpace': 'pre-line','width': '90%'}),
+    dbc.Container(id='para_selected', 
+             style={'whiteSpace': 'pre-line','width': '95%'})             
 ])
 #%% total score
 
@@ -1161,7 +1164,8 @@ def para_update(n, color, colorscale, reverse_colorscale,
     Output('para_table', 'data'),    
     Input('para_plus', 'n_clicks'),
     Input('para_minus', 'n_clicks'),    
-    State('para_table', 'data'),   
+    State('para_table', 'data'), 
+    prevent_initial_call=True  
 )
 def para_plus_minus(p,m, records):
     '''adds/removes rows in para-table'''
@@ -1189,7 +1193,8 @@ def para_plus_minus(p,m, records):
     State("para_store_df", "data"),
     prevent_initial_call=True
 )
-def display_selected_traces(n,restyleData, fig,  ranges, records):
+def para_display_selected_traces(n,restyleData, fig,  ranges, records):
+    '''shows field names for the selected traces'''
 
     df = pd.DataFrame(data=records) 
     df = df.set_index('field')
@@ -1199,7 +1204,6 @@ def display_selected_traces(n,restyleData, fig,  ranges, records):
     for i in fig['data'][0]['dimensions']:
         labels.append(i['label'])
 
-    
     # getting axes' selected ranges
     if restyleData is None: return None, ranges 
 
@@ -1312,6 +1316,7 @@ def ts_update(n, use_only_selected,
     Input('ts_plus', 'n_clicks'),
     Input('ts_minus', 'n_clicks'),    
     State('ts_table', 'data'),   
+    prevent_initial_call=True
 )
 def ts_plus_minus(p,m, records):
     '''adds/removes rows in ts-table'''
