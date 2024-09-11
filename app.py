@@ -422,7 +422,7 @@ c_para_tab = html.Div([
     c_para_table_div,
     dcc.Graph(
         id='para_fig',
-        # style={'height': '87vh'},
+        style={'height': '65vh'},
         config={'displayModeBar': True}),
     html.Div(id='para_selected', style={'whiteSpace': 'pre-line'})
 ])
@@ -463,7 +463,7 @@ c_ts_tab=html.Div([
     ], direction='horizontal', gap=2,
     ),
     c_ts_table_div,
-    dcc.Graph(id='ts_fig')
+    dcc.Graph(id='ts_fig', style={'height': '65vh'},)
 ], 
 # style={'display': 'grid'}
 )
