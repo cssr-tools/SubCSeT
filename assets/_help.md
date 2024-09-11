@@ -25,7 +25,7 @@ How to select data on the chart:
     * to remove all segments along an axis: double-click on the axis  
     * the list of selected fields shows up below the chart  
 + TOTAL SCORE - to sets rules to aggregate multiple features into a **total score** and rank the best candidates in the histogram below. The total score is calculated for all reservoirs, but only reservoirs selected in the table are rendered in the histogram. 
-The total score is designed to be in range from 0 (absolutely terrible) to 100 (best-ever). **Negative weight** can be used to indicate that a parameter needs to be minimized (for example, *[CO2 SC]/[well num]* - storage capacity per legacy well).  In this case the parameter is first multiplied by -1 and then normalized. 
+The total score is designed to be in range from 0 (absolutely terrible) to 100 (best-ever). **Negative weight** can be used to indicate that a parameter needs to be minimized (for example, *[CO2 SC]/[well num]* - storage capacity per legacy well).  In this case the parameter is first multiplied by -1 and then normalized. The **"only selected rows"** allows to limit the total score calculations to currently selected rows. These option allows to focus on a subset and/or exclude outliers.  
 
 The icons above the table:
 * ![](/assets/check2-square.svg) - add all filtered table rows to the selection

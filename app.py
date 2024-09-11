@@ -414,10 +414,15 @@ c_wtable = DataTable(id='wtable', columns=[], data=[], editable=True)
 c_wtable_div = html.Div(c_wtable, id='wtable_div')
 
 c_w_tab=html.Div([
-    dbc.Button(
-        'update', id='update_ts', n_clicks=0,
-        color='danger', className="me-1", size='md',
-    ),    
+    dbc.Stack([
+        dbc.Button(
+            'update', id='update_ts', n_clicks=0,
+            color='danger', className="me-1", size='md',
+        ), 
+        dbc.Switch(label='only selected rows', value=True, id='ts_switch',
+                   style={'padding-top': '0.75vh'}),
+    ], direction='horizontal',
+    ),
     c_wtable_div,
     dcc.Graph(id='ts_fig')
 ], 
@@ -444,7 +449,7 @@ c_tabs = dbc.Tabs([
         c_w_tab, label='TOTAL SCORE', tab_id='tab_ts',
         active_tab_style={"fontWeight": "bold"}
         ) 
-    ], id='all_tabs', active_tab='tab_sc'
+    ], id='all_tabs', active_tab='tab_sc',
 )
 
 app.layout = html.Div([
@@ -466,6 +471,8 @@ app.layout = html.Div([
 style={
     # 'display': 'grid', 
     # to account for scrollbars
+    'padding-right': '0.25vw',
+    # 'padding-left':  '0.25vw',
     'width': 'calc(100vw - (100vw - 100%))',
     'height': 'calc(100vh - (100vh - 100%))',
     },
@@ -648,7 +655,7 @@ def initial_setup(path2csv, theme_url):
          'reverse': False}, 
         {'#': 3, 'parameter': 'depth', 'normalize': None, 'log10': False,
          'reverse': True},          
-        {'#': 4, 'parameter': 'peak year', 'normalize': None, 'log10': False,
+        {'#': 4, 'parameter': None, 'normalize': None, 'log10': False,
          'reverse': True},  
         {'#': 5, 'parameter': None, 'normalize': None, 'log10': False,
          'reverse': True},             
@@ -696,8 +703,8 @@ def initial_setup(path2csv, theme_url):
          'weight': 1}, 
         {'#': 3, 'parameter': 'depth', 'normalize': 'min-max', 'log10': False,
          'weight': -1},          
-        {'#': 4, 'parameter': 'peak year', 'normalize': 'min-max', 'log10': False,
-         'weight': -1},  
+        {'#': 4, 'parameter': None, 'normalize': 'min-max', 'log10': False,
+         'weight': 1},  
         {'#': 5, 'parameter': None, 'normalize': 'min-max', 'log10': False,
          'weight': 1},   
         ]
@@ -1172,34 +1179,40 @@ def display_selected_traces(n,restyleData, fig,  ranges, records):
 @app.callback(
     Output('mtable', 'data'),
     Output('ts_fig', 'figure'),    
-    Input('update_ts', 'n_clicks'),    
+    Input('update_ts', 'n_clicks'),  
+    Input('ts_switch', 'value'),      
     State('mtable', 'data'),
     State('mtable', 'selected_rows'),    
     State('wtable', 'data'),    
     State('theme_store', 'data'),
     prevent_initial_call=True
 )
-def update_ts(n, records, sel_rows, wrecords, theme):
+def update_ts(n, use_only_selected, 
+              records, sel_rows, wrecords, theme):
     '''calculates total score column, updates the chart'''
+    
     df = pd.DataFrame(data=records) # main df
+    if not use_only_selected: 
+        sel_rows = df.index.to_list()
+    else:
+        if sel_rows is None or sel_rows == []:
+            raise PreventUpdate  
 
     wdf = pd.DataFrame(data=wrecords)  # weights etc.
     wdf = wdf.dropna(subset='parameter')
-    cdf = df[['field']].copy() # to store contributions
-    # print(wdf)
+    cdf = df.loc[sel_rows,['field']].copy() # to store contributions
     weight_sum=wdf['weight'].abs().sum()
     params = wdf['parameter'].to_list()
 
-    df['total score'] = 0
+    df.loc[sel_rows,'total score'] = 0.0
     for i in wdf.index:
         p = wdf.loc[i, 'parameter']
         if p is None: continue
         
-        x = df[p].copy()
+        x = df.loc[sel_rows,p].copy()
         weight = wdf.loc[i, 'weight']
 
-        if wdf.loc[i, 'log10']:  
-            x=np.log10(x)
+        if wdf.loc[i, 'log10']:  x=np.log10(x)
 
         norm_method = wdf.loc[i,'normalize']
         x=normalize_series(x, method=norm_method)
@@ -1208,31 +1221,24 @@ def update_ts(n, records, sel_rows, wrecords, theme):
         x = x*np.sign(weight)
         cdf[p] = 100*np.abs(weight)*(x - x.min())/(x.max()-x.min())/ weight_sum
         cdf[p] = cdf[p].round(1)
-        df['total score'] += cdf[p]
+        df.loc[sel_rows,'total score'] += cdf[p]
 
     # df['total score'] = df['total score'].apply(round_to_sign_digits)
-    df['total score'] = df['total score'].round(1)
-    
-    if sel_rows is None or sel_rows == []: raise PreventUpdate  
-    cdf = cdf.loc[sel_rows, :]
+    df.loc[sel_rows,'total score'] = df.loc[sel_rows,'total score'].round(1)
 
-    fig = None
+    # creating the histogram with the results
     cdf['total score'] = df['total score'].round(1)
     cdf = cdf.dropna()
     cdf = cdf.sort_values(by='total score', ascending=False)
     cdf = cdf[:min(15,cdf.shape[0])]
-    # print(cdf)
 
-    fig = None
     fig = px.bar(cdf, x=params, y="field", orientation='h',log_x=False,
                  hover_data=['total score'], template=theme
                  )
     fig.update_layout(
         barmode='stack',
         yaxis=dict(autorange='reversed'), 
-        xaxis=dict(title='total score and its components', side='top', 
-                #    range=(0,100)
-                   ),
+        xaxis=dict(title='total score and its components', side='top')
         )
     return df.to_dict('records'), fig
 
