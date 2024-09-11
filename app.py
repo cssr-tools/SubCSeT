@@ -303,7 +303,7 @@ c_map_tab = html.Div([
             #            size='md', outline=True, id='map_color_reset'),            
             ], style={'width': '30%'}
         ),         
-        ], gap=3, direction="horizontal"),
+        ], gap=2, direction="horizontal"),
     c_map, # map itself
 ])
 
@@ -389,13 +389,11 @@ c_para_tab = html.Div([
         dbc.ButtonGroup([
             dbc.Button(
                 html.I(className="bi bi-plus"),
-                # html.I(className="bi bi-building-add"),
                 size='md', id='para_plus',
                 outline=True, color="dark",
                 # className="me-1",
                ),
             dbc.Button(
-                # ['+/- ', html.I(className="bi bi-table")], 
                 html.I(className="bi bi-table"),             
                 id='hide_para_table', n_clicks=0,
                 # color='danger',
@@ -439,9 +437,30 @@ c_ts_tab=html.Div([
             'update', id='ts_update', n_clicks=0,
             color='danger', className="me-1", size='md',
         ), 
+        dbc.ButtonGroup([
+            dbc.Button(
+                html.I(className="bi bi-plus"),
+                size='md', id='ts_plus',
+                outline=True, color="dark",
+                # className="me-1",
+               ),
+            dbc.Button(
+                html.I(className="bi bi-table"),             
+                id='hide_ts_table', n_clicks=0,
+                color="dark", outline=True, 
+                # className="me-1", 
+                size='md',
+            ),  
+            dbc.Button(
+                html.I(className="bi bi-dash"), 
+                size='md', id='ts_minus',
+                outline=True, color="dark",
+                # className="me-1",
+               ),
+        ]),        
         dbc.Switch(label='only selected rows', value=True, id='ts_switch',
                    style={'padding-top': '0.75vh'}),
-    ], direction='horizontal',
+    ], direction='horizontal', gap=2,
     ),
     c_ts_table_div,
     dcc.Graph(id='ts_fig')
@@ -1151,7 +1170,7 @@ def para_plus_minus(p,m, records):
             '#': nrows+1, 'parameter': None, 'normalize': None, 'log10': False,
             'reverse': False
             })
-    if ('para_minus' in changed_id) and (nrows-1>=2): 
+    if ('para_minus' in changed_id) and (nrows-1>=3): 
         records=records[:-1]
 
     return records
@@ -1282,6 +1301,28 @@ def ts_update(n, use_only_selected,
         xaxis=dict(title='total score and its components', side='top')
         )
     return df.to_dict('records'), fig
+
+
+@app.callback(
+    Output('ts_table', 'data'),    
+    Input('ts_plus', 'n_clicks'),
+    Input('ts_minus', 'n_clicks'),    
+    State('ts_table', 'data'),   
+)
+def ts_plus_minus(p,m, records):
+    '''adds/removes rows in ts-table'''
+    nrows = len(records)
+    # print(nrows, p, m, p-m)
+    changed_id = [p['prop_id'] for p in callback_context.triggered][0]
+    if 'ts_plus' in changed_id:
+        records.append({
+            '#': nrows+1, 'parameter': None, 'normalize': 'min-max', 
+            'log10': False, 'weight': -1
+            })
+    if ('ts_minus' in changed_id) and (nrows-1>=3): 
+        records=records[:-1]
+
+    return records
 
 if __name__ == '__main__':
     if DEBUG:
