@@ -265,9 +265,9 @@ def open_import_help(n):
     return True
 
 @app.callback(
-    Output('ptable_div', 'is_open'),
+    Output('para_table_div', 'is_open'),
     Input('hide_para_table', 'n_clicks'),
-    State('ptable_div', 'is_open'),
+    State('para_table_div', 'is_open'),
     prevent_initial_call=True,
 )
 def collapse_para_table(n, is_open):
@@ -377,13 +377,13 @@ c_sc_tab = html.Div([
 ])
 #%% Parallel plot
 
-# c_ptable = DataTable(id='ptable', columns=[], data=[], editable=True)
-c_ptable_div = dbc.Collapse([], id='ptable_div',is_open=True)
+# c_para_table = DataTable(id='para_table', columns=[], data=[], editable=True)
+c_para_table_div = dbc.Collapse([], id='para_table_div',is_open=True)
 
 c_para_tab = html.Div([
     dbc.Stack([
         dbc.Button(
-            'update', id='update_para', n_clicks=0,
+            'update', id='para_update', n_clicks=0,
             color='danger', className="me-1", size='md',
         ),   
         dbc.ButtonGroup([
@@ -421,7 +421,7 @@ c_para_tab = html.Div([
         # ]),        
     ], direction="horizontal", gap=2
     ),
-    c_ptable_div,
+    c_para_table_div,
     dcc.Graph(
         id='para_fig',
         # style={'height': '87vh'},
@@ -430,20 +430,20 @@ c_para_tab = html.Div([
 ])
 #%% total score
 
-c_wtable = DataTable(id='wtable', columns=[], data=[], editable=True)
-c_wtable_div = html.Div(c_wtable, id='wtable_div')
+c_ts_table = DataTable(id='ts_table', columns=[], data=[], editable=True)
+c_ts_table_div = html.Div(c_ts_table, id='ts_table_div')
 
-c_w_tab=html.Div([
+c_ts_tab=html.Div([
     dbc.Stack([
         dbc.Button(
-            'update', id='update_ts', n_clicks=0,
+            'update', id='ts_update', n_clicks=0,
             color='danger', className="me-1", size='md',
         ), 
         dbc.Switch(label='only selected rows', value=True, id='ts_switch',
                    style={'padding-top': '0.75vh'}),
     ], direction='horizontal',
     ),
-    c_wtable_div,
+    c_ts_table_div,
     dcc.Graph(id='ts_fig')
 ], 
 # style={'display': 'grid'}
@@ -466,7 +466,7 @@ c_tabs = dbc.Tabs([
         active_tab_style={"fontWeight": "bold"}
         ),
     dbc.Tab(
-        c_w_tab, label='TOTAL SCORE', tab_id='tab_ts',
+        c_ts_tab, label='TOTAL SCORE', tab_id='tab_ts',
         active_tab_style={"fontWeight": "bold"}
         ) 
     ], id='all_tabs', active_tab='tab_para',
@@ -502,12 +502,12 @@ className="dbc"
 
 @app.callback(
     Output('mtable_div', 'children'),
-    Output('ptable_div', 'children'),
-    Output('wtable_div', 'children'),    
+    Output('para_table_div', 'children'),
+    Output('ts_table_div', 'children'),    
     Output('update_map', 'n_clicks'),
     Output('update_sc', 'n_clicks'),
-    Output('update_para', 'n_clicks'),    
-    Output('update_ts', 'n_clicks'),    
+    Output('para_update', 'n_clicks'),    
+    Output('ts_update', 'n_clicks'),    
     Output('map_dd_size', 'options'),
     Output('map_dd_color', 'options'),
     Output('sc_dd_x', 'options'),
@@ -638,7 +638,7 @@ def initial_setup(path2csv, theme_url):
                     'textAlign': 'center',
                     'whiteSpace': 'normal'}
     )
-    #%% ptable
+    #%% para_table
     clmns = [{'name': i, 'id': i} \
              for i in ['#','parameter','log10','normalize','reverse']]
     clmns[0]['type'] = 'numeric'
@@ -681,8 +681,8 @@ def initial_setup(path2csv, theme_url):
         #  'reverse': True},             
         ]
 
-    ptable = DataTable(
-        id='ptable', columns=clmns, data=pdata,
+    para_table = DataTable(
+        id='para_table', columns=clmns, data=pdata,
         dropdown=dropdowns, editable=True,
         style_table={'width': '45vw'},
         style_cell={'fontSize': 14, 
@@ -729,8 +729,8 @@ def initial_setup(path2csv, theme_url):
         #  'weight': 1},   
         ]
 
-    wtable = DataTable(
-        id='wtable', columns=clmns, data=wdata,
+    ts_table = DataTable(
+        id='ts_table', columns=clmns, data=wdata,
         dropdown=dropdowns, editable=True,
         style_table={'width': '45vw'},
         style_cell={'fontSize': 14, 
@@ -747,7 +747,7 @@ def initial_setup(path2csv, theme_url):
         markdown_help += f"{nn}. **{key}**: {value}  \n" 
 
     out = (
-        mtable, ptable, wtable,  #
+        mtable, para_table, ts_table,  #
         1, 1, 1, 1, # initializes the plots
         num_clmns,  # options for map's size dropdown
         all_clmns,  # options for map's color dropdown
@@ -1081,17 +1081,17 @@ def open_FactPageUrl(clickData, open):
 @app.callback(
     Output('para_fig', 'figure'),
     Output('para_store_df', 'data'),   
-    Input('update_para', 'n_clicks'),
+    Input('para_update', 'n_clicks'),
     Input('para_dd_color','value'),
     Input('select_para_colorscale','value'),
     Input('switch_reverse_para_cs','value'),
     State('mtable', 'selected_rows'),    
     State('mtable', 'data'),        
-    State('ptable', 'data'),  
+    State('para_table', 'data'),  
     State('theme_store', 'data'),
     prevent_initial_call=True
 )
-def update_para(n, color, colorscale, reverse_colorscale, 
+def para_update(n, color, colorscale, reverse_colorscale, 
                 sel_rows, mrecords, precords,  theme):
 
     if sel_rows is None or sel_rows == []: raise PreventUpdate
@@ -1136,10 +1136,10 @@ def update_para(n, color, colorscale, reverse_colorscale,
     return fig, df.to_dict('records')
 
 @app.callback(
-    Output('ptable', 'data'),    
+    Output('para_table', 'data'),    
     Input('para_plus', 'n_clicks'),
     Input('para_minus', 'n_clicks'),    
-    State('ptable', 'data'),   
+    State('para_table', 'data'),   
 )
 def para_plus_minus(p,m, records):
     '''adds/removes rows in para-table'''
@@ -1160,7 +1160,7 @@ def para_plus_minus(p,m, records):
     Output("para_selected", "children"),  
     Output("para_store_ranges", "data"),  
     #
-    Input('update_para', 'n_clicks'),
+    Input('para_update', 'n_clicks'),
     Input("para_fig", "restyleData"),
     Input("para_fig", "figure"),    
     State("para_store_ranges", "data"),
@@ -1220,15 +1220,15 @@ def display_selected_traces(n,restyleData, fig,  ranges, records):
 @app.callback(
     Output('mtable', 'data'),
     Output('ts_fig', 'figure'),    
-    Input('update_ts', 'n_clicks'),  
+    Input('ts_update', 'n_clicks'),  
     Input('ts_switch', 'value'),      
     State('mtable', 'data'),
     State('mtable', 'selected_rows'),    
-    State('wtable', 'data'),    
+    State('ts_table', 'data'),    
     State('theme_store', 'data'),
     prevent_initial_call=True
 )
-def update_ts(n, use_only_selected, 
+def ts_update(n, use_only_selected, 
               records, sel_rows, wrecords, theme):
     '''calculates total score column, updates the chart'''
     
