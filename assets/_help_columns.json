@@ -35,7 +35,7 @@
     "faulted": "indicates if the field is faulted",
     "reservoir": "description of the reservoir",
     "group": "lithostratigraphical groups",
-    "formation": "main geological formations",
+    "formation": "geological formation(s). Group name(s) are used if formation is not available",
     "lithology": "dominant type of formation minerals",
     "recovery": "description of the recovery strategy",
     "FactPageUrl": "URL to the field's fact page",

@@ -26,7 +26,7 @@ import re
 from datetime import datetime, timedelta
 import json
 # import warnings
-# import utils
+from utils import generate_rainbow_colors
 import webbrowser
 # microchange2 to test the fork
 # %% constants
@@ -244,7 +244,21 @@ c_settings=dbc.Offcanvas(
                 ), width=9
             ),
             dbc.Col([],width=3), 
-        ]),     
+        ]),    
+        dbc.Row([
+            dbc.Col(
+                dbc.InputGroup([
+                    dbc.InputGroupText("discrete colors",style={'width': '45%'}),
+                    dbc.Select(
+                        id='select_dclrs', value='Rainbow',
+                        options=['Rainbow',
+                                 'Plotly', 'D3', 'G10', 'T10', 'Alphabet',
+                                 'Dark24','Light24','Vivid']
+                        )
+                    ]), 
+            ),
+            dbc.Col([],width=3), 
+        ]),          
         dbc.Checkbox(
             id='checkbox_URL', 
             label="click on a field to open its page on factpages.sodir.no "+\
@@ -253,7 +267,7 @@ c_settings=dbc.Offcanvas(
             value=False)  
     ]),
     id='settings', is_open=False, scrollable=True,
-    style={'width': '30vw'}
+    style={'width': '37vw'}
 )
 
 @app.callback(
@@ -849,12 +863,13 @@ def reopen_current_chart(n, active_tab, fig_map, fig_sc, fig_para):
     Input('select_map_colorscale', 'value'),  
     Input('switch_reverse_map_cs', 'value'),  
     Input('select_map_style', 'value'),      
+    Input('select_dclrs', 'value'),  
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
     State('theme_store', 'data'),
     # prevent_initial_call=True
 )
-def update_map(n, color, size, colorscale, reverse_colorscale, map_style,
+def update_map(n, color, size, colorscale, reverse_colorscale, map_style, dclrs,
                sel_rows, records, theme):
 
     if sel_rows is None or sel_rows == []: raise PreventUpdate
@@ -881,10 +896,14 @@ def update_map(n, color, size, colorscale, reverse_colorscale, map_style,
     #         df.loc[ind, 'color'] = clr
 
     if df[color].dtype in ['float', 'int64', 'int32', 'int16', 'int8']:
-        pass
+        dclrs = None
     else:
         df = df.sort_values(by=color, ascending=True, kind='stable')
-
+        if dclrs=='Rainbow':
+            dclrs = generate_rainbow_colors(len(df[color].unique()))
+        else:
+            dclrs = eval(f'px.colors.qualitative.{dclrs}')
+        
     if size is None:
         df['size'] = 5
         _size = size
@@ -931,7 +950,8 @@ def update_map(n, color, size, colorscale, reverse_colorscale, map_style,
         size_max=size_max, 
         custom_data=['FactPageUrl'],
         color_continuous_scale=colorscale,
-        color_discrete_sequence=px.colors.qualitative.G10,
+        # color_discrete_sequence=px.colors.qualitative.G10,
+        color_discrete_sequence=dclrs
         )
 
     ref_lat, ref_lon = df.loc[:, ['lat', 'lon']].mean().values
@@ -970,6 +990,7 @@ def update_map(n, color, size, colorscale, reverse_colorscale, map_style,
     Input('sc_dd_size', 'value'),
     Input('select_sc_colorscale', 'value'),    
     Input('switch_reverse_sc_cs', 'value'),  
+    Input('select_dclrs', 'value'),  
     Input('sc_x_log10', 'value'),  
     Input('sc_y_log10', 'value'),  
     #
@@ -978,7 +999,7 @@ def update_map(n, color, size, colorscale, reverse_colorscale, map_style,
     State('theme_store', 'data')
     # prevent_initial_call=True
 )
-def update_sc(n, x, y, color, size, colorscale, reverse_colorscale,
+def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
               log10_x, log10_y,
               sel_rows, records, theme):
     
@@ -987,6 +1008,15 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale,
 
     if sel_rows is None or sel_rows == []:
         return go.Figure()
+    
+    if df[color].dtype in ['float', 'int64', 'int32', 'int16', 'int8']:
+        dclrs = None
+    else:
+        df = df.sort_values(by=color, ascending=True, kind='stable')
+        if dclrs=='Rainbow':
+            dclrs = generate_rainbow_colors(len(df[color].unique()))
+        else:
+            dclrs = eval(f'px.colors.qualitative.{dclrs}')
     
     df = df.loc[sel_rows, :]
     size_max = 10
@@ -1007,6 +1037,7 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale,
         template=theme, color_continuous_scale=colorscale,
         hover_data = hover_data,
         log_x=log10_x, log_y=log10_y,
+        color_discrete_sequence=dclrs
         )    
 
     fig.update_layout(
