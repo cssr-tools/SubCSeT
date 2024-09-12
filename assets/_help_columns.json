@@ -34,8 +34,11 @@
     "res. quality": "quality of the reservoir",
     "faulted": "indicates if the field is faulted",
     "reservoir": "description of the reservoir",
+    "group": "lithostratigraphical groups",
+    "formation": "main geological formations",
+    "lithology": "dominant type of formation minerals",
     "recovery": "description of the recovery strategy",
-    "FactPageUrl": "URL to the fact page of the field",
+    "FactPageUrl": "URL to the field's fact page",
     "peak year": "year of peak production",
     "peak OE YPR": "peak yearly oil equivalent production in Msm3",
     "peak oil YPR": "peak yearly oil production in Msm3",
@@ -75,5 +78,5 @@
     "qi_gas": "initial gas injectivity indicator (sm3/day)",
     "q_gas2": "secondary gas injectivity indicator (sm3/day)",
     "q_resv2": "secondary reservoir injectivity indicator (rm3/day)",
-    "total score": "aggregated parameter, calculated as a weighted sum of other parameters in TOTAL SCORE tab (-)"
+    "total score": "aggregated indicator, calculated as a weighted sum of other parameters in TOTAL SCORE tab (-)"
 }

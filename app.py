@@ -1156,7 +1156,7 @@ def para_update(n, color, colorscale, reverse_colorscale,
         df, dimensions=new_params, # labels=old_labels_dict, 
         color=color, color_continuous_scale=colorscale, template=theme
         )
-    fig = fig.update_layout(font_size=16)
+    fig = fig.update_layout(font_size=14)
 
     return fig, df.to_dict('records')
 
@@ -1271,6 +1271,7 @@ def ts_update(n, use_only_selected,
     weight_sum=wdf['weight'].abs().sum()
     params = wdf['parameter'].to_list()
 
+    df['total score'] = df['total score'].astype(float)
     df.loc[sel_rows,'total score'] = 0.0
     for i in wdf.index:
         p = wdf.loc[i, 'parameter']
