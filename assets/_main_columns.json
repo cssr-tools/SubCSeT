@@ -47,196 +47,196 @@
   "",
   "8"
  ],
+ "res. quality": [
+  "overview",
+  "reservoir quality",
+  "",
+  "9"
+ ],
+ "faulted": [
+  "overview",
+  "faulted",
+  "",
+  "10"
+ ],
+ "reservoir": [
+  "overview",
+  "reservoir",
+  "",
+  "11"
+ ],
+ "group": [
+  "overview",
+  "group",
+  "",
+  "12"
+ ],
+ "formation": [
+  "overview",
+  "formation",
+  "",
+  "13"
+ ],
+ "lithology": [
+  "overview",
+  "lithology",
+  "",
+  "14"
+ ],
+ "recovery": [
+  "overview",
+  "recovery strategy",
+  "",
+  "15"
+ ],
+ "FactPageUrl": [
+  "overview",
+  "URL",
+  "",
+  "16"
+ ],
  "rec. oil": [
   "initial reserves",
   "oil",
   "Msm3",
-  "9"
+  "17"
  ],
  "rec. gas": [
   "initial reserves",
   "gas",
   "Bsm3",
-  "10"
+  "18"
  ],
  "rec. ass. liq.": [
   "initial reserves",
   "ass. liq.",
   "Msm3",
-  "11"
+  "19"
  ],
  "rec. OE": [
   "initial reserves",
   "OE",
   "Msm3",
-  "12"
+  "20"
  ],
  "rem. oil": [
   "remaining reserves",
   "oil",
   "Msm3",
-  "13"
+  "21"
  ],
  "rem. gas": [
   "remaining reserves",
   "gas",
   "Bsm3",
-  "14"
+  "22"
  ],
  "rem. ass. liq.": [
   "remaining reserves",
   "ass. liq.",
   "Msm3",
-  "15"
+  "23"
  ],
  "rem. OE": [
   "remaining reserves",
   "OE",
   "Msm3",
-  "16"
+  "24"
  ],
  "rem. OE prod. years": [
   "remaining reserves",
   "lifetime",
   "years",
-  "17"
+  "25"
  ],
  "STOIIP": [
   "initial in-place volumes",
   "oil",
   "Msm3",
-  "18"
+  "26"
  ],
  "GIIP": [
   "initial in-place volumes",
   "gas",
   "Bsm3",
-  "19"
+  "27"
  ],
  "in-place ass. liquid": [
   "initial in-place volumes",
   "oil",
   "Msm3",
-  "20"
+  "28"
  ],
  "in-place ass. gas": [
   "initial in-place volumes",
   "ass. gas",
   "Bsm3",
-  "21"
+  "29"
  ],
  "in-place free gas": [
   "initial in-place volumes",
   "free gas",
   "Bsm3",
-  "22"
+  "30"
  ],
  "in-place OE": [
   "initial in-place volumes",
   "OE",
   "Msm3",
-  "23"
+  "31"
  ],
  "in-place liq./OE ratio": [
   "initial in-place volumes",
   "liquids/OE",
   "-",
-  "24"
+  "32"
  ],
  "in-place free gas/OE ratio": [
   "initial in-place volumes",
   "free gas/OE",
   "-",
-  "25"
+  "33"
  ],
  "RF oil": [
   "recovery factor",
   "oil",
   "-",
-  "26"
+  "34"
  ],
  "RF liq.": [
   "recovery factor",
   "liq.",
   "-",
-  "27"
+  "35"
  ],
  "RF gas": [
   "recovery factor",
   "gas",
   "-",
-  "28"
+  "36"
  ],
  "maturity oil": [
   "maturity",
   "oil",
   "-",
-  "29"
+  "37"
  ],
  "maturity gas": [
   "maturity",
   "gas",
   "-",
-  "30"
+  "38"
  ],
  "maturity liq.": [
   "maturity",
   "liq.",
   "-",
-  "31"
+  "39"
  ],
  "maturity OE": [
   "maturity",
   "OE",
   "-",
-  "32"
- ],
- "res. quality": [
-  "",
-  "reservoir quality",
-  "",
-  "33"
- ],
- "faulted": [
-  "",
-  "faulted",
-  "",
-  "34"
- ],
- "reservoir": [
-  "description",
-  "reservoir",
-  "",
-  "35"
- ],
- "group": [
-  "description",
-  "group",
-  "",
-  "36"
- ],
- "formation": [
-  "description",
-  "formation",
-  "",
-  "37"
- ],
- "lithology": [
-  "description",
-  "lithology",
-  "",
-  "38"
- ],
- "recovery": [
-  "description",
-  "recovery strategy",
-  "",
-  "39"
- ],
- "FactPageUrl": [
-  "description",
-  "URL",
-  "",
   "40"
  ],
  "peak year": [

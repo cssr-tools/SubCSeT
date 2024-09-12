@@ -312,7 +312,7 @@ c_map_tab = html.Div([
         ),
         dbc.InputGroup([
             dbc.InputGroupText('color'),
-            dbc.Select(id='map_dd_color', value='field'),
+            dbc.Select(id='map_dd_color', value='q_resv'),
             # dbc.Button(html.I(className="bi bi-x-square"),
             #            size='md', outline=True, id='map_color_reset'),            
             ], style={'width': '30%'}
@@ -380,7 +380,7 @@ c_sc_tab = html.Div([
                 ),
             dbc.InputGroup([
                 dbc.InputGroupText('color', style={'width': '20%'}),
-                dbc.Select(id='sc_dd_color',value='gas PV0/HC PV0'),
+                dbc.Select(id='sc_dd_color',value='group'),
                 dbc.Button(html.I(className="bi bi-x-square"), size='md', 
                         outline=True, color="dark", id='sc_color_reset'),
                 ], #style={'width': '25%'}
@@ -505,7 +505,7 @@ c_tabs = dbc.Tabs([
         c_ts_tab, label='TOTAL SCORE', tab_id='tab_ts',
         active_tab_style={"fontWeight": "bold"}
         ) 
-    ], id='all_tabs', active_tab='tab_para',
+    ], id='all_tabs', active_tab='tab_sc',
 )
 
 app.layout = html.Div([
@@ -872,13 +872,12 @@ def reopen_current_chart(n, active_tab, fig_map, fig_sc, fig_para):
 def update_map(n, color, size, colorscale, reverse_colorscale, map_style, dclrs,
                sel_rows, records, theme):
 
-    if sel_rows is None or sel_rows == []: raise PreventUpdate
     fig = go.Figure()
-    df = pd.DataFrame(data=records)
-    if reverse_colorscale: colorscale += "_r"
+    if sel_rows is None or sel_rows == []: return fig
 
+    df = pd.DataFrame(data=records)
     df = df.loc[sel_rows, :]
-    # df.reset_index(inplace=True)
+    if reverse_colorscale: colorscale += "_r"
 
     # legacy block kept just in case
     # df['color'] = 'grey'  # preallocating
@@ -1008,7 +1007,8 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
 
     if sel_rows is None or sel_rows == []:
         return go.Figure()
-    
+
+    df = df.loc[sel_rows, :]    
     if df[color].dtype in ['float', 'int64', 'int32', 'int16', 'int8']:
         dclrs = None
     else:
@@ -1018,7 +1018,6 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
         else:
             dclrs = eval(f'px.colors.qualitative.{dclrs}')
     
-    df = df.loc[sel_rows, :]
     size_max = 10
     _size = None
     hover_data=['field', x, y, color, size]
