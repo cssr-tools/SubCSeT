@@ -22,7 +22,6 @@ def get_production_yearly(update=False):
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:
-        # runs MUCH faster!!!  
         pp=r"https://factpages.sodir.no/public?/Factpages/external/tableview/field_production_yearly&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false"
         df = pd.read_csv(pp)
         df.to_csv(p)
