@@ -573,8 +573,24 @@ def initial_setup(path2csv, theme_url):
 
     # only numerical columns
     num_clmns = df.select_dtypes(include=['number','bool']).columns
+    
+    #%% preparing help content and options for dropdowns
+    # loading ...
+    with open(r'./assets/_help.md', 'r') as file:
+        markdown_help = file.read()  
+    # ... adding columns to Glossary and ...
+    # creating options for the dropdowns
+    _num_clmns = []
+    _all_clmns = []    
+    for key, value in HELP_CLMNS.items():
+        nn = CLMNS[key][-1]
+        markdown_help += f"{nn}. **{key}**: {value}  \n" 
+        foo = {'label': f'{nn}. {key}', 'value': key}
+        _all_clmns.append(foo)
+        if key in num_clmns:
+            _num_clmns.append(foo)
 
-    # adding another field column in the end to improve readability
+    #%% adding another field column in the end to improve readability
     df['field2'] = df['field']
     CLMNS['field2']=deepcopy(CLMNS['field'])
 
@@ -634,7 +650,8 @@ def initial_setup(path2csv, theme_url):
 
     tooltip_header = deepcopy(HELP_CLMNS)
     for k in HELP_CLMNS:
-        tooltip_header[k] = ['',tooltip_header[k], '']
+        tooltip_header[k] = ['',tooltip_header[k], '', tooltip_header[k]]
+        # tooltip_header[k] = tooltip_header[k]
 
     mtable = DataTable(
         id='mtable', columns=clmns,
@@ -686,8 +703,9 @@ def initial_setup(path2csv, theme_url):
 
     dropdowns = {}
     dropdowns['parameter']={}
-    dropdowns['parameter']['options']=\
-        [{'label': i, 'value': i} for i in num_clmns]
+    dropdowns['parameter']['options']=_num_clmns
+    # dropdowns['parameter']['options']=\
+    #     [{'label': i, 'value': i} for i in num_clmns]
     
     dropdowns['normalize']={}
     dropdowns['normalize']['options']=\
@@ -738,8 +756,9 @@ def initial_setup(path2csv, theme_url):
 
     dropdowns = {}
     dropdowns['parameter']={}
-    dropdowns['parameter']['options']=\
-        [{'label': i, 'value': i} for i in num_clmns]
+    dropdowns['parameter']['options']=_num_clmns
+    # dropdowns['parameter']['options']=\
+    #     [{'label': i, 'value': i} for i in num_clmns]
     
     dropdowns['normalize']={}
     dropdowns['normalize']['options']=\
@@ -773,25 +792,17 @@ def initial_setup(path2csv, theme_url):
                     'textAlign': 'center',
                     'whiteSpace': 'normal'} 
     ) 
-    #%% preparing help content
-    # loading ...
-    with open(r'./assets/_help.md', 'r') as file:
-        markdown_help = file.read()  
-    # ... adding columns to Glossary
-    for key, value in HELP_CLMNS.items():
-        nn = CLMNS[key][-1]
-        markdown_help += f"{nn}. **{key}**: {value}  \n" 
 
     out = (
         mtable, para_table, ts_table,  #
         1, 1, 1, 1, # initializes the plots
-        num_clmns,  # options for map's size dropdown
-        all_clmns,  # options for map's color dropdown
-        num_clmns, # options for scatter's X dropdown
-        num_clmns, # options for scatter's Y dropdown
-        num_clmns, # options for scatter's size dropdown
-        all_clmns, # options for scatter's color dropdown
-        all_clmns, # options for para's color dropdown        
+        _num_clmns,  # options for map's size dropdown
+        _all_clmns,  # options for map's color dropdown
+        _num_clmns, # options for scatter's X dropdown
+        _num_clmns, # options for scatter's Y dropdown
+        _num_clmns, # options for scatter's size dropdown
+        _all_clmns, # options for scatter's color dropdown
+        _all_clmns, # options for para's color dropdown  
         markdown_help  # help text
     )
     return out
