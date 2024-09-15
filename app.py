@@ -258,7 +258,15 @@ c_settings=dbc.Offcanvas(
                     ]), 
             ),
             dbc.Col([],width=3), 
-        ]),          
+        ]),   
+        dbc.Row(
+            dbc.Col([
+                dcc.Dropdown(
+                    [], id='dd_configure_tooltips', multi=True,
+                    placeholder='add columns to map and scatter tooltips'
+                )
+            ])
+        ),
         dbc.Checkbox(
             id='checkbox_URL', 
             label="click on a field to open its page on factpages.sodir.no "+\
@@ -550,6 +558,7 @@ className="dbc"
     Output('sc_dd_y', 'options'),
     Output('sc_dd_size', 'options'),
     Output('sc_dd_color', 'options'),
+    Output('dd_configure_tooltips', 'options'),
     Output('para_dd_color','options'),
     Output('help_markdown','children'),
     #
@@ -803,6 +812,7 @@ def initial_setup(path2csv, theme_url):
         _num_clmns, # options for scatter's size dropdown
         _all_clmns, # options for scatter's color dropdown
         _all_clmns, # options for para's color dropdown  
+        _all_clmns, # configure tooltips in maps and scatter
         markdown_help  # help text
     )
     return out
@@ -878,13 +888,16 @@ def reopen_current_chart(n, active_tab, fig_map, fig_sc, fig_para):
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
     State('theme_store', 'data'),
+    Input('dd_configure_tooltips', 'value'),
     # prevent_initial_call=True
 )
 def update_map(n, color, size, colorscale, reverse_colorscale, map_style, dclrs,
-               sel_rows, records, theme):
+               sel_rows, records, theme, add_to_tooltips):
 
     fig = go.Figure()
     if sel_rows is None or sel_rows == []: return fig
+
+    if add_to_tooltips is None: add_to_tooltips=[]
 
     df = pd.DataFrame(data=records)
     df = df.loc[sel_rows, :]
@@ -956,7 +969,8 @@ def update_map(n, color, size, colorscale, reverse_colorscale, map_style, dclrs,
 
     fig=px.scatter_mapbox(
         df, lat='lat', lon='lon',size=_size, color=color,
-        hover_data=['field','lat','lon',size,color,'size'],
+        # hover_data=['field','lat','lon',size,color,'size', *add_to_tooltips],
+        hover_data=['field',size,color,'size',*add_to_tooltips],
         size_max=size_max, 
         custom_data=['FactPageUrl'],
         color_continuous_scale=colorscale,
@@ -1006,12 +1020,13 @@ def update_map(n, color, size, colorscale, reverse_colorscale, map_style, dclrs,
     #
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
-    State('theme_store', 'data')
+    State('theme_store', 'data'),
+    Input('dd_configure_tooltips', 'value'),
     # prevent_initial_call=True
 )
 def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
               log10_x, log10_y,
-              sel_rows, records, theme):
+              sel_rows, records, theme, add_to_tooltips):
     
     df = pd.DataFrame(data=records)
     if reverse_colorscale: colorscale += "_r"
@@ -1041,6 +1056,9 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
         df.s = df.s.round(3)
         size_max = 50
         _size = df.s        
+
+    if add_to_tooltips is None: add_to_tooltips=[]
+    hover_data += add_to_tooltips
 
     fig=px.scatter(
         df, x=x, y=y, color=color, size=_size, size_max=size_max,
