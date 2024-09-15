@@ -13,7 +13,5 @@ __pycache__/
 *.png
 *.csv
 
-data/*
-!data/_main.csv
 nist_tables/
 *.ipynb
