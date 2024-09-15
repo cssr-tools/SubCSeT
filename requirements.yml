@@ -14,5 +14,4 @@ dependencies:
  - pandas
  - plotly
  - nbformat>=4.2.0
- - pip:
-    - npd-data
+ - gunicorn
