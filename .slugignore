@@ -1,8 +1,8 @@
-.vscode/
-.ipynb_checkpoints/
-figures/
+/.vscode
+/.ipynb_checkpoints
+/figures
 
-__pycache__/
+/__pycache__
 
 *test*.ipynb
 *test*.py
@@ -13,5 +13,5 @@ __pycache__/
 *.png
 *.csv
 
-nist_tables/
+/nist_tables
 *.ipynb
