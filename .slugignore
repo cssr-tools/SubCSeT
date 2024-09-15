@@ -1,7 +1,6 @@
 *.xlsx
 *.html
 *.png
-*.csv
 *.ipynb
 
 /nist_tables
