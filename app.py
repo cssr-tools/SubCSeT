@@ -361,7 +361,7 @@ c_sc_tab = html.Div([
         dbc.Stack([
             dbc.InputGroup([
                 dbc.InputGroupText('X'),
-                dbc.Select(id='sc_dd_x',value='CO2 SC'),
+                dbc.Select(id='sc_dd_x',value='depth'),
                 ], # style={'width': '20%'}
             ),  
             dbc.InputGroup([
@@ -371,7 +371,7 @@ c_sc_tab = html.Div([
             ),  
         ]),
         dbc.Stack([
-            dbc.Switch(label='log10',value=True,id='sc_x_log10',
+            dbc.Switch(label='log10',value=False,id='sc_x_log10',
                        style={'padding-top': '0.75vh'}
                        ), 
             dbc.Switch(label='log10',value=True,id='sc_y_log10',
@@ -381,14 +381,14 @@ c_sc_tab = html.Div([
         dbc.Stack([
             dbc.InputGroup([
                 dbc.InputGroupText('size', style={'width': '20%'}),
-                dbc.Select(id='sc_dd_size',value='CO2 SC/well num'),
+                dbc.Select(id='sc_dd_size',value='CO2 SC'),
                 dbc.Button(html.I(className="bi bi-x-square"), size='md', 
                         outline=True, color="dark", id='sc_size_reset'), 
                 ], #style={'width': '25%'}
                 ),
             dbc.InputGroup([
                 dbc.InputGroupText('color', style={'width': '20%'}),
-                dbc.Select(id='sc_dd_color',value='group'),
+                dbc.Select(id='sc_dd_color',value='grad_p0'),
                 dbc.Button(html.I(className="bi bi-x-square"), size='md', 
                         outline=True, color="dark", id='sc_color_reset'),
                 ], #style={'width': '25%'}
