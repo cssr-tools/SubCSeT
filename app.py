@@ -1,5 +1,5 @@
 DEBUG=False # switch for many parameters, should be False for deployment
-# DEBUG=True
+DEBUG=True
 
 import pandas as pd
 import numpy as np
@@ -262,7 +262,7 @@ c_settings=dbc.Offcanvas(
         dbc.Row(
             dbc.Col([
                 dcc.Dropdown(
-                    [], id='dd_configure_tooltips', multi=True,
+                    [], value=[], id='dd_configure_tooltips', multi=True,
                     placeholder='add columns to map and scatter tooltips'
                 )
             ])
@@ -1034,15 +1034,18 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
     if sel_rows is None or sel_rows == []:
         return go.Figure()
 
-    df = df.loc[sel_rows, :]    
-    if df[color].dtype in ['float', 'int64', 'int32', 'int16', 'int8']:
-        dclrs = None
-    else:
-        df = df.sort_values(by=color, ascending=True, kind='stable')
-        if dclrs=='Rainbow':
-            dclrs = generate_rainbow_colors(len(df[color].unique()))
+    df = df.loc[sel_rows, :]  
+    if not color is None:
+        if df[color].dtype in ['float', 'int64', 'int32', 'int16', 'int8']:
+            dclrs = None
         else:
-            dclrs = eval(f'px.colors.qualitative.{dclrs}')
+            df = df.sort_values(by=color, ascending=True, kind='stable')
+            if dclrs=='Rainbow':
+                dclrs = generate_rainbow_colors(len(df[color].unique()))
+            else:
+                dclrs = eval(f'px.colors.qualitative.{dclrs}')
+    else:
+        dclrs = None
     
     size_max = 10
     _size = None
