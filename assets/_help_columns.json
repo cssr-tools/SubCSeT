@@ -57,6 +57,8 @@
     "depth": "estimated depth (m) used for varios calculations (hydrostatic pressure, reservoir temperature etc.)",
     "p_h": "estimate of hydrostatic pressure (bar)",
     "p0": "initial reservoir pressure estimate (bar)",
+    "grad_p0": "pressure gradient calculated as (p0-1)/depth (bar/km)",
+    "p0 checked": "indicates if pressure was verified/refined by data from exploration well(s) or literature. If False => hydrostatic pressure estimate p0=p_h",
     "T0": "initial reservoir temperature estimate (degC)",
     "GOR": "gas-to-oil ratio (sm3/sm3)",
     "oil FVF": "oil formation volume factor (rm3/sm3)",

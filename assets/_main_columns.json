@@ -347,136 +347,148 @@
   "bar",
   "58"
  ],
+ "grad_p0": [
+  "res. estimates",
+  "grad p0",
+  "bar/km",
+  "59"
+ ],
+ "p0 checked": [
+  "res. estimates",
+  "p0 checked",
+  "-",
+  "60"
+ ],
  "T0": [
   "res. estimates",
   "T0",
   "degC",
-  "59"
+  "61"
  ],
  "GOR": [
   "res. estimates",
   "GOR",
   "sm3/sm3",
-  "60"
+  "62"
  ],
  "oil FVF": [
   "res. estimates",
   "oil FVF",
   "rm3/sm3",
-  "61"
+  "63"
  ],
  "gas FVF": [
   "res. estimates",
   "gas FVF",
   "rm3/sm3",
-  "62"
+  "64"
  ],
  "oil PV0": [
   "initial PV",
   "oil",
   "Mrm3",
-  "63"
+  "65"
  ],
  "gas PV0": [
   "initial PV",
   "gas",
   "Mrm3",
-  "64"
+  "66"
  ],
  "HCPV0": [
   "initial PV",
   "HC",
   "Mrm3",
-  "65"
+  "67"
  ],
  "gas PV0/HC PV0": [
   "initial PV",
   "gas/HC",
   "-",
-  "66"
+  "68"
  ],
  "rec. oil PV": [
   "released PV0",
   "oil",
   "Mrm3",
-  "67"
+  "69"
  ],
  "rec. gas PV": [
   "released PV0",
   "gas",
   "Mrm3",
-  "68"
+  "70"
  ],
  "rec. HCPV": [
   "released PV0",
   "HCPV",
   "Mrm3",
-  "69"
+  "71"
  ],
  "CO2 SC": [
   "storage capacity ind.",
   "CO2",
   "Mt",
-  "70"
+  "72"
  ],
  "H2 SC": [
   "storage capacity ind.",
   "H2",
   "Mt",
-  "71"
+  "73"
  ],
  "CO2 SC/well num": [
   "CO2 SC/well",
   "",
   "Mt/well",
-  "72"
+  "74"
  ],
  "CO2 density RC": [
   "CO2 density",
   "",
   "kg/rm3",
-  "73"
+  "75"
  ],
  "q_resv": [
   "injectivity ind.",
   "q_resv",
   "rm3/day",
-  "74"
+  "76"
  ],
  "qi_resv": [
   "injectivity ind.",
   "qi_resv",
   "rm3/day",
-  "75"
+  "77"
  ],
  "q_gas": [
   "injectivity ind.",
   "q_gas",
   "sm3/day",
-  "76"
+  "78"
  ],
  "qi_gas": [
   "injectivity ind.",
   "qi_gas",
   "sm3/day",
-  "77"
+  "79"
  ],
  "q_gas2": [
   "injectivity ind.",
   "q_gas2",
   "sm3/day",
-  "78"
+  "80"
  ],
  "q_resv2": [
   "injectivity ind.",
   "q_resv2",
   "rm3/day",
-  "79"
+  "81"
  ],
  "total score": [
   "total",
   "score",
   "-",
-  "80"
+  "82"
  ]
 }
