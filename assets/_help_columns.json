@@ -8,7 +8,6 @@
     "operator": "company operating the field",
     "HPHT": "indicates if the field is high pressure/high temperature",
     "res. quality": "quality of the reservoir",
-    "faulted": "indicates if the field is faulted",
     "reservoir": "description of the reservoir",
     "group": "lithostratigraphical groups",
     "formation": "geological formation(s). Group name(s) are used if formation is not available",
