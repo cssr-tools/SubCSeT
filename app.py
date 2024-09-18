@@ -262,7 +262,7 @@ c_settings=dbc.Offcanvas(
         dbc.Row(
             dbc.Col([
                 dcc.Dropdown(
-                    [], value=[], id='dd_configure_tooltips', multi=True,
+                    value=['depth','grad_p0'], id='dd_configure_tooltips', multi=True,
                     placeholder='add columns to map and scatter tooltips'
                 )
             ])
@@ -316,14 +316,14 @@ c_map_tab = html.Div([
             dbc.Button(html.I(className="bi bi-x-square"),
                        size='md', outline=True, color="dark",
                        id='map_size_reset'),
-            ], style={'width': '30%'}
+            ], style={'width': '45%'}
         ),
         dbc.InputGroup([
             dbc.InputGroupText('color'),
             dbc.Select(id='map_dd_color', value='q_resv'),
             # dbc.Button(html.I(className="bi bi-x-square"),
             #            size='md', outline=True, id='map_color_reset'),            
-            ], style={'width': '30%'}
+            ], style={'width': '45%'}
         ),         
         ], gap=2, direction="horizontal"),
     c_map, # map itself
