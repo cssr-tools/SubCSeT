@@ -1003,6 +1003,7 @@ def update_map(n, color, size,
             'style': map_style,
             'center': center,
             'zoom': zoom,
+            'scrollZoom': True
         },
         # colorbar to the left
         coloraxis_colorbar=dict(x=0.0,  y=1.0, xanchor='left', yanchor='top'),
