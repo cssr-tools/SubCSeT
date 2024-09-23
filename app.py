@@ -134,7 +134,7 @@ c_map = dcc.Graph(
     style={
         'height': '89vh',
     },
-    # config={'displayModeBar': True,'scrollZoom': True}
+    config={'displayModeBar': True,'scrollZoom': True}
 )
 
 c_b_save = dbc.Button(
@@ -270,9 +270,9 @@ c_settings=dbc.Offcanvas(
                 )
             ])
         ),
-        dbc.Switch(label='mousewheel/two-finger scroll to zoom the map',
-                   value=True,id='map_zoom_switch',
-                   style={'padding-top': '0.75vh'}),         
+        # dbc.Switch(label='mousewheel/two-finger scroll to zoom the map',
+        #            value=True,id='map_zoom_switch',
+        #            style={'padding-top': '0.75vh'}),         
         dbc.Checkbox(
             id='checkbox_URL', 
             label="click on a field to open its page on factpages.sodir.no "+\
@@ -292,13 +292,13 @@ c_settings=dbc.Offcanvas(
 def open_import_help(n):
     return True
 
-@app.callback(
-    Output('map_fig', 'config'),
-    Input('map_zoom_switch', 'value'),
-)
-def set_map_zoom_mode(v):
-    '''mousewheel/two-finger scroll to zoom the map'''
-    return {'displayModeBar': True, 'scrollZoom': v}
+# @app.callback(
+#     Output('map_fig', 'config'),
+#     Input('map_zoom_switch', 'value'),
+# )
+# def set_map_zoom_mode(v):
+#     '''mousewheel/two-finger scroll to zoom the map'''
+#     return {'displayModeBar': True, 'scrollZoom': v}
     
 @app.callback(
     Output('para_table_div', 'is_open'),
