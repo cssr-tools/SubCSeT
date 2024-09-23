@@ -134,7 +134,7 @@ c_map = dcc.Graph(
     style={
         'height': '89vh',
     },
-    config={'displayModeBar': True}
+    config={'displayModeBar': True,'scrollZoom': True}
 )
 
 c_b_save = dbc.Button(
@@ -1003,7 +1003,6 @@ def update_map(n, color, size,
             'style': map_style,
             'center': center,
             'zoom': zoom,
-            'scrollZoom': True
         },
         # colorbar to the left
         coloraxis_colorbar=dict(x=0.0,  y=1.0, xanchor='left', yanchor='top'),
