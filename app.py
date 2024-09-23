@@ -680,12 +680,11 @@ def initial_setup(path2csv, theme_url):
         hidden_columns=[
             '#','FactPageUrl', 'reservoir', 
             'res. quality','faulted',
-            'recovery', 'fldID', 'GOR'
+            'recovery', 'fldID', 'PL/BAA',
             'size', 'lat', 'lon',
             'depth min',  'depth mean', 'depth median', 'depth max',
-            'net oil yearly pr.', 'net gas yearly pr.'
-            'net NGL yearly pr.', 'net condensate yearly pr.',
-            'net OE yearly pr.',  'water yearly pr.',
+            'peak year', 'peak OE YPR', 'peak oil YPR', 'peak gas YPR',
+            'q_gas','qi_gas', 'q_gas2', 'qi_resv',
             ],
         style_table={
             'height': '90vh',
