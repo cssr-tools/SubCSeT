@@ -884,13 +884,17 @@ def reopen_current_chart(n, active_tab, fig_map, fig_sc, fig_para):
     Input('switch_reverse_map_cs', 'value'),  
     Input('select_map_style', 'value'),      
     Input('select_dclrs', 'value'),  
+    State('map_fig', 'figure'),    
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
     State('theme_store', 'data'),
     Input('dd_configure_tooltips', 'value'),
     # prevent_initial_call=True
 )
-def update_map(n, color, size, colorscale, reverse_colorscale, map_style, dclrs,
+def update_map(n, color, size, 
+               colorscale, reverse_colorscale, 
+               map_style, dclrs,
+               fig0,
                sel_rows, records, theme, add_to_tooltips):
 
     fig = go.Figure()
@@ -977,14 +981,28 @@ def update_map(n, color, size, colorscale, reverse_colorscale, map_style, dclrs,
         color_discrete_sequence=dclrs
         )
 
-    ref_lat, ref_lon = df.loc[:, ['lat', 'lon']].mean().values
+    if (fig0 is not None) and (fig0['layout'].get('mapbox') is not None):
+        # print(fig0['layout']['mapbox'])
+        zoom = fig0['layout']['mapbox']['zoom']
+        ref_lat, ref_lon = \
+            fig0['layout']['mapbox']['center']['lat'], \
+            fig0['layout']['mapbox']['center']['lon']
+    else:
+        # these limits are configured to show all fields in the North sea
+        zoom = 5.5
+        ref_lat, ref_lon = df.loc[:, ['lat', 'lon']].mean().values
+        # these limits are configures to show all NCS fields
+        # ref_lat, ref_lon, zoom = 65.7, 8.280232, 3.7
+    
+    center = {'lat': ref_lat, 'lon': ref_lon}
+    # center = go.layout.mapbox.Center(lat=ref_lat, lon=ref_lon)
 
     fig.update_layout(
         template=theme,
         mapbox={
             'style': map_style,
-            'center': go.layout.mapbox.Center(lat=ref_lat, lon=ref_lon),
-            'zoom': 5.5,
+            'center': center,
+            'zoom': zoom,
         },
         # colorbar to the left
         coloraxis_colorbar=dict(x=0.0,  y=1.0, xanchor='left', yanchor='top'),
