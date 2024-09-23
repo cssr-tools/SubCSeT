@@ -134,7 +134,7 @@ c_map = dcc.Graph(
     style={
         'height': '89vh',
     },
-    config={'displayModeBar': True}
+    config={'displayModeBar': True,'scrollZoom': True}
 )
 
 c_b_save = dbc.Button(
