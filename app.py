@@ -134,7 +134,7 @@ c_map = dcc.Graph(
     style={
         'height': '89vh',
     },
-    config={'displayModeBar': True,'scrollZoom': True}
+    # config={'displayModeBar': True,'scrollZoom': True}
 )
 
 c_b_save = dbc.Button(
@@ -261,18 +261,24 @@ c_settings=dbc.Offcanvas(
         ]),   
         dbc.Row(
             dbc.Col([
+                html.Div('configure map and scatter tooltips:', 
+                         style={'padding-top': '1vh'}),
                 dcc.Dropdown(
-                    value=['depth','grad_p0'], id='dd_configure_tooltips', multi=True,
-                    placeholder='add columns to map and scatter tooltips'
+                    value=['depth','grad_p0'], id='dd_configure_tooltips', 
+                    multi=True,
+                    placeholder='add/remove parameters in map and scatter tooltips'
                 )
             ])
         ),
+        dbc.Switch(label='mousewheel/two-finger scroll to zoom the map',
+                   value=True,id='map_zoom_switch',
+                   style={'padding-top': '0.75vh'}),         
         dbc.Checkbox(
             id='checkbox_URL', 
             label="click on a field to open its page on factpages.sodir.no "+\
                 "(may not work in the cloud)", 
             # style={'alignSelf': 'center'},
-            value=False)  
+            value=False),
     ]),
     id='settings', is_open=False, scrollable=True,
     style={'width': '37vw'}
@@ -286,6 +292,14 @@ c_settings=dbc.Offcanvas(
 def open_import_help(n):
     return True
 
+@app.callback(
+    Output('map_fig', 'config'),
+    Input('map_zoom_switch', 'value'),
+)
+def set_map_zoom_mode(v):
+    '''mousewheel/two-finger scroll to zoom the map'''
+    return {'displayModeBar': True, 'scrollZoom': v}
+    
 @app.callback(
     Output('para_table_div', 'is_open'),
     Input('hide_para_table', 'n_clicks'),
