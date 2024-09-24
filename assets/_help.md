@@ -30,7 +30,7 @@ The total score is designed to be in range from 0 (absolutely terrible) to 100 (
 The icons above the table:
 * ![](/assets/check2-square.svg) - add all filtered table rows to the selection
 * ![](/assets/x-square.svg) - deselect all selected rows
-* ![](/assets/box-arrow-up-right.svg) - reopen the current chart in a new tab (does not work in the versio deployed in the cloud)
+* ![](/assets/arrow-90deg-down.svg) - add the fields selected in the current chart to the table selection  
 * ![](/assets/gear-fill.svg) - setting, here you can adjust the colorscale, theme etc.
 * ![](/assets/question-lg.svg) - help (you are here)
 

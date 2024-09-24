@@ -154,10 +154,12 @@ c_toolbar = dbc.ButtonGroup([
                size='md', id='b_deselect',
                outline=True, color="dark",
                ),
-    dbc.Button(html.I(className="bi bi-box-arrow-up-right"),
-               id='b_reopen', size='md',
-               outline=True, color="dark",
-               ),
+    dbc.Button(
+        # html.I(className="bi bi-box-arrow-down-left"),
+        html.I(className="bi bi-arrow-90deg-down"),
+        id='b_chart_selection', size='md',
+        outline=True, color="dark",
+        ),
     dbc.Button(html.I(className="bi bi-gear-fill"),
                outline=True, color="dark",
                id='b_settings', size='md',
@@ -352,7 +354,7 @@ c_toolbar = dbc.Stack([
                 delay=tooltip_delay),
     dbc.Tooltip('deselect all', target='b_deselect',
                 delay=tooltip_delay),
-    dbc.Tooltip('reopen chart in new tab', target='b_reopen',
+    dbc.Tooltip('add selected in chart', target='b_chart_selection',
                 delay=tooltip_delay),
     c_inp_fldr,
     c_help,
@@ -464,12 +466,16 @@ c_para_tab = html.Div([
     c_para_table_div,
     dcc.Graph(
         id='para_fig',
-        style={'height': '65vh'},
+        style={'height': '62vh'},
         config={'displayModeBar': True}),
     # html.Div(id='para_selected', 
     #          style={'whiteSpace': 'pre-line','width': '90%'}),
-    dbc.Container(id='para_selected', 
-             style={'whiteSpace': 'pre-line','width': '95%'})             
+    dbc.Container(
+        id='para_selected', 
+        style={'width': '95%','height':'12vh', 
+               "overflowY": "scroll",
+            #    "border": "2px solid"
+               }) 
 ])
 #%% total score
 
@@ -801,7 +807,7 @@ def initial_setup(path2csv, theme_url):
 
     wdata=[\
         {'#': 1, 'parameter': 'CO2 SC','normalize': 'min-max', 'log10': True,
-         'weight': 5}, 
+         'weight': 1}, 
         {'#': 2, 'parameter': 'q_resv','normalize': 'min-max', 'log10': True,
          'weight': 1}, 
         {'#': 3, 'parameter': 'depth', 'normalize': 'min-max', 'log10': False,
@@ -830,7 +836,7 @@ def initial_setup(path2csv, theme_url):
         _num_clmns, # options for scatter's Y dropdown
         _num_clmns, # options for scatter's size dropdown
         _all_clmns, # options for scatter's color dropdown
-        _all_clmns, # options for para's color dropdown  
+        _num_clmns, # options for para's color dropdown  
         _all_clmns, # configure tooltips in maps and scatter
         markdown_help  # help text
     )
@@ -840,12 +846,20 @@ def initial_setup(path2csv, theme_url):
 @app.callback(
     Output('mtable', 'selected_rows'),
     Input('b_deselect', 'n_clicks'),
+    Input('b_chart_selection', "n_clicks"),    
     Input('b_select', 'n_clicks'),    
+    State('mtable', 'data'), 
     State('mtable', 'selected_rows'),
     State('mtable', 'derived_virtual_data'),
+    State("all_tabs", 'active_tab'),
+    State('map_fig', 'selectedData'),
+    State('sc_fig', 'selectedData'),    
+    State('para_selected', 'children'),     
     prevent_initial_call=True
 )
-def select_deselect(m, b, selected_rows, filtered_rows):
+def select_deselect(m, b, n, 
+                    records, selected_rows, filtered_rows,
+                    active_tab, sel_map, sel_sc, sel_para):
 
     changed_id = [p['prop_id'] for p in callback_context.triggered][0]
     if 'b_deselect' in changed_id:
@@ -854,45 +868,28 @@ def select_deselect(m, b, selected_rows, filtered_rows):
         selected_rows += [row['#'] for row in filtered_rows]
         selected_rows.sort()
         selected_rows = list(set(selected_rows))  # adds to previous selection
+    elif 'b_chart_selection' in changed_id:
+        sel = []
+        if active_tab == 'tab_map':
+            if sel_map is None: return selected_rows
+            for p in sel_map['points']:
+                sel.append(p['customdata'][1])
+        elif active_tab == 'tab_sc': 
+            if sel_sc is None: return selected_rows
+            for p in sel_sc['points']:
+                sel.append(p['customdata'][0])
+        elif active_tab == 'tab_para':
+            sel=eval(sel_para[10:])
+        else:
+            pass  
+        # geting # from field names
+        df = pd.DataFrame(data=records)[['field','#']]
+        df = df.set_index('field')
+        selected_rows += df.loc[sel,'#'].to_list()
     else:
-        # raise PreventUpdate
         pass
     selected_rows.sort()
     return selected_rows
-
-
-@app.callback(
-    Output('b_reopen', "n_clicks"),
-    Input('b_reopen', "n_clicks"),
-    State("all_tabs", 'active_tab'),
-    State('map_fig', 'figure'),
-    State('sc_fig', 'figure'),    
-    State('para_fig', 'figure'),      
-    prevent_initial_call=True
-)
-
-def reopen_current_chart(n, active_tab, fig_map, fig_sc, fig_para):
-
-    fig = None
-    # print('active tab:', active_tab)
-    if active_tab == 'tab_map':
-        fig=fig_map
-    elif active_tab == 'tab_sc':
-        fig=fig_sc   
-    elif active_tab == 'tab_para':
-        fig=fig_para           
-    else:
-        pass   
-
-    if fig is not None: 
-        # Stranglely enough Plotly refuses to render None values in fig
-        # here is a temp. fix which replaces None values with "grey"
-        # Maybe not so efficient ...
-        fig = replace_none_colors(fig) 
-        fig = go.Figure(fig)
-        fig.show(renderer='browser', validate=False)   
-
-    return n
 
 
 @app.callback(
@@ -1209,14 +1206,17 @@ def open_FactPageUrl(clickData, open):
     Input('switch_reverse_para_cs','value'),
     State('mtable', 'selected_rows'),    
     State('mtable', 'data'),        
-    State('para_table', 'data'),  
+    Input('para_table', 'data'),  
     State('theme_store', 'data'),
     prevent_initial_call=True
 )
 def para_update(n, color, colorscale, reverse_colorscale, 
                 sel_rows, mrecords, precords,  theme):
 
-    if sel_rows is None or sel_rows == []: raise PreventUpdate
+    # print(sel_rows, sel_rows == [], (sel_rows is None) or (sel_rows == []))
+    if (sel_rows is None) or (sel_rows == []): 
+        return go.Figure(), []
+    
     df = pd.DataFrame(data=mrecords)
     df = df.loc[sel_rows,:]
     pdf = pd.DataFrame(data=precords)
@@ -1292,9 +1292,10 @@ def para_plus_minus(p,m, records):
     State("para_store_df", "data"),
     prevent_initial_call=True
 )
-def para_display_selected_traces(n,restyleData, fig,  ranges, records):
+def para_display_selected_traces(n, restyleData, fig,  ranges, records):
     '''shows field names for the selected traces'''
 
+    if records==[]: return None, {}
     df = pd.DataFrame(data=records) 
     df = df.set_index('field')
     
@@ -1349,7 +1350,7 @@ def para_display_selected_traces(n,restyleData, fig,  ranges, records):
     Input('ts_switch', 'value'),      
     State('mtable', 'data'),
     State('mtable', 'selected_rows'),    
-    State('ts_table', 'data'),    
+    Input('ts_table', 'data'),    
     State('theme_store', 'data'),
     prevent_initial_call=True
 )
