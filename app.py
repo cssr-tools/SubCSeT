@@ -29,7 +29,10 @@ import json
 from utils import generate_rainbow_colors
 import webbrowser
 # microchange2 to test the fork
+
 # %% constants
+tooltip_delay={'show': 750, 'hide': 0}
+
 themes = [
     "bootstrap", "cerulean", "cosmo", "cyborg", "darkly", "flatly",
     "journal", "litera", "lumen", "lux", "materia", "minty", "morph",
@@ -345,9 +348,12 @@ c_map_tab = html.Div([
 
 c_toolbar = dbc.Stack([
     c_toolbar,    
-    # dbc.Tooltip('add all filtered rows to selection', target='b_select'),
-    # dbc.Tooltip('deselect all', target='b_deselect'),
-    # dbc.Tooltip('reopen chart in new tab', target='b_reopen'),
+    dbc.Tooltip('add all filtered rows to selection', target='b_select',
+                delay=tooltip_delay),
+    dbc.Tooltip('deselect all', target='b_deselect',
+                delay=tooltip_delay),
+    dbc.Tooltip('reopen chart in new tab', target='b_reopen',
+                delay=tooltip_delay),
     c_inp_fldr,
     c_help,
     c_settings
