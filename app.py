@@ -420,10 +420,6 @@ c_sc_tab = html.Div([
     c_sc
 ])
 #%% Parallel plot
-
-# c_para_table = DataTable(id='para_table', columns=[], data=[], editable=True)
-c_para_table_div = dbc.Collapse([], id='para_table_div',is_open=True)
-
 c_para_tab = html.Div([
     dbc.Stack([
         dbc.Button(
@@ -458,24 +454,17 @@ c_para_tab = html.Div([
             dbc.Button(html.I(className="bi bi-x-square"),
                         size='md', outline=True, color="dark",
                         id='para_color_reset'),
-        ], style={'width': '40%'}
-        ),
-        # ]),        
-    ], direction="horizontal", gap=2
-    ),
-    c_para_table_div,
+        ], style={'width': '40%'}), 
+    ], direction="horizontal", gap=2),
+    dbc.Collapse([], id='para_table_div',is_open=True), 
     dcc.Graph(
-        id='para_fig',
-        style={'height': '62vh'},
+        id='para_fig', style={'height': '53vh'},
         config={'displayModeBar': True}),
-    # html.Div(id='para_selected', 
-    #          style={'whiteSpace': 'pre-line','width': '90%'}),
     dbc.Container(
         id='para_selected', 
-        style={'width': '95%','height':'12vh', 
-               "overflowY": "scroll",
-            #    "border": "2px solid"
-               }) 
+        style={'width': '95%','maxHeight':'12vh', 
+               "overflowY": "auto", #    "border": "2px solid"
+               }),           
 ])
 #%% total score
 
@@ -772,7 +761,11 @@ def initial_setup(path2csv, theme_url):
     para_table = DataTable(
         id='para_table', columns=clmns, data=pdata,
         dropdown=dropdowns, editable=True,
-        style_table={'width': '45vw'},
+        style_table={
+            'width': '47vw',
+            'maxHeight': '23vh',
+            'overflowY': 'auto'
+            },
         style_cell={'fontSize': 14, 
                     'textAlign': 'center',
                     'whiteSpace': 'normal'} 
