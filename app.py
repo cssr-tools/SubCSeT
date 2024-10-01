@@ -1206,7 +1206,6 @@ def open_FactPageUrl(clickData, open):
 def para_update(n, color, colorscale, reverse_colorscale, 
                 sel_rows, mrecords, precords,  theme):
 
-    # print(sel_rows, sel_rows == [], (sel_rows is None) or (sel_rows == []))
     if (sel_rows is None) or (sel_rows == []): 
         return go.Figure(), []
     
