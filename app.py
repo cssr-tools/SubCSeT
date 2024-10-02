@@ -829,8 +829,8 @@ def initial_setup(path2csv, theme_url):
         _num_clmns, # options for scatter's Y dropdown
         _num_clmns, # options for scatter's size dropdown
         _all_clmns, # options for scatter's color dropdown
-        _num_clmns, # options for para's color dropdown  
         _all_clmns, # configure tooltips in maps and scatter
+        _num_clmns, # options for para's color dropdown          
         markdown_help  # help text
     )
     return out
