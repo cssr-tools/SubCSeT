@@ -1,2 +1,4 @@
-*.ipynb diff=suppress
-*.csv diff=suppress
+*.ipynb binary
+*.csv binary
+*.png binary
+*.svg binary

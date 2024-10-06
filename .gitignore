@@ -1,12 +1,11 @@
 .vscode/
 .ipynb_checkpoints/
 figures/
-
 __pycache__/
 
-*test*.ipynb
-*test*.py
-
+*test*.*
+*.ipynb
+!main.ipynb
 
 *.xlsx
 *.html
@@ -15,5 +14,3 @@ temp.csv
 #  temporarily
 data/*
 !data/_main.csv
-nist_tables/
-*.ipynb
