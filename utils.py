@@ -3,12 +3,20 @@ import numpy as np
 import os
 import colorsys
 
-def get_production_monthly(update=False):
-    p = r'./data/production_monthly.csv'
+def get_production_monthly(update=False, 
+                           p=r'./data/NOD/production_monthly.csv'):
+    '''
+    Parameters
+    ----------
+    update: bool
+        if True (or "p" does not exists): fetch csv-data from FactPages and save to "p" 
+        if False (and "p" exists): reload local data from "p"
+    p: str
+        path to a csv file
+    '''
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:
-        # generic way to import
         # monthly by field saleable
         pp=r"https://factpages.sodir.no/public?/Factpages/external/tableview/field_production_monthly&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false"
         # sum wellbores monthly by field
@@ -17,8 +25,17 @@ def get_production_monthly(update=False):
         df.to_csv(p)
     return df
 
-def get_production_yearly(update=False):
-    p = r'./data/production_yearly.csv'
+def get_production_yearly(update=False, 
+                          p = r'./data/NOD/production_yearly.csv'):
+    '''
+    Parameters
+    ----------
+    update: bool
+        if True (or "p" does not exists): fetch csv-data from FactPages and save to "p" 
+        if False (and "p" exists): reload local data from "p"
+    p: str
+        path to a csv file
+    '''    
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:
@@ -27,8 +44,17 @@ def get_production_yearly(update=False):
         df.to_csv(p)
     return df
 
-def get_field_inplace_volumes(update=False):
-    p = r'./data/inplace_volumes.csv'
+def get_field_inplace_volumes(update=False, 
+                              p=r'./data/NOD/inplace_volumes.csv'):
+    '''
+    Parameters
+    ----------
+    update: bool
+        if True (or "p" does not exists): fetch csv-data from FactPages and save to "p" 
+        if False (and "p" exists): reload local data from "p"
+    p: str
+        path to a csv file
+    '''    
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:
@@ -37,8 +63,17 @@ def get_field_inplace_volumes(update=False):
         df.to_csv(p)            
     return df
 
-def get_field_reserves(update=False):
-    p = r'./data/reserves.csv'
+def get_field_reserves(update=False, 
+                       p=r'./data/NOD/reserves.csv'):  
+    '''
+    Parameters
+    ----------
+    update: bool
+        if True (or "p" does not exists): fetch csv-data from FactPages and save to "p" 
+        if False (and "p" exists): reload local data from "p"
+    p: str
+        path to a csv file
+    '''    
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:
@@ -47,9 +82,17 @@ def get_field_reserves(update=False):
         df.to_csv(p) 
     return df
 
-
-def get_all_wells(update=False):
-    p = r'./data/wells_all.csv'
+def get_all_wells(update=False, 
+                  p=r'./data/NOD/wells_all.csv'):
+    '''
+    Parameters
+    ----------
+    update: bool
+        if True (or "p" does not exists): fetch csv-data from FactPages and save to "p" 
+        if False (and "p" exists): reload local data from "p"
+    p: str
+        path to a csv file
+    '''    
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:
@@ -58,8 +101,17 @@ def get_all_wells(update=False):
         df.to_csv(p, index=False) 
     return df
 
-def get_development_wells(update=False):
-    p = r'./data/wells_dev.csv'
+def get_development_wells(update=False, 
+                          p=r'./data/NOD/wells_dev.csv'):
+    '''
+    Parameters
+    ----------
+    update: bool
+        if True (or "p" does not exists): fetch csv-data from FactPages and save to "p" 
+        if False (and "p" exists): reload local data from "p"
+    p: str
+        path to a csv file
+    '''    
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:
@@ -68,8 +120,17 @@ def get_development_wells(update=False):
         df.to_csv(p) 
     return df
 
-def get_exploration_wells(update=False):
-    p = r'./data/exploration_wells.csv'
+def get_exploration_wells(update=False, 
+                          p=r'./data/NOD/wells_exploration.csv'):
+    '''
+    Parameters
+    ----------
+    update: bool
+        if True (or "p" does not exists): fetch csv-data from FactPages and save to "p" 
+        if False (and "p" exists): reload local data from "p"
+    p: str
+        path to a csv file
+    '''    
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:
@@ -78,8 +139,17 @@ def get_exploration_wells(update=False):
         df.to_csv(p)
     return df
 
-def get_wells_with_dst(update=False):
-    p = r'./data/wells_with_dst.csv'
+def get_wells_with_dst(update=False, 
+                       p=r'./data/NOD/wells_with_dst.csv'):
+    '''
+    Parameters
+    ----------
+    update: bool
+        if True (or "p" does not exists): fetch csv-data from FactPages and save to "p" 
+        if False (and "p" exists): reload local data from "p"
+    p: str
+        path to a csv file
+    '''    
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:
@@ -88,8 +158,17 @@ def get_wells_with_dst(update=False):
         df.to_csv(p)
     return df 
 
-def get_field_status(update=False):
-    p = r'./data/field_status.csv'
+def get_field_status(update=False, 
+                     p=r'./data/NOD/field_status.csv'):  
+    '''
+    Parameters
+    ----------
+    update: bool
+        if True (or "p" does not exists): fetch csv-data from FactPages and save to "p" 
+        if False (and "p" exists): reload local data from "p"
+    p: str
+        path to a csv file
+    '''    
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:    
@@ -98,8 +177,16 @@ def get_field_status(update=False):
         df.to_csv(p)
     return df
 
-def get_field_overview(update=False):
-    p = r'./data/field_overview.csv'
+def get_field_overview(update=False, p=r'./data/NOD/field_overview.csv'):
+    '''
+    Parameters
+    ----------
+    update: bool
+        if True (or "p" does not exists): fetch csv-data from FactPages and save to "p" 
+        if False (and "p" exists): reload local data from "p"
+    p: str
+        path to a csv file
+    '''    
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:    
@@ -108,8 +195,17 @@ def get_field_overview(update=False):
         df.to_csv(p, index=False)
     return df
 
-def get_field_description(update=False):
-    p = r'./data/field_description.csv'
+def get_field_description(update=False, 
+                          p=r'./data/NOD/field_description.csv'):  
+    '''
+    Parameters
+    ----------
+    update: bool
+        if True (or "p" does not exists): fetch csv-data from FactPages and save to "p" 
+        if False (and "p" exists): reload local data from "p"
+    p: str
+        path to a csv file
+    '''    
     if os.path.exists(p) and not update:
         df = pd.read_csv(p)
     else:
