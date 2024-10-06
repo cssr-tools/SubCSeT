@@ -2,6 +2,7 @@
 *.html
 *.png
 *.ipynb
+*.html
 
 /data/NIST
 /data/NOD

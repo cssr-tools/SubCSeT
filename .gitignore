@@ -9,6 +9,7 @@ __pycache__/
 
 *.xlsx
 *.html
+!main.html
 temp.csv
 
 #  temporarily
