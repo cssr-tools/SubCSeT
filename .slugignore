@@ -3,4 +3,6 @@
 *.png
 *.ipynb
 
-/nist_tables
+/data/NIST
+/data/NOD
+/data/DISKOS
