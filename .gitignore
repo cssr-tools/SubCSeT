@@ -10,6 +10,7 @@ figures/
 
 *.ipynb
 *test*.ipynb
+leftovers.ipynb
 #!main.ipynb
 
 #  data
