@@ -7,7 +7,6 @@
     "PL/BAA": "production license or block area agreement",
     "operator": "company operating the field",
     "HPHT": "indicates if the field is high pressure/high temperature",
-    "res. quality": "quality of the reservoir",
     "reservoir": "description of the reservoir",
     "group": "lithostratigraphical groups",
     "formation": "geological formation(s). Group name(s) are used if formation is not available",
