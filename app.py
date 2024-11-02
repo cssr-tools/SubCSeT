@@ -28,7 +28,6 @@ import json
 # import warnings
 from utils import generate_rainbow_colors
 import webbrowser
-# microchange2 to test the fork
 
 # %% constants
 tooltip_delay={'show': 750, 'hide': 0}
@@ -84,7 +83,7 @@ def normalize_series(s, method='min-max'):
         return (s - s_min)/(s_max - s_min)
     elif method=='median':
         return s/s.median()
-    elif method=='min':
+    elif method=='mean':
         return s/s.mean()
     elif method=='z-score':
         return (s - s.mean())/s.std()
@@ -1371,16 +1370,21 @@ def ts_update(n, use_only_selected,
         
         x = df.loc[sel_rows,p].copy()
         weight = wdf.loc[i, 'weight']
+        # the series is mirrorred  if it should be minimized ... 
+        if weight < 0: 
+            x = x.max() - x + x.min()  
+            weight = np.abs(weight)
 
+        # utitlity function
         if wdf.loc[i, 'log10']:  x=np.log10(x)
 
-        norm_method = wdf.loc[i,'normalize']
-        x=normalize_series(x, method=norm_method)
-            
-         # to correctly hangle weights<0, i.e. parameters to be minimized
-        x = x*np.sign(weight)
-        cdf[p] = 100*np.abs(weight)*(x - x.min())/(x.max()-x.min())/ weight_sum
+        # to normalize
+        x=normalize_series(x, method=wdf.loc[i,'normalize'])
+        
+        # to calculate contribution of the parameter to the total score
+        cdf[p] = 100*weight*x/weight_sum
         cdf[p] = cdf[p].round(1)
+        # adding the parameter's contribution to the total score 
         df.loc[sel_rows,'total score'] += cdf[p]
 
     # df['total score'] = df['total score'].apply(round_to_sign_digits)
