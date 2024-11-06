@@ -6,13 +6,13 @@ The repository contains codes, tools, and data for screening CO2 storage potenti
     * [FactPages of the Norwegian Offshore Directorate](https://factpages.sodir.no/)  
     * [Public portal of DISKOS database](https://www.diskos.com/) 
     * more references are to be found in the main.ipynb  
-2. [*main.ipynb*](https://github.com/cssr-tools/SubCSeT/blob/main/main.ipynb) details data retrival, processing and feature engineering workflows  
+2. [*main.ipynb*](https://github.com/cssr-tools/SubCSeT/blob/main/main.ipynb) details data retrieval, processing, and feature engineering workflows  
 3. **web app** to visualize the data and perform screening is deployed at **https://subcset-35e143428f88.herokuapp.com/**  
   
 ![](./assets/app_view.png)
 
 ## Requirements
-The **requirements** are listed in *requirements.txt* (for **pip**) and *requirements.yml* (for **conda**). The environements can be reproduced by:  
+The **requirements** are listed in *requirements.txt* (for **pip**) and *requirements.yml* (for **conda**). The environment can be reproduced by:  
 `pip install requirements.txt`  
 or `conda env create -n [*env. name*] --file requirements.yml` 
 
