@@ -6,8 +6,8 @@ The repository contains codes, tools, and data for screening CO2 storage potenti
     * [FactPages of the Norwegian Offshore Directorate](https://factpages.sodir.no/)  
     * [Public portal of DISKOS database](https://www.diskos.com/) 
     * more references are to be found in the main.ipynb  
-2. [*main.ipynb*](https://github.com/cssr-tools/SubCSeT/blob/main/main.ipynb) details data retrieval, processing, and feature engineering workflows  
-3. **web app** to visualize the data and perform screening is deployed at **https://subcset-35e143428f88.herokuapp.com/**  
+2. [*main.ipynb*](https://github.com/cssr-tools/SubCSeT/blob/main/main.ipynb) details the data retrieval, processing, and feature engineering workflows  
+3. **web app** to visualize the data and perform screening deployed at **https://subcset-35e143428f88.herokuapp.com/**  
   
 ![](./assets/app_view.png)
 
