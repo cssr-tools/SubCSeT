@@ -1,6 +1,6 @@
 # SubCSeT 
 ### (Screening Tools for SUBsurface CO2 storage in petroleum reservoirs on the NCS)  
-
+![](./assets/app_view.png)
 The repository contains codes, tools, and data for screening CO2 storage potential of petroleum reservoirs on the Norwegian Continental Shelf (NCS) developed in [WP6 of the CSSR](https://cssr.no/research/fa3/wp-6/), namely:
 1.  an open database [*data/_main.csv*](https://github.com/cssr-tools/SubCSeT/blob/main/data/_main.csv) of 134 fields on the NCS compiled from:
     * [FactPages of the Norwegian Offshore Directorate](https://factpages.sodir.no/)  
@@ -9,7 +9,7 @@ The repository contains codes, tools, and data for screening CO2 storage potenti
 2. [*main.ipynb*](https://github.com/cssr-tools/SubCSeT/blob/main/main.ipynb) details the data retrieval, processing, and feature engineering workflows  
 3. **web app** to visualize the data and perform screening deployed at **https://subcset-35e143428f88.herokuapp.com/**  
   
-![](./assets/app_view.png)
+The version of the data and the codes from GHGT-17 conference and conference paper is tagged as ["GHGT17"](https://github.com/cssr-tools/SubCSeT/releases/tag/GHGT17)
 
 ## Requirements
 The **requirements** are listed in *requirements.txt* (for **pip**) and *requirements.yml* (for **conda**). The environment can be reproduced by:  
