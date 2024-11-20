@@ -11,7 +11,7 @@ figures/
 *.ipynb
 *test*.ipynb
 leftovers.ipynb
-!main.ipynb
+main.ipynb
 
 #  data
 # data/*
