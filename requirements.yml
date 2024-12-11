@@ -1,7 +1,6 @@
 name: cssr
 channels:
   - conda-forge
-  - defaults
 dependencies:
  - pip
  - python
