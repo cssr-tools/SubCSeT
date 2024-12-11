@@ -16,4 +16,4 @@ The **requirements** are listed in *requirements.txt* (for **pip**) and *require
 `pip install requirements.txt`  
 or `conda env create -n [*env. name*] --file requirements.yml` 
 
-NB! For Anaconda users. As Anaconda has recently updated its terms of service (read [HERE](https://www.anaconda.com/blog/is-conda-free) and [HERE](https://www.anaconda.com/pricing/terms-of-service-faqs)), please check if you can use the `default` channel. Remove it from the yml-file if necessary.
+NB! For Anaconda users. As Anaconda has recently updated its terms of service (read [HERE](https://www.anaconda.com/blog/is-conda-free) and [HERE](https://www.anaconda.com/pricing/terms-of-service-faqs)). So, the `defaults` channel was removed from *requirements.yml*, as an active Anaconda subscription may be needed to use it. 
