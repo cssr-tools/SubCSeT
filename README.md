@@ -13,7 +13,16 @@ The version of the data and the codes from GHGT-17 conference and conference pap
 
 ## Requirements
 The **requirements** are listed in *requirements.txt* (for **pip**) and *requirements.yml* (for **conda**). The environment can be reproduced by:  
-`pip install requirements.txt`  
-or `conda env create -n [*env. name*] --file requirements.yml` 
+```
+pip install requirements.txt
+```  
+or 
+```
+conda env create -n ENV_NAME --file requirements.yml
+``` 
+or 
+```
+mamba env create -n ENV_NAME --file requirements.yml
+``` 
 
-NB! For Anaconda users. As Anaconda has recently updated its terms of service (read [HERE](https://www.anaconda.com/blog/is-conda-free) and [HERE](https://www.anaconda.com/pricing/terms-of-service-faqs)), please check if you can use the `default` channel. Remove it from the yml-file if necessary.
+NB! For Anaconda users. As Anaconda has recently updated its terms of service (read [HERE](https://www.anaconda.com/blog/is-conda-free) and [HERE](https://www.anaconda.com/pricing/terms-of-service-faqs)). So, the `defaults` channel was removed from *requirements.yml*, as an active Anaconda subscription may be needed to use it. 
