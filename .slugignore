@@ -1,4 +1,5 @@
 *.xlsx
+*.pdf
 *.html
 *.png
 *.ipynb
