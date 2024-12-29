@@ -1,5 +1,10 @@
 # About
-This is a web application for screening petroleum reservoirs on the Norwegian Continental Shelf (NCS) for purposes of CO2 storage, developed in [the Centre for Sustainable Subsurface Resources (CSSR)](https://cssr.no/) hosted by the Norwegian Research Centre (NORCE).  
+This is a web application for screening petroleum reservoirs on the Norwegian Continental Shelf (NCS) for purposes of CO2 storage, developed in [the Centre for Sustainable Subsurface Resources (CSSR)](https://cssr.no/) hosted by the Norwegian Research Centre (NORCE). The app is based on a study presented at the GHGT-17 conference (Calgary, October 2024): 
+* [**e-poster**](https://api.ltb.io/show/ACGES) with a short presentation,
+* [**conference paper (draft)**](https://github.com/cssr-tools/SubCSeT/blob/main/GHGT-17%2C%20Khrulenko%2C%20Mykkeltvedt%2C%20Gasda%20-%20draft.pdf) with more details.
+A short description is also presented below.
+
+Other links:  
 [**Contact the developer via LinkedIn**](https://www.linkedin.com/in/alexey-khrulenko-8021a64a/)  
 [**GitHub Repository**](https://github.com/cssr-tools/SubCSeT)  
 [**Report a problem**](https://github.com/cssr-tools/SubCSeT/issues/new)
