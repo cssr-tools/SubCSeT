@@ -9,7 +9,8 @@ The repository contains codes, tools, and data for screening CO2 storage potenti
 2. [*main.ipynb*](https://github.com/cssr-tools/SubCSeT/blob/main/main.ipynb) details the data retrieval, processing, and feature engineering workflows  
 3. **web app** to visualize the data and perform screening deployed at **https://subcset-35e143428f88.herokuapp.com/**  
   
-The version of the data and the codes from the GHGT-17 conference and the conference paper ([the paper draft](https://github.com/cssr-tools/SubCSeT/blob/main/GHGT-17%2C%20Khrulenko%2C%20Mykkeltvedt%2C%20Gasda%20-%20draft.pdf) / [the e-poster](https://api.ltb.io/show/ACGES)) is tagged as ["GHGT17"](https://github.com/cssr-tools/SubCSeT/releases/tag/GHGT17) 
+The version of the data and the codes presented at the GHGT-17 conference  is tagged as ["GHGT17"](https://github.com/cssr-tools/SubCSeT/releases/tag/GHGT17).  
+The [**conference paper**](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5069175) and [**e-poster**](https://api.ltb.io/show/ACGES) are available at the highlighted links.  
 
 ## Requirements
 The **requirements** are listed in *requirements.txt* (for **pip**) and *requirements.yml* (for **conda**). The environment can be reproduced by:  
