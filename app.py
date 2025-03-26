@@ -1061,6 +1061,8 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
         return go.Figure()
 
     df = df.loc[sel_rows, :]  
+    not_none_clms=[i for i in [x, y, color, size] if i is not None]
+    df = df.dropna(subset=not_none_clms)    
     if not color is None:
         if df[color].dtype in ['float', 'int64', 'int32', 'int16', 'int8']:
             dclrs = None
