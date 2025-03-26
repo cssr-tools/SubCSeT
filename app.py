@@ -543,7 +543,8 @@ app.layout = html.Div([
     ),
     dcc.Store(id='theme_store', data=theme0),
     dcc.Store(id='para_store_df', data={}),
-    dcc.Store(id='para_store_ranges', data={}),    
+    dcc.Store(id='para_store_ranges', data={}), 
+    dcc.Store(id='units_info_store', data={}),
     html.Div(id='dummy_output', hidden=True)
 ],
 style={
@@ -575,6 +576,7 @@ className="dbc"
     Output('dd_configure_tooltips', 'options'),
     Output('para_dd_color','options'),
     Output('help_markdown','children'),
+    Output('units_info_store', 'data'),
     #
     Input('inp_fldr', 'value'),  
     State(ThemeChangerAIO.ids.radio("theme"), "value"), 
@@ -612,6 +614,10 @@ def initial_setup(path2csv, theme_url):
         _all_clmns.append(foo)
         if key in num_clmns:
             _num_clmns.append(foo)
+    # saving columns units and descriptions for further use
+    UNITS_INFO={}
+    for key, value in CLMNS.items():
+        UNITS_INFO[key] = {'info': HELP_CLMNS[key], 'unit': CLMNS[key][2]}
 
     #%% adding another field column in the end to improve readability
     df['field2'] = df['field']
@@ -830,7 +836,8 @@ def initial_setup(path2csv, theme_url):
         _all_clmns, # options for scatter's color dropdown
         _all_clmns, # configure tooltips in maps and scatter
         _num_clmns, # options for para's color dropdown          
-        markdown_help  # help text
+        markdown_help,  # help text
+        UNITS_INFO # dictionary: {'column': {'info': '...', unit: '...'}}
     )
     return out
         
@@ -897,6 +904,7 @@ def select_deselect(m, b, n,
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
     State('theme_store', 'data'),
+    State('units_info_store','data'),
     Input('dd_configure_tooltips', 'value'),
     # prevent_initial_call=True
 )
@@ -904,7 +912,7 @@ def update_map(n, color, size,
                colorscale, reverse_colorscale, 
                map_style, dclrs,
                fig0,
-               sel_rows, records, theme, add_to_tooltips):
+               sel_rows, records, theme, info_units, add_to_tooltips):
 
     fig = go.Figure()
     if sel_rows is None or sel_rows == []: return fig
@@ -978,16 +986,20 @@ def update_map(n, color, size,
     #                     'color': row['color']}
     #         )
     #     )
+    labels ={}
+    for i in [size,color,*add_to_tooltips]:
+        unit = info_units[i]['unit']
+        labels[i] = i if unit in [''] else f"{i} ({unit})"
 
     fig=px.scatter_mapbox(
         df, lat='lat', lon='lon',size=_size, color=color,
         # hover_data=['field','lat','lon',size,color,'size', *add_to_tooltips],
-        hover_data=['field',size,color,'size',*add_to_tooltips],
+        hover_data=['field',size,color,*add_to_tooltips],
         size_max=size_max, 
         custom_data=['FactPageUrl'],
         color_continuous_scale=colorscale,
         # color_discrete_sequence=px.colors.qualitative.G10,
-        color_discrete_sequence=dclrs
+        color_discrete_sequence=dclrs, labels=labels
         )
 
     if (fig0 is not None) and (fig0['layout'].get('mapbox') is not None):
@@ -1047,12 +1059,13 @@ def update_map(n, color, size,
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
     State('theme_store', 'data'),
+    State('units_info_store','data'),
     Input('dd_configure_tooltips', 'value'),
     # prevent_initial_call=True
 )
 def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
               log10_x, log10_y,
-              sel_rows, records, theme, add_to_tooltips):
+              sel_rows, records, theme, info_units, add_to_tooltips):
     
     df = pd.DataFrame(data=records)
     if reverse_colorscale: colorscale += "_r"
@@ -1061,9 +1074,15 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
         return go.Figure()
 
     df = df.loc[sel_rows, :]  
-    not_none_clms=[i for i in [x, y, color, size] if i is not None]
+    not_none_clms=[i for i in [x, y, size] if i is not None]
     df = df.dropna(subset=not_none_clms)    
+    labels ={}
+    for i in [*not_none_clms,*add_to_tooltips]:
+        unit = info_units[i]['unit']
+        labels[i] = i if unit in [''] else f"{i} ({unit})"
+
     if not color is None:
+        labels[color]=f"{color}<br>({info_units[color]['unit']})"
         if df[color].dtype in ['float', 'int64', 'int32', 'int16', 'int8']:
             dclrs = None
         else:
@@ -1096,7 +1115,8 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
         template=theme, color_continuous_scale=colorscale,
         hover_data = hover_data,
         log_x=log10_x, log_y=log10_y,
-        color_discrete_sequence=dclrs
+        color_discrete_sequence=dclrs,
+        labels = labels
         )    
 
     fig.update_layout(
