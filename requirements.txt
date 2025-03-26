@@ -1,10 +1,10 @@
 gunicorn
 scikit-learn
-dash
-dash-bootstrap-components
+dash==2.16.0
+dash-bootstrap-components==1.5.0 
 dash-bootstrap-templates==1.0.8
 matplotlib
 numpy
 pandas
-plotly
+plotly==5.19.0 
 nbformat>=4.2.0
