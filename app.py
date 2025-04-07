@@ -597,7 +597,7 @@ def initial_setup(path2csv, theme_url):
         HELP_CLMNS = json.load(f)
     
     # uploading shapes to visualize CO2 expl. and storage licenses
-    with open("./data/NOD/baa_shapes.json", "r") as f:
+    with open(r'./data/NOD/baa_shapes.json', "r") as f:
         SHAPES  = json.load(f)      
     # keeping only CO2 licenses ...
     SHAPES = [f for f in SHAPES if f['baaName'][:3] in ['EL0', 'EXL']]
