@@ -283,6 +283,11 @@ c_settings=dbc.Offcanvas(
                 "(may not work in the cloud)", 
             # style={'alignSelf': 'center'},
             value=False),
+        dbc.Checkbox(
+            id='checkbox_CO2_BAA', 
+            label="show CO2 exploration and storage licenses ",
+            # style={'alignSelf': 'center'},
+            value=True),            
     ]),
     id='settings', is_open=False, scrollable=True,
     style={'width': '37vw'}
@@ -545,6 +550,7 @@ app.layout = html.Div([
     dcc.Store(id='para_store_df', data={}),
     dcc.Store(id='para_store_ranges', data={}), 
     dcc.Store(id='units_info_store', data={}),
+    dcc.Store(id='shape_store', data={}),    
     html.Div(id='dummy_output', hidden=True)
 ],
 style={
@@ -577,6 +583,7 @@ className="dbc"
     Output('para_dd_color','options'),
     Output('help_markdown','children'),
     Output('units_info_store', 'data'),
+    Output('shape_store', 'data'),    
     #
     Input('inp_fldr', 'value'),  
     State(ThemeChangerAIO.ids.radio("theme"), "value"), 
@@ -588,6 +595,12 @@ def initial_setup(path2csv, theme_url):
 
     with open(r'./assets/_help_columns.json', 'r') as f:
         HELP_CLMNS = json.load(f)
+    
+    # uploading shapes to visualize CO2 expl. and storage licenses
+    with open("./data/NOD/baa_shapes.json", "r") as f:
+        SHAPES  = json.load(f)      
+    # keeping only CO2 licenses ...
+    SHAPES = [f for f in SHAPES if f['baaName'][:3] in ['EL0', 'EXL']]
 
     df = pd.read_csv(path2csv)
     
@@ -837,7 +850,8 @@ def initial_setup(path2csv, theme_url):
         _all_clmns, # configure tooltips in maps and scatter
         _num_clmns, # options for para's color dropdown          
         markdown_help,  # help text
-        UNITS_INFO # dictionary: {'column': {'info': '...', unit: '...'}}
+        UNITS_INFO, # dictionary: {'column': {'info': '...', unit: '...'}}
+        SHAPES # shapes of BAA inc. CO2 expl. and storage licenses
     )
     return out
         
@@ -900,19 +914,21 @@ def select_deselect(m, b, n,
     Input('switch_reverse_map_cs', 'value'),  
     Input('select_map_style', 'value'),      
     Input('select_dclrs', 'value'),  
+    Input('dd_configure_tooltips', 'value'),        
+    Input('checkbox_CO2_BAA', 'value'),      
     State('map_fig', 'figure'),    
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
     State('theme_store', 'data'),
     State('units_info_store','data'),
-    Input('dd_configure_tooltips', 'value'),
+    State('shape_store', 'data'),
+
     # prevent_initial_call=True
 )
 def update_map(n, color, size, 
                colorscale, reverse_colorscale, 
-               map_style, dclrs,
-               fig0,
-               sel_rows, records, theme, info_units, add_to_tooltips):
+               map_style, dclrs, add_to_tooltips, show_co2_baa,
+               fig0, sel_rows, records, theme, info_units, SHAPES):
 
     fig = go.Figure()
     if sel_rows is None or sel_rows == []: return fig
@@ -1017,6 +1033,33 @@ def update_map(n, color, size,
     
     center = {'lat': ref_lat, 'lon': ref_lon}
     # center = go.layout.mapbox.Center(lat=ref_lat, lon=ref_lon)
+
+
+    if show_co2_baa:
+        for shape in SHAPES:
+            name = shape['baaName']
+            # skipping petroleum BAAs ...
+            if not name[:3] in ['EL0', 'EXL']: continue
+
+            coords = shape['coordinates']
+            lons, lats = zip(*coords)
+            lons += (lons[0],)
+            lats += (lats[0],)
+
+            fig.add_trace(go.Scattermapbox(
+                lon=lons, lat=lats, mode='lines', name=name,
+                hovertext=(
+                    f"<b>{shape['baaName']}</b><br>"
+                    f"{shape['baaKind']}<br>"
+                    f"Operator: {shape.get('cmpLongName', 'N/A')}<br>"
+                ),            
+                hoverinfo='text',
+                # customdata=[shape["baaFactPageUrl"]],
+                showlegend=False,
+                line=dict(width=2, color='rgba(125, 125, 125, 0.15)'),
+                fill='toself',
+                fillcolor='rgba(125, 125, 125, 0.15)'  # semi-transparent fill
+            ))
 
     fig.update_layout(
         template=theme,
@@ -1204,7 +1247,8 @@ def update_theme(theme_url, fig_map, fig_sc, fig_para, fig_ts):
 def open_FactPageUrl(clickData, open):
     "open the field's page on factpages.sodir.no/en"
     # print(clickData)
-    if clickData is not None and open==True:
+    if clickData is not None and open==True and \
+        clickData['points'][0].get('customdata',False):
         url=clickData['points'][0]['customdata'][0]
         url = url[0] if isinstance(url,list) else url
         webbrowser.open(url)
