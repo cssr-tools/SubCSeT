@@ -1,5 +1,5 @@
 DEBUG=False # switch for many parameters, should be False for deployment
-DEBUG=True
+# DEBUG=True
 
 import pandas as pd
 import numpy as np
@@ -392,7 +392,7 @@ c_sc_tab = html.Div([
             ),  
             dbc.InputGroup([
                 dbc.InputGroupText('Y'),
-                dbc.Select(id='sc_dd_y',value='q_resv'),
+                dbc.Select(id='sc_dd_y',value='CO2 density RC'),
                 ], #style={'width': '20%'}
             ),  
         ]),
@@ -400,7 +400,7 @@ c_sc_tab = html.Div([
             dbc.Switch(label='log10',value=False,id='sc_x_log10',
                        style={'padding-top': '0.75vh'}
                        ), 
-            dbc.Switch(label='log10',value=True,id='sc_y_log10',
+            dbc.Switch(label='log10',value=False,id='sc_y_log10',
                     #    style={'padding-top': '0.5vh'}
                        ),  
         ]),
@@ -676,7 +676,8 @@ def initial_setup(path2csv, theme_url):
             Format(precision=3, scheme=Scheme.decimal_or_exponent)
         clmns[i]['type'] = 'numeric'
 
-    preselected_rows = df[df['sea'] == 'NORTH'].index.to_list()
+    # preselected_rows = df[df['sea'] == 'NORTH'].index.to_list()
+    preselected_rows = df.index.to_list()
 
     # Setting up tooltips to include first column value and column name
     # tooltip_data = [
@@ -1026,8 +1027,8 @@ def update_map(n, color, size,
             fig0['layout']['mapbox']['center']['lon']
     else:
         # these limits are configured to show all fields in the North sea
-        zoom = 5.5
-        ref_lat, ref_lon = df.loc[:, ['lat', 'lon']].mean().values
+        zoom = 5.5  
+        ref_lat, ref_lon = df.loc[df['sea']=='NORTH', ['lat','lon']].mean().values
         # these limits are configures to show all NCS fields
         # ref_lat, ref_lon, zoom = 65.7, 8.280232, 3.7
     
