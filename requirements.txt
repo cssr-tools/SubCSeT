@@ -3,6 +3,7 @@ scikit-learn
 dash==2.16.0
 dash-bootstrap-components==1.5.0 
 dash-bootstrap-templates==1.0.8
+kaleido
 matplotlib
 numpy
 pandas

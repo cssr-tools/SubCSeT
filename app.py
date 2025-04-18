@@ -3,9 +3,10 @@ DEBUG=False # switch for many parameters, should be False for deployment
 
 import pandas as pd
 import numpy as np
+import io
 # plotly & dash
 import plotly.express as px
-from plotly.io import write_html, to_json, from_json
+from plotly.io import write_html, write_image, to_json, to_html, to_image
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
@@ -185,7 +186,7 @@ COLORSCALES=['rainbow','hot','jet','RdBu','Bluered','Portland','PuOr','Temps']
 
 c_settings=dbc.Offcanvas(
     dbc.Stack([
-        html.H1('Settings'),
+        html.H2('Settings'),
         c_theme,
         dbc.Row([
             dbc.Col(
@@ -287,7 +288,27 @@ c_settings=dbc.Offcanvas(
             id='checkbox_CO2_BAA', 
             label="show CO2 exploration and storage licenses ",
             # style={'alignSelf': 'center'},
-            value=True),            
+            value=True),   
+        html.Hr(),
+        html.H2('Additional Tools'),   
+        dbc.InputGroup([
+            dbc.Button('save picture as',id='b_save_fig', color="primary"),
+            dbc.Input(id="input_save_fig", placeholder="enter a name to override the default",
+                    #   style={'width': '50%'}
+                      ),
+            dcc.Dropdown(id='select_save_fig_format',
+                       options=['.png', '.jpeg', '.webp', '.svg', '.pdf', '.html'], 
+                       value='.png', style={'width': '5vw'}, clearable=False), 
+            dcc.Dropdown(id='select_save_fig_scale',
+                       options=[{'label': 'x1', 'value': 1.0},\
+                                {'label': 'x2', 'value': 2.0},
+                                {'label': 'x3', 'value': 3.0},
+                                ],
+                       value=1.0, style={'width': '3vw'}, clearable=False),   
+            dbc.Tooltip('scale', target='select_save_fig_scale',
+                        delay=tooltip_delay),                       
+        ]),
+        dcc.Download("download"),
     ]),
     id='settings', is_open=False, scrollable=True,
     style={'width': '37vw'}
@@ -1496,6 +1517,79 @@ def ts_plus_minus(p,m, records):
         records=records[:-1]
 
     return records
+
+@app.callback(
+    Output("download", 'data'),    
+    Input("b_save_fig", 'n_clicks'),    
+    State("all_tabs", 'active_tab'),
+    State("map_fig", 'figure'),
+    State("sc_fig", 'figure'), 
+    State("para_fig", 'figure'),  
+    State("ts_fig", 'figure'),
+    State("select_save_fig_format", 'value'),
+    State("input_save_fig", 'value'),    
+    State("select_save_fig_scale", 'value'),        
+    prevent_initial_call=True
+)
+def save_current_figure(n, active_tab, map_fig, sc_fig, para_fig, ts_fig, 
+                        format, _filename, scale):
+    
+    def clean_marker_colors(fig_dict, default_color="gray"):
+        for trace in fig_dict.get("data", []):
+            marker = trace.get("marker", {})
+            color = marker.get("color", None)
+            if isinstance(color, list):
+                # Replace None values
+                marker["color"] =\
+                      [default_color if c is None else c for c in color]
+        return fig_dict    
+    
+    width = 1100 
+    height = 9.00/9.50*width
+    if active_tab == 'tab_map':
+        # replace None colors with grey
+        fig = clean_marker_colors(map_fig)
+        filename = 'subcset_map'
+    elif active_tab == 'tab_sc':
+        fig = clean_marker_colors(sc_fig)
+        filename = 'subcset_scatter'
+    elif active_tab == 'tab_para':
+        filename = 'subcset_para'
+        fig = para_fig
+        width, height = width, 5/9.5*width
+    elif active_tab == 'tab_ts':
+        filename = 'subcset_total_score'
+        fig = ts_fig
+        width, height = width, 6/9.50*width 
+    else:
+        pass
+
+    if _filename is None:
+        now = datetime.now().strftime('%Y-%m-%d-%H%M%S')
+        filename = f'{now}_{filename}{format}'
+    else:
+        filename = f'{_filename}{format}'
+        
+    # changed_id = [p['prop_id'] for p in callback_context.triggered][0]
+
+    # this one works fine
+    # return {'content': to_html(fig), 'filename': f'{now}_{filename}.html'}
+    # this one works fine
+    # buffer = io.BytesIO()
+    # write_image(fig, buffer, format=format[1:], 
+    #             scale=1, width=width, height=height
+    #             )
+    # buffer.seek(0)    
+    # return dcc.send_bytes(buffer.read(), filename=filename)
+    # this one works fine
+    if format == '.html':
+        return {'content': to_html(fig), 'filename': filename}
+    else: 
+        return dcc.send_bytes(
+            to_image(fig, format=format[1:], scale=scale, 
+                     width=width, height=height), 
+            filename=filename)        
+
 
 if __name__ == '__main__':
     if DEBUG:
