@@ -292,26 +292,39 @@ c_settings=dbc.Offcanvas(
         html.Hr(),
         html.H2('Additional Tools'),   
         dbc.InputGroup([
-            dbc.Button('save picture as',id='b_save_fig', color="primary"),
-            dbc.Input(id="input_save_fig", placeholder="enter a name to override the default",
-                    #   style={'width': '50%'}
-                      ),
-            dcc.Dropdown(id='select_save_fig_format',
+            dbc.Button('save fig. as',id='b_save_fig', color="primary"),
+            # dbc.Input(id="input_save_fig", 
+            #           placeholder="enter a name to override the default",
+            #           ),
+            dbc.Select(id='select_save_fig_format',
                        options=['.png', '.jpeg', '.webp', '.svg', '.pdf', '.html'], 
-                       value='.png', style={'width': '5vw'}, clearable=False), 
-            dcc.Dropdown(id='select_save_fig_scale',
-                       options=[{'label': 'x1', 'value': 1.0},\
-                                {'label': 'x2', 'value': 2.0},
-                                {'label': 'x3', 'value': 3.0},
+                       value='.png', 
+                    #    style={'width': '4.5vw'}, 
+                       ), 
+            dbc.InputGroupText("width (px):"),
+            dbc.Input(id='width_save_fig', type='number', value=1000,
+                      #   placeholder='default', 
+                    #   style={'width': '4.5vw'}
+                      ),
+            dbc.InputGroupText("scale:"),
+            # dbc.Tooltip('a good guess is 1000 px', target='width_save_fig',
+            #             delay=tooltip_delay),
+            dbc.Select(id='select_save_fig_scale',
+                       options=[
+                                {'label': '50%', 'value': 0.50},
+                                {'label': '75%', 'value': 0.75},
+                                {'label': '100%', 'value': 1.0},
+                                {'label': '200%', 'value': 2.0},
+                                {'label': '300%', 'value': 3.0},
                                 ],
-                       value=1.0, style={'width': '3vw'}, clearable=False),   
-            dbc.Tooltip('scale', target='select_save_fig_scale',
-                        delay=tooltip_delay),                       
-        ]),
+                       value=1.0, 
+                    #    style={'width': '4.5vw'}
+                       ),  
+        ]),      
         dcc.Download("download"),
     ]),
     id='settings', is_open=False, scrollable=True,
-    style={'width': '37vw'}
+    style={'width': '39vw'}
 )
 
 @app.callback(
@@ -1527,12 +1540,12 @@ def ts_plus_minus(p,m, records):
     State("para_fig", 'figure'),  
     State("ts_fig", 'figure'),
     State("select_save_fig_format", 'value'),
-    State("input_save_fig", 'value'),    
+    State("width_save_fig", 'value'),  
     State("select_save_fig_scale", 'value'),        
     prevent_initial_call=True
 )
 def save_current_figure(n, active_tab, map_fig, sc_fig, para_fig, ts_fig, 
-                        format, _filename, scale):
+                        format, width, scale):
     
     def clean_marker_colors(fig_dict, default_color="gray"):
         for trace in fig_dict.get("data", []):
@@ -1544,8 +1557,7 @@ def save_current_figure(n, active_tab, map_fig, sc_fig, para_fig, ts_fig,
                       [default_color if c is None else c for c in color]
         return fig_dict    
     
-    width = 1100 
-    height = 9.00/9.50*width
+    height = 9.00/9.50*width if width is not None else None
     if active_tab == 'tab_map':
         # replace None colors with grey
         fig = clean_marker_colors(map_fig)
@@ -1556,19 +1568,16 @@ def save_current_figure(n, active_tab, map_fig, sc_fig, para_fig, ts_fig,
     elif active_tab == 'tab_para':
         filename = 'subcset_para'
         fig = para_fig
-        width, height = width, 5/9.5*width
+        height = 5/9.5*width if width is not None else None
     elif active_tab == 'tab_ts':
         filename = 'subcset_total_score'
         fig = ts_fig
-        width, height = width, 6/9.50*width 
+        height = 6/9.50*width if width is not None else None
     else:
         pass
 
-    if _filename is None:
-        now = datetime.now().strftime('%Y-%m-%d-%H%M%S')
-        filename = f'{now}_{filename}{format}'
-    else:
-        filename = f'{_filename}{format}'
+    now = datetime.now().strftime('%Y-%m-%d-%H%M%S')
+    filename = f'{now}_{filename}{format}'
         
     # changed_id = [p['prop_id'] for p in callback_context.triggered][0]
 
