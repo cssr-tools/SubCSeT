@@ -300,22 +300,13 @@ c_settings=dbc.Offcanvas(
         html.H2('Additional Tools'),   
         dbc.InputGroup([
             dbc.Button('save fig. as',id='b_save_fig', color="primary"),
-            # dbc.Input(id="input_save_fig", 
-            #           placeholder="enter a name to override the default",
-            #           ),
             dbc.Select(id='select_save_fig_format',
                        options=['.png', '.jpeg', '.webp', '.svg', '.pdf', '.html'], 
                        value='.png', 
-                    #    style={'width': '4.5vw'}, 
                        ), 
             dbc.InputGroupText("width (px):"),
-            dbc.Input(id='width_save_fig', type='number', value=1000,
-                      #   placeholder='default', 
-                    #   style={'width': '4.5vw'}
-                      ),
+            dbc.Input(id='width_save_fig', type='number', value=1000),
             dbc.InputGroupText("scale:"),
-            # dbc.Tooltip('a good guess is 1000 px', target='width_save_fig',
-            #             delay=tooltip_delay),
             dbc.Select(id='select_save_fig_scale',
                        options=[
                                 {'label': '50%', 'value': 0.50},
@@ -325,10 +316,12 @@ c_settings=dbc.Offcanvas(
                                 {'label': '300%', 'value': 3.0},
                                 ],
                        value=1.0, 
-                    #    style={'width': '4.5vw'}
                        ),  
-        ]),      
-        dcc.Download("download"),
+        ]),    
+        dbc.Button('export selected table rows to a CSV',id='b_save_csv', 
+                   color="success", className='mt-2'),
+        dcc.Download("download_fig"),
+        dcc.Download("download_csv"),
     ]),
     id='settings', is_open=False, scrollable=True,
     style={'width': '39vw'}
@@ -1559,7 +1552,7 @@ def ts_plus_minus(p,m, records):
     return records
 
 @app.callback(
-    Output("download", 'data'),    
+    Output("download_fig", 'data'),    
     Input("b_save_fig", 'n_clicks'),    
     State("all_tabs", 'active_tab'),
     State("map_fig", 'figure'),
@@ -1626,6 +1619,18 @@ def save_current_figure(n, active_tab, map_fig, sc_fig, para_fig, ts_fig,
                      width=width, height=height), 
             filename=filename)        
 
+@app.callback(
+    Output("download_csv", 'data'),    
+    Input("b_save_csv", 'n_clicks'), 
+    State("mtable", 'data'),       
+    State("mtable", 'selected_rows'),   
+    prevent_initial_call=True
+)
+def save_csv(n, records, selected_rows):
+    df = pd.DataFrame(data=records)
+    df = df.loc[selected_rows,:]
+    now = datetime.now().strftime('%Y-%m-%d-%H%M%S')
+    return dcc.send_data_frame(df.to_csv, f"{now}.csv") 
 
 if __name__ == '__main__':
     if DEBUG:
