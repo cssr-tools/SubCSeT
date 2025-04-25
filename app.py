@@ -286,9 +286,16 @@ c_settings=dbc.Offcanvas(
             value=False),
         dbc.Checkbox(
             id='checkbox_CO2_BAA', 
-            label="show CO2 exploration and storage licenses ",
+            label="show CO2 exploration and storage licenses",
             # style={'alignSelf': 'center'},
             value=True),   
+        dbc.Checkbox(
+            id='checkbox_norwegian_share', 
+            label="divide volumes in crossboarder fields by Norwegian share "+\
+                "and update the main table "+\
+                '(applies to all columns measured in "Msm3","Mrm3" and "Bsm3",' +\
+                ' i.e. in-place, recoverable, storage and peak yearly production volumes)',
+            value=False),               
         html.Hr(),
         html.H2('Additional Tools'),   
         dbc.InputGroup([
@@ -939,6 +946,26 @@ def select_deselect(m, b, n,
     selected_rows.sort()
     return selected_rows
 
+@app.callback(
+    Output('mtable', 'data', allow_duplicate=True),
+    Input('checkbox_norwegian_share', 'value'),
+    State('mtable', 'data'),
+    State('units_info_store','data'),    
+    prevent_initial_call=True,
+)    
+def adjust_norwegian_share(norwegian_share, records, info_units):
+    df = pd.DataFrame(data=records)
+
+    for k,v in info_units.items():
+        if v['unit'] in ['Mrm3','Msm3','Bsm3']:
+            if norwegian_share:
+                print(f'{k} divided by Norwegian share (to show total volumes)')
+                df[k] = df[k] / df['norwegian share']
+            else:
+                df[k] = df[k] * df['norwegian share']
+                print(f'{k} multiplied by Norwegian share (to show just Norwegian share)')
+
+    return df.to_dict('records')
 
 @app.callback(
     Output('map_fig', 'figure'),
