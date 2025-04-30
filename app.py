@@ -664,7 +664,9 @@ def initial_setup(path2csv, theme_url):
     # saving columns units and descriptions for further use
     UNITS_INFO={}
     for key, value in CLMNS.items():
-        UNITS_INFO[key] = {'info': HELP_CLMNS[key], 'unit': CLMNS[key][2]}
+        # UNITS_INFO[key] = {'info': HELP_CLMNS[key], 'unit': CLMNS[key][2]}
+        UNITS_INFO[key] = {'info': HELP_CLMNS.get(key,'?'),\
+                            'unit': CLMNS.get(key,['','','?'])[2]}
 
     #%% adding another field column in the end to improve readability
     df['field2'] = df['field']
