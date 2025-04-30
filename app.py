@@ -650,21 +650,21 @@ def initial_setup(path2csv, theme_url):
     # loading ...
     with open(r'./assets/_help.md', 'r') as file:
         markdown_help = file.read()  
-    # ... adding columns to Glossary and ...
-    # creating options for the dropdowns
-    _num_clmns = []
-    _all_clmns = []    
+    # ... adding columns to Glossary
     for key, value in HELP_CLMNS.items():
         nn = CLMNS[key][-1]
         markdown_help += f"{nn}. **{key}**: {value}  \n" 
+
+    # creating options for the dropdowns and
+    # saving columns units and descriptions for further use
+    UNITS_INFO={}
+    _num_clmns = []
+    _all_clmns = []     
+    for key, value in CLMNS.items():
         foo = {'label': f'{nn}. {key}', 'value': key}
         _all_clmns.append(foo)
         if key in num_clmns:
-            _num_clmns.append(foo)
-    # saving columns units and descriptions for further use
-    UNITS_INFO={}
-    for key, value in CLMNS.items():
-        # UNITS_INFO[key] = {'info': HELP_CLMNS[key], 'unit': CLMNS[key][2]}
+            _num_clmns.append(foo)  
         UNITS_INFO[key] = {'info': HELP_CLMNS.get(key,'?'),\
                             'unit': CLMNS.get(key,['','','?'])[2]}
 
