@@ -145,7 +145,19 @@ c_b_save = dbc.Button(
     className="me-1", size='md',
 )
 
+c_map_modal = dbc.Modal([
+    dbc.ModalHeader(dbc.ModalTitle("message:"), close_button=True),
+    dbc.ModalBody(id='map_modal_msg', children='')
+], id="map_modal_main", is_open=False, scrollable=True)
+
+c_sc_modal = dbc.Modal([
+    dbc.ModalHeader(dbc.ModalTitle("message:"), close_button=True),
+    dbc.ModalBody(id='sc_modal_msg', children='')
+], id="sc_modal_main", is_open=False, scrollable=True)
+
 c_toolbar = dbc.ButtonGroup([
+    c_map_modal,
+    c_sc_modal,    
     dbc.Button(html.I(className="bi bi-check2-square"),
                size='md', id='b_select',
                outline=True, color="dark",
@@ -947,6 +959,8 @@ def adjust_norwegian_share(norwegian_share, records, info_units):
 
 @app.callback(
     Output('map_fig', 'figure'),
+    Output('map_modal_main', 'is_open'),  
+    Output('map_modal_msg', 'children'),        
     Input('update_map', 'n_clicks'),
     Input('map_dd_color', 'value'),
     Input('map_dd_size', 'value'),
@@ -970,6 +984,7 @@ def update_map(n, color, size,
                map_style, dclrs, add_to_tooltips, show_co2_baa,
                fig0, sel_rows, records, theme, info_units, SHAPES):
 
+    model_msg, model_open  = '', False
     fig = go.Figure()
     if sel_rows is None or sel_rows == []: return fig
 
@@ -1016,12 +1031,21 @@ def update_map(n, color, size,
             (df['size'].max())
         df['size'] = df['size'].round(2)
         _size = "size"
-        # NAs are set to min to avoid the error
+        # handling NAs (2 ways)
         foo = df[size].isna()
         if foo.any():
-            print(f'NAs in column SIZE={size} are set to min. Affected fields:')
-            print(df.loc[foo,'field'])
-            df['size'] = df['size'].fillna(5)
+            model_open = True   
+            for f in df.loc[foo, 'field']:
+                  model_msg += f'{f}, '        
+            model_msg = model_msg[:-2]      
+            ## 1) set to min: ----------
+            # model_msg = f'NAs in column SIZE={size} are set to min. Affected field(s):  ' +\
+            #   model_msg
+            # df['size'] = df['size'].fillna(5)
+            ## 2) filtering out: -------
+            model_msg = f'The following field(s) with "{size}"==NaN cannot be displayed: ' +\
+                model_msg
+            df = df[~foo]
     # legacy block kept just in case
     # for i in df.index:
     #     row = df.loc[i, :]
@@ -1129,10 +1153,12 @@ def update_map(n, color, size,
     )
     fig.update_geos(fitbounds="locations")
 
-    return fig
+    return fig, model_open, model_msg
 
 @app.callback(
-    Output('sc_fig', 'figure'),
+    Output('sc_fig', 'figure'),  
+    Output('sc_modal_main', 'is_open'),  
+    Output('sc_modal_msg', 'children'),       
     Input('update_sc', 'n_clicks'),
     Input('sc_dd_x', 'value'),    
     Input('sc_dd_y', 'value'),    
@@ -1155,6 +1181,7 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
               log10_x, log10_y,
               sel_rows, records, theme, info_units, add_to_tooltips):
     
+    model_msg, model_open  = '', False
     df = pd.DataFrame(data=records)
     if reverse_colorscale: colorscale += "_r"
 
@@ -1163,8 +1190,18 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
 
     df = df.loc[sel_rows, :]  
     not_none_clms=[i for i in [x, y, size] if i is not None]
-    df = df.dropna(subset=not_none_clms)    
-    labels ={}
+    ## 2) filtering out  
+    foo = df[not_none_clms].isna().any(axis=1)
+    if foo.any():
+        model_open = True   
+        for f in df.loc[foo, 'field']:
+            model_msg += f'{f}, '        
+        model_msg = model_msg[:-2]      
+        model_msg =\
+              f'{not_none_clms} of the following field(s) have NaNs and cannot be displayed: ' +\
+                model_msg
+    df = df.dropna(subset=not_none_clms)  
+    labels = {}
     for i in [*not_none_clms,*add_to_tooltips]:
         unit = info_units[i]['unit']
         labels[i] = i if unit in [''] else f"{i} ({unit})"
@@ -1212,7 +1249,7 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
         modebar_add=['toggleHover', 'drawline', 'drawopenpath',
                      'drawclosedpath', 'drawcircle', 'drawrect',
                      'eraseshape', 'toggleSpikelines'])
-    return fig
+    return fig, model_open, model_msg
 
 @app.callback(
     Output('map_dd_size', 'value'),
