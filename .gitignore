@@ -9,10 +9,4 @@ figures/
 *test*.py
 
 *.ipynb
-*test*.ipynb
-leftovers.ipynb
-#!main.ipynb
-
-#  data
-# data/*
-# !data/_main.csv
+!main.ipynb
