@@ -377,7 +377,7 @@ c_map_tab = html.Div([
         ),
         dbc.InputGroup([
             dbc.InputGroupText('color'),
-            dbc.Select(id='map_dd_color', value='q_resv'),
+            dbc.Select(id='map_dd_color', value='injectivity ind.'),
             # dbc.Button(html.I(className="bi bi-x-square"),
             #            size='md', outline=True, id='map_color_reset'),            
             ], style={'width': '45%'}
@@ -652,6 +652,7 @@ def initial_setup(path2csv, theme_url):
         markdown_help = file.read()  
     # ... adding columns to Glossary
     for key, value in HELP_CLMNS.items():
+        if not key in CLMNS: continue
         nn = CLMNS[key][-1]
         markdown_help += f"{nn}. **{key}**: {value}  \n" 
 
@@ -661,31 +662,20 @@ def initial_setup(path2csv, theme_url):
     _num_clmns = []
     _all_clmns = []     
     for key, value in CLMNS.items():
+        nn = CLMNS[key][-1]
         foo = {'label': f'{nn}. {key}', 'value': key}
         _all_clmns.append(foo)
         if key in num_clmns:
             _num_clmns.append(foo)  
         UNITS_INFO[key] = {'info': HELP_CLMNS.get(key,'?'),\
-                            'unit': CLMNS.get(key,['','','?'])[2]}
+                           'unit': CLMNS.get(key,['','','?'])[2]}
 
     #%% adding another field column in the end to improve readability
     df['field2'] = df['field']
     CLMNS['field2']=deepcopy(CLMNS['field'])
 
-    # loading the themes for charts
-    # t0=time.time()
     theme  = template_from_url(theme_url)
     load_figure_template(theme)
-    # load_figure_template(themes)
-    # t1=time.time()
-    # print(f'load template(s): {t1-t0:.3f} s')    
-
-    # # Determine which DataFrame columns are not in the priority list
-    # priority_columns = [i for i in FANCY_CLMNS if i in df.columns]     
-    # other_columns = [col for col in df.columns if col not in priority_columns]
-    # # Combine the lists, with priority columns first, then others
-    # new_column_order = priority_columns + other_columns
-    # df = df[new_column_order]
 
     #%% mtable
     clmns = []
@@ -704,8 +694,7 @@ def initial_setup(path2csv, theme_url):
                 'produced HCPV', 'CO2 SC', 'H2 SC'
                 ]:
         
-        if not col in df.columns:
-            continue
+        if not col in df.columns: continue
 
         i = df.columns.get_loc(key=col)
         clmns[i]['format'] =\
@@ -716,11 +705,6 @@ def initial_setup(path2csv, theme_url):
     preselected_rows = df.index.to_list()
 
     # Setting up tooltips to include first column value and column name
-    # tooltip_data = [
-    #     {column: {'value': f"{df.iloc[i]['field']} - {column}", 'type': 'markdown'}
-    #     for column in df.columns} for i in range(len(df))
-    # ]
-
     tooltip_data = [
         {column: {'value': f"{df.loc[i,'field']} - {column}", \
                   'type': 'markdown'}
@@ -732,6 +716,17 @@ def initial_setup(path2csv, theme_url):
         tooltip_header[k] = ['',tooltip_header[k], '', tooltip_header[k]]
         # tooltip_header[k] = tooltip_header[k]
 
+    hidden_columns =\
+    ['#','FactPageUrl', 'reservoir', 'development', 'recovery', 
+     'res. quality','faulted', 'fldID', 'PL/BAA','size', 'lat', 'lon',
+     'depth min',  'depth mean', 'depth median', 'depth max',
+     'peak year', 'peak OE YPR', 'peak oil YPR', 'peak gas YPR',
+     'q_gas','qi_gas', 'q_gas2', 'qi_resv'
+     ]
+    # filtering ... just in case ...
+    hidden_columns = list(filter(lambda x: x in df.columns, hidden_columns))
+    print('The following columns are hidden:')
+    print(hidden_columns)
     mtable = DataTable(
         id='mtable', columns=clmns,
         data=df.to_dict('records'),
@@ -747,15 +742,7 @@ def initial_setup(path2csv, theme_url):
         tooltip_header=tooltip_header,
         # fixed_columns={'headers': True, 'data': 1},
         page_action="native", page_current=0,
-        hidden_columns=[
-            '#','FactPageUrl', 'reservoir', 
-            'res. quality','faulted',
-            'recovery', 'fldID', 'PL/BAA',
-            'size', 'lat', 'lon',
-            'depth min',  'depth mean', 'depth median', 'depth max',
-            'peak year', 'peak OE YPR', 'peak oil YPR', 'peak gas YPR',
-            'q_gas','qi_gas', 'q_gas2', 'qi_resv',
-            ],
+        hidden_columns=hidden_columns,
         style_table={
             'height': '90vh',
             # 'height': 'auto',
@@ -782,8 +769,6 @@ def initial_setup(path2csv, theme_url):
     dropdowns = {}
     dropdowns['parameter']={}
     dropdowns['parameter']['options']=_num_clmns
-    # dropdowns['parameter']['options']=\
-    #     [{'label': i, 'value': i} for i in num_clmns]
     
     dropdowns['normalize']={}
     dropdowns['normalize']['options']=\
@@ -803,7 +788,7 @@ def initial_setup(path2csv, theme_url):
     pdata=[\
         {'#': 1, 'parameter': 'CO2 SC','normalize': None, 'log10': True,
          'reverse': False}, 
-        {'#': 2, 'parameter': 'q_resv','normalize': None, 'log10': True,
+        {'#': 2, 'parameter': 'injectivity ind.','normalize': None, 'log10': True,
          'reverse': False}, 
         {'#': 3, 'parameter': 'depth', 'normalize': None, 'log10': False,
          'reverse': True},          
@@ -839,8 +824,6 @@ def initial_setup(path2csv, theme_url):
     dropdowns = {}
     dropdowns['parameter']={}
     dropdowns['parameter']['options']=_num_clmns
-    # dropdowns['parameter']['options']=\
-    #     [{'label': i, 'value': i} for i in num_clmns]
     
     dropdowns['normalize']={}
     dropdowns['normalize']['options']=\
@@ -856,7 +839,7 @@ def initial_setup(path2csv, theme_url):
     wdata=[\
         {'#': 1, 'parameter': 'CO2 SC','normalize': 'min-max', 'log10': True,
          'weight': 1}, 
-        {'#': 2, 'parameter': 'q_resv','normalize': 'min-max', 'log10': True,
+        {'#': 2, 'parameter': 'injectivity ind.','normalize': 'min-max', 'log10': True,
          'weight': 1}, 
         {'#': 3, 'parameter': 'depth', 'normalize': 'min-max', 'log10': False,
          'weight': -1},          
@@ -1033,7 +1016,12 @@ def update_map(n, color, size,
             (df['size'].max())
         df['size'] = df['size'].round(2)
         _size = "size"
-
+        # NAs are set to min to avoid the error
+        foo = df[size].isna()
+        if foo.any():
+            print(f'NAs in column SIZE={size} are set to min. Affected fields:')
+            print(df.loc[foo,'field'])
+            df['size'] = df['size'].fillna(5)
     # legacy block kept just in case
     # for i in df.index:
     #     row = df.loc[i, :]
