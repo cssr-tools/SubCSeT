@@ -302,6 +302,10 @@ c_settings=dbc.Offcanvas(
             # style={'alignSelf': 'center'},
             value=True),   
         dbc.Checkbox(
+            id='checkbox_warnings', 
+            label="show warnings on missing data",
+            value=False),               
+        dbc.Checkbox(
             id='checkbox_norwegian_share', 
             label="divide volumes in crossboarder fields by Norwegian share "+\
                 "and update the main table "+\
@@ -976,13 +980,13 @@ def adjust_norwegian_share(norwegian_share, records, info_units):
     State('theme_store', 'data'),
     State('units_info_store','data'),
     State('shape_store', 'data'),
-
+    State('checkbox_warnings','value')
     # prevent_initial_call=True
 )
 def update_map(n, color, size, 
                colorscale, reverse_colorscale, 
                map_style, dclrs, add_to_tooltips, show_co2_baa,
-               fig0, sel_rows, records, theme, info_units, SHAPES):
+               fig0, sel_rows, records, theme, info_units, SHAPES, show_warnings):
 
     model_msg, model_open  = '', False
     fig = go.Figure()
@@ -1046,6 +1050,8 @@ def update_map(n, color, size,
             model_msg = f'The following field(s) with "{size}"==NaN cannot be displayed: ' +\
                 model_msg
             df = df[~foo]
+            if not show_warnings: 
+                model_msg, model_open  = '', False
     # legacy block kept just in case
     # for i in df.index:
     #     row = df.loc[i, :]
@@ -1175,11 +1181,13 @@ def update_map(n, color, size,
     State('theme_store', 'data'),
     State('units_info_store','data'),
     Input('dd_configure_tooltips', 'value'),
+    State('checkbox_warnings','value')    
     # prevent_initial_call=True
 )
 def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
               log10_x, log10_y,
-              sel_rows, records, theme, info_units, add_to_tooltips):
+              sel_rows, records, theme, info_units, add_to_tooltips,
+              show_warnings):
     
     model_msg, model_open  = '', False
     df = pd.DataFrame(data=records)
@@ -1200,6 +1208,8 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
         model_msg =\
               f'{not_none_clms} of the following field(s) have NaNs and cannot be displayed: ' +\
                 model_msg
+        if not show_warnings: 
+            model_msg, model_open  = '', False
     df = df.dropna(subset=not_none_clms)  
     labels = {}
     for i in [*not_none_clms,*add_to_tooltips]:
