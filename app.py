@@ -20,6 +20,7 @@ from dash import callback_context
 from dash import dcc
 from dash import Dash
 from copy import deepcopy
+from sklearn.linear_model import LinearRegression
 import time
 import timeit
 import os
@@ -311,7 +312,11 @@ c_settings=dbc.Offcanvas(
                 "and update the main table "+\
                 '(applies to all columns measured in "Msm3","Mrm3" and "Bsm3",' +\
                 ' i.e. in-place, recoverable, storage and peak yearly production volumes)',
-            value=False),               
+            value=False),  
+        dbc.Checkbox(
+            id='checkbox_corr', 
+            label="show linear trend and its R2 in the scatter plot",
+            value=False),                
         html.Hr(),
         html.H2('Additional Tools'),   
         dbc.InputGroup([
@@ -1175,6 +1180,7 @@ def update_map(n, color, size,
     Input('select_dclrs', 'value'),  
     Input('sc_x_log10', 'value'),  
     Input('sc_y_log10', 'value'),  
+    Input('checkbox_corr', 'value'),
     #
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
@@ -1185,7 +1191,7 @@ def update_map(n, color, size,
     # prevent_initial_call=True
 )
 def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
-              log10_x, log10_y,
+              log10_x, log10_y, show_corr,
               sel_rows, records, theme, info_units, add_to_tooltips,
               show_warnings):
     
@@ -1253,6 +1259,36 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
         color_discrete_sequence=dclrs,
         labels = labels
         )    
+    
+    if show_corr:
+        _x = df[[x]].copy()
+        _y = df[y].copy()
+        _x = np.log10(_x) if log10_x else _x
+        _y = np.log10(_y) if log10_y else _y
+        ltrend = LinearRegression()
+        ltrend.fit(_x,_y)
+        r2 = ltrend.score(_x,_y)
+        _yf = ltrend.predict(_x)
+        if log10_y: _yf = 10**_yf
+        fig.add_trace(
+            go.Scattergl(
+                x=df[x], y=_yf, mode='lines+markers',
+                line={'color': 'gray', 'dash': 'dash'}, name = 'trend',
+                showlegend=False
+                )
+            )
+        regr_text = f"R={r2**0.5:.3f}, R2={r2:.3f}, "
+        regr_text += "log10(y)" if log10_y else "y"
+        regr_text += f"={ltrend.coef_[0]:.2e}*{"log10(x)" if log10_x else "x"}"
+        regr_text += f"+{ltrend.intercept_:.2e}" 
+        # print(regr_text)
+
+        fig.add_annotation(
+            text=regr_text,
+            xref="paper", yref="paper", x=0.5, y=0.01, 
+            xanchor = 'center', showarrow=False,  
+            font=dict(size=14, color="gray")
+            )
 
     fig.update_layout(
         font_size=14,
