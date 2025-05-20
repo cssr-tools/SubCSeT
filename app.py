@@ -311,8 +311,9 @@ c_settings=dbc.Offcanvas(
             label="divide volumes in crossboarder fields by Norwegian share "+\
                 "and update the main table "+\
                 '(applies to all columns measured in "Msm3","Mrm3" and "Bsm3",' +\
-                ' i.e. in-place, recoverable, storage and peak yearly production volumes)',
-            value=False),  
+                ' i.e. in-place, recoverable, storage and peak yearly production volumes).'+\
+                'Press the "update" button to update the current chart.',
+            value=True),  
         dbc.Checkbox(
             id='checkbox_corr', 
             label="show linear trend and its R2 in the scatter plot",
@@ -1195,7 +1196,7 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
               sel_rows, records, theme, info_units, add_to_tooltips,
               show_warnings):
     
-    model_msg, model_open  = '', False
+    modal_msg, modal_open  = '', False
     df = pd.DataFrame(data=records)
     if reverse_colorscale: colorscale += "_r"
 
@@ -1207,15 +1208,15 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
     ## 2) filtering out  
     foo = df[not_none_clms].isna().any(axis=1)
     if foo.any():
-        model_open = True   
+        modal_open = True   
         for f in df.loc[foo, 'field']:
-            model_msg += f'{f}, '        
-        model_msg = model_msg[:-2]      
-        model_msg =\
+            modal_msg += f'{f}, '        
+        modal_msg = modal_msg[:-2]      
+        modal_msg =\
               f'{not_none_clms} of the following field(s) have NaNs and cannot be displayed: ' +\
-                model_msg
+                modal_msg
         if not show_warnings: 
-            model_msg, model_open  = '', False
+            modal_msg, modal_open  = '', False
     df = df.dropna(subset=not_none_clms)  
     labels = {}
     for i in [*not_none_clms,*add_to_tooltips]:
@@ -1295,7 +1296,7 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
         modebar_add=['toggleHover', 'drawline', 'drawopenpath',
                      'drawclosedpath', 'drawcircle', 'drawrect',
                      'eraseshape', 'toggleSpikelines'])
-    return fig, model_open, model_msg
+    return fig, modal_open, modal_msg
 
 @app.callback(
     Output('map_dd_size', 'value'),
