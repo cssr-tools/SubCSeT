@@ -1,7 +1,7 @@
 [
  {
   "baaNpdidBsnsArrArea": 34751726,
-  "baaName": "EL001",
+  "baaName": "EL001 (Aurora)",
   "baaKind": "EXPLOITATION LICENCE",
   "baaDateApproved": "2019-01-11 00:00:00",
   "baaDateValidFrom": "2019-01-11 00:00:00",
@@ -1492,7 +1492,7 @@
  },
  {
   "baaNpdidBsnsArrArea": 40889547,
-  "baaName": "EXL002",
+  "baaName": "EXL002 (Smeaheia)",
   "baaKind": "EXPLORATION LICENCE",
   "baaDateApproved": "2022-07-01 00:00:00",
   "baaDateValidFrom": "2022-06-10 00:00:00",
@@ -3483,7 +3483,7 @@
  },
  {
   "baaNpdidBsnsArrArea": 40889715,
-  "baaName": "EXL003",
+  "baaName": "EXL003 (Polaris)",
   "baaKind": "EXPLORATION LICENCE",
   "baaDateApproved": "2022-07-01 00:00:00",
   "baaDateValidFrom": "2022-06-10 00:00:00",
@@ -4750,7 +4750,7 @@
  },
  {
   "baaNpdidBsnsArrArea": 41319880,
-  "baaName": "EXL004",
+  "baaName": "EXL004 (Luna)",
   "baaKind": "EXPLORATION LICENCE",
   "baaDateApproved": "2022-12-19 00:00:00",
   "baaDateValidFrom": "2022-11-11 00:00:00",
@@ -5717,7 +5717,7 @@
  },
  {
   "baaNpdidBsnsArrArea": 41319884,
-  "baaName": "EXL005",
+  "baaName": "EXL005 (Poseidon)",
   "baaKind": "EXPLORATION LICENCE",
   "baaDateApproved": "2023-06-01 00:00:00",
   "baaDateValidFrom": "2023-05-05 00:00:00",
@@ -6752,7 +6752,7 @@
  },
  {
   "baaNpdidBsnsArrArea": 41319885,
-  "baaName": "EXL006",
+  "baaName": "EXL006 (Havstjerne)",
   "baaKind": "EXPLORATION LICENCE",
   "baaDateApproved": "2023-06-02 00:00:00",
   "baaDateValidFrom": "2023-05-05 00:00:00",
@@ -8267,7 +8267,7 @@
  },
  {
   "baaNpdidBsnsArrArea": 41319892,
-  "baaName": "EXL007",
+  "baaName": "EXL007 (Trudvang)",
   "baaKind": "EXPLORATION LICENCE",
   "baaDateApproved": "2023-09-15 00:00:00",
   "baaDateValidFrom": "2023-09-15 00:00:00",
@@ -9670,7 +9670,7 @@
  },
  {
   "baaNpdidBsnsArrArea": 41319923,
-  "baaName": "EXL009",
+  "baaName": "EXL009 (Iroko)",
   "baaKind": "EXPLORATION LICENCE",
   "baaDateApproved": "2024-09-20 00:00:00",
   "baaDateValidFrom": "2024-09-20 00:00:00",
@@ -10921,7 +10921,7 @@
  },
  {
   "baaNpdidBsnsArrArea": 41319924,
-  "baaName": "EXL008",
+  "baaName": "EXL008 (Albondigas)",
   "baaKind": "EXPLORATION LICENCE",
   "baaDateApproved": "2024-09-20 00:00:00",
   "baaDateValidFrom": "2024-09-20 00:00:00",
@@ -11864,7 +11864,7 @@
  },
  {
   "baaNpdidBsnsArrArea": 41319925,
-  "baaName": "EXL011",
+  "baaName": "EXL011 (Atlas)",
   "baaKind": "EXPLORATION LICENCE",
   "baaDateApproved": "2024-09-20 00:00:00",
   "baaDateValidFrom": "2024-09-20 00:00:00",
@@ -13367,7 +13367,7 @@
  },
  {
   "baaNpdidBsnsArrArea": 41319926,
-  "baaName": "EXL010",
+  "baaName": "EXL010 (Kinno)",
   "baaKind": "EXPLORATION LICENCE",
   "baaDateApproved": "2024-09-20 00:00:00",
   "baaDateValidFrom": "2024-09-20 00:00:00",
