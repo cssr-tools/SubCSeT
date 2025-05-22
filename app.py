@@ -1281,7 +1281,7 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
         regr_text = f"R={r2**0.5:.3f}, R2={r2:.3f}, "
         regr_text += "log10(y)" if log10_y else "y"
         regr_text += f"={ltrend.coef_[0]:.2e}*{"log10(x)" if log10_x else "x"}"
-        regr_text += f"+{ltrend.intercept_:.2e}" 
+        regr_text += f"{ltrend.intercept_:+.2e}" 
         # print(regr_text)
 
         fig.add_annotation(
