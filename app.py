@@ -1085,7 +1085,7 @@ def update_map(n, color, size,
     #     )
     labels ={}
     for i in [size,color,*add_to_tooltips]:
-        unit = info_units[i]['unit']
+        unit = info_units[i]['unit'] if i is not None else ''
         labels[i] = i if unit in [''] else f"{i} ({unit})"
 
     fig=px.scatter_mapbox(
