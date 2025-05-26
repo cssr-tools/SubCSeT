@@ -287,256 +287,262 @@
   "years",
   "48"
  ],
- "rem. OE prod. years": [
-  "lifetime estimates",
-  "rem. /prod.",
+ "start year": [
+  "start",
+  "year",
   "years",
   "49"
+ ],
+ "rem. OE prod. years": [
+  "lifetime estimates",
+  "rem. res./prod.",
+  "years",
+  "50"
  ],
  "total lifetime": [
   "lifetime estimates",
   "total",
   "years",
-  "50"
+  "51"
  ],
  "rem. lifetime": [
   "lifetime estimates",
   "remaining",
   "years",
-  "51"
+  "52"
  ],
  "est. P&A year": [
   "lifetime estimates",
   "P&A",
   "year",
-  "52"
+  "53"
  ],
  "peak year": [
   "peak yearly production",
   "year",
   "",
-  "53"
+  "54"
  ],
  "peak OE YPR": [
   "peak yearly production",
   "OE",
   "Msm3",
-  "54"
+  "55"
  ],
  "peak oil YPR": [
   "peak yearly production",
   "oil",
   "Msm3",
-  "55"
+  "56"
  ],
  "peak gas YPR": [
   "peak yearly production",
   "gas",
   "Bsm3",
-  "56"
+  "57"
  ],
  "well num": [
   "wells",
   "sum",
   "",
-  "57"
+  "58"
  ],
  "prod. num": [
   "wells",
   "prod.",
   "",
-  "58"
+  "59"
  ],
  "inj. num": [
   "wells",
   "inj.",
   "",
-  "59"
+  "60"
  ],
  "obs. num": [
   "wells",
   "obs.",
   "",
-  "60"
+  "61"
  ],
  "subsea index": [
   "subsea",
   "index",
   "-",
-  "61"
+  "62"
  ],
  "lat": [
   "coordinates",
   "lat",
   "",
-  "62"
+  "63"
  ],
  "lon": [
   "coordinates",
   "lon",
   "",
-  "63"
+  "64"
  ],
  "depth min": [
   "depth",
   "min",
   "m",
-  "64"
+  "65"
  ],
  "depth mean": [
   "depth",
   "mean",
   "m",
-  "65"
+  "66"
  ],
  "depth median": [
   "depth",
   "median",
   "m",
-  "66"
+  "67"
  ],
  "depth max": [
   "depth",
   "max",
   "m",
-  "67"
+  "68"
  ],
  "water depth": [
   "depth",
   "water",
   "m",
-  "68"
+  "69"
  ],
  "depth": [
   "res. estimates",
   "depth",
   "m",
-  "69"
+  "70"
  ],
  "p_h": [
   "res. estimates",
   "p_h",
   "bar",
-  "70"
+  "71"
  ],
  "p0": [
   "res. estimates",
   "p0",
   "bar",
-  "71"
+  "72"
  ],
  "grad_p0": [
   "res. estimates",
   "grad p0",
   "bar/km",
-  "72"
+  "73"
  ],
  "p0 checked": [
   "res. estimates",
   "p0 checked",
   "-",
-  "73"
+  "74"
  ],
  "T0": [
   "res. estimates",
   "T0",
   "degC",
-  "74"
+  "75"
  ],
  "GOR": [
   "res. estimates",
   "GOR",
   "sm3/sm3",
-  "75"
+  "76"
  ],
  "oil FVF": [
   "res. estimates",
   "oil FVF",
   "rm3/sm3",
-  "76"
+  "77"
  ],
  "gas FVF": [
   "res. estimates",
   "gas FVF",
   "rm3/sm3",
-  "77"
+  "78"
  ],
  "oil PV0": [
   "initial PV",
   "oil",
   "Mrm3",
-  "78"
+  "79"
  ],
  "gas PV0": [
   "initial PV",
   "gas",
   "Mrm3",
-  "79"
+  "80"
  ],
  "HCPV0": [
   "initial PV",
   "HC",
   "Mrm3",
-  "80"
+  "81"
  ],
  "gas PV0/HC PV0": [
   "initial PV",
   "gas/HC",
   "-",
-  "81"
+  "82"
  ],
  "rec. oil PV": [
   "released PV0",
   "oil",
   "Mrm3",
-  "82"
+  "83"
  ],
  "rec. gas PV": [
   "released PV0",
   "gas",
   "Mrm3",
-  "83"
+  "84"
  ],
  "rec. HCPV": [
   "released PV0",
   "HCPV",
   "Mrm3",
-  "84"
+  "85"
  ],
  "CO2 SC": [
   "storage capacity ind.",
   "CO2",
   "Mt",
-  "85"
+  "86"
  ],
  "H2 SC": [
   "storage capacity ind.",
   "H2",
   "Mt",
-  "86"
+  "87"
  ],
  "CO2 SC/well num": [
   "CO2 SC/well",
   "",
   "Mt/well",
-  "87"
+  "88"
  ],
  "CO2 density RC": [
   "CO2 density",
   "@RC",
   "kg/rm3",
-  "88"
+  "89"
  ],
  "injectivity ind.": [
   "injectivity ind.",
   "(q_resv)",
   "rm3/day",
-  "89"
+  "90"
  ],
  "total score": [
   "total",
   "score",
   "-",
-  "90"
+  "91"
  ]
 }
