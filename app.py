@@ -743,7 +743,7 @@ def initial_setup(path2csv, theme_url):
      'res. quality','faulted', 'fldID', 'PL/BAA','size', 'lat', 'lon',
      'depth min',  'depth mean', 'depth median', 'depth max',
      'peak year', 'peak OE YPR', 'peak oil YPR', 'peak gas YPR',
-     'q_gas','qi_gas', 'q_gas2', 'qi_resv'
+     'q_gas','qi_gas', 'q_gas2', 'qi_resv', 'oil FVF', 'gas FVF'
      ]
     # filtering ... just in case ...
     hidden_columns = list(filter(lambda x: x in df.columns, hidden_columns))
