@@ -49,7 +49,7 @@
     "t95": "time to reach 95% maturity (years)",
     "t100": "time to reach 100% maturity (years)",
     "rem. OE prod. years": "remaining production years, ratio of current remaining OE rec. volume to current OE production",
-    "total lifetime": "statistical estimate of total lifetime (years)",
+    "est. total lifetime": "statistical estimate of total lifetime (years)",
     "rem. lifetime": "statistical estimate of remaining lifetime (years)",
     "est. P&A year": "statistical estimate of year of 100% maturity and P&A or, for abandoned fields, date of the last production",
     "peak year": "year of peak production",
