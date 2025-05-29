@@ -310,10 +310,10 @@ c_settings=dbc.Offcanvas(
             id='checkbox_norwegian_share', 
             label="divide volumes in crossboarder fields by Norwegian share "+\
                 "and update the main table "+\
-                '(applies to all columns measured in "Msm3","Mrm3" and "Bsm3",' +\
-                ' i.e. in-place, recoverable, storage and peak yearly production volumes).'+\
+                '(applies to all columns measured in "Msm3","Mrm3", "Bsm3" and "Mt",' +\
+                ' i.e. in-place, recoverable, storage and peak yearly production volumes). '+\
                 'Press the "update" button to update the current chart.',
-            value=True),  
+            value=False),  
         dbc.Checkbox(
             id='checkbox_corr', 
             label="show linear trend and its R2 in the scatter plot",
@@ -957,7 +957,7 @@ def adjust_norwegian_share(norwegian_share, records, info_units):
     df = pd.DataFrame(data=records)
 
     for k,v in info_units.items():
-        if v['unit'] in ['Mrm3','Msm3','Bsm3']:
+        if v['unit'] in ['Mrm3','Msm3','Bsm3','Mt']:
             if norwegian_share:
                 print(f'{k} divided by Norwegian share (to show total volumes)')
                 df[k] = df[k] / df['norwegian share']
