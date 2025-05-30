@@ -1598,7 +1598,8 @@ def ts_update(n, use_only_selected,
         barmode='stack',
         font_size=14,
         yaxis=dict(autorange='reversed'), 
-        xaxis=dict(title='total score and its components', side='top')
+        xaxis=dict(title='total score and its components', side='top'),
+        legend=dict(x=1.0, y=0.0, xanchor='right', yanchor='bottom')
         )
     return df.to_dict('records'), fig
 
