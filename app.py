@@ -440,40 +440,37 @@ c_sc_tab = html.Div([
         c_sc_b_update,
         dbc.Stack([
             dbc.InputGroup([
-                dbc.InputGroupText('X'),
-                dbc.Select(id='sc_dd_x',value='depth'),
-                ], # style={'width': '20%'}
-            ),  
+                dbc.InputGroupText('X',style={'width': '10%'}),
+                html.Div(dcc.Dropdown(id='sc_dd_x',value='depth', 
+                                      clearable=False),
+                         style={'width': '90%'}, className="dash-bootstrap"),
+            ]),  
             dbc.InputGroup([
-                dbc.InputGroupText('Y'),
-                dbc.Select(id='sc_dd_y',value='CO2 density RC'),
-                ], #style={'width': '20%'}
-            ),  
-        ]),
+                dbc.InputGroupText('Y',style={'width': '10%'}),
+                html.Div(dcc.Dropdown(id='sc_dd_y',value='CO2 density RC',
+                                      clearable=False), 
+                         style={'width': '90%'}, className="dash-bootstrap"),
+            ])  
+        ],style={'width': '40%'}),
         dbc.Stack([
             dbc.Switch(label='log10',value=False,id='sc_x_log10',
-                       style={'padding-top': '0.75vh'}
-                       ), 
-            dbc.Switch(label='log10',value=False,id='sc_y_log10',
-                    #    style={'padding-top': '0.5vh'}
-                       ),  
-        ]),
+                       style={'padding-top': '0.75vh'}), 
+            dbc.Switch(label='log10',value=False,id='sc_y_log10'),  
+        ],
+        # style={'width': '10%'}
+        ),
         dbc.Stack([
             dbc.InputGroup([
                 dbc.InputGroupText('size', style={'width': '20%'}),
-                dbc.Select(id='sc_dd_size',value='CO2 SC'),
-                dbc.Button(html.I(className="bi bi-x-square"), size='md', 
-                        outline=True, color="dark", id='sc_size_reset'), 
-                ], #style={'width': '25%'}
-                ),
+                html.Div(dcc.Dropdown(id='sc_dd_size',value='CO2 SC'),
+                         style={'width': '80%'}, className="dash-bootstrap")
+                ]),
             dbc.InputGroup([
                 dbc.InputGroupText('color', style={'width': '20%'}),
-                dbc.Select(id='sc_dd_color',value='grad_p0'),
-                dbc.Button(html.I(className="bi bi-x-square"), size='md', 
-                        outline=True, color="dark", id='sc_color_reset'),
-                ], #style={'width': '25%'}
-                ),   
-        ]),
+                html.Div(dcc.Dropdown(id='sc_dd_color',value='grad_p0'),
+                         style={'width': '80%'}, className="dash-bootstrap")
+                ]),   
+        ], style={'width': '40%'}),
         ], gap=2, direction="horizontal"),
     c_sc
 ])
@@ -1296,21 +1293,6 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
                      'eraseshape', 'toggleSpikelines'])
     return fig, modal_open, modal_msg
 
-# @app.callback(
-#     Output('map_dd_size', 'value'),
-#     Input('map_size_reset', 'n_clicks'),
-#     prevent_initial_call=True
-# )
-# def map_size_reset(n):
-#     return None
-
-@app.callback(
-    Output('sc_dd_size', 'value'),
-    Input('sc_size_reset', 'n_clicks'),
-    prevent_initial_call=True
-)
-def sc_size_reset(n):
-    return None
 
 @app.callback(
     Output('para_dd_color', 'value'),
@@ -1318,14 +1300,6 @@ def sc_size_reset(n):
     prevent_initial_call=True
 )
 def para_color_reset(n):
-    return None
-
-@app.callback(
-    Output('sc_dd_color', 'value'),
-    Input('sc_color_reset', 'n_clicks'),
-    prevent_initial_call=True
-)
-def sc_color_reset(n):
     return None
 
 #%% Theme change callback
