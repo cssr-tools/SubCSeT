@@ -504,11 +504,9 @@ c_para_tab = html.Div([
                ),
         ]),
         dbc.InputGroup([
-            dbc.InputGroupText('color'),
-            dbc.Select(id='para_dd_color', value='p0'),
-            dbc.Button(html.I(className="bi bi-x-square"),
-                        size='md', outline=True, color="dark",
-                        id='para_color_reset'),
+            dbc.InputGroupText('color',style={'width': '20%'}),
+            html.Div(dcc.Dropdown(id='para_dd_color', value='p0'),
+                     style={'width': '80%'}, className="dash-bootstrap")
         ], style={'width': '40%'}), 
     ], direction="horizontal", gap=2),
     dbc.Collapse([], id='para_table_div',is_open=True), 
@@ -1293,14 +1291,6 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
                      'eraseshape', 'toggleSpikelines'])
     return fig, modal_open, modal_msg
 
-
-@app.callback(
-    Output('para_dd_color', 'value'),
-    Input('para_color_reset', 'n_clicks'),
-    prevent_initial_call=True
-)
-def para_color_reset(n):
-    return None
 
 #%% Theme change callback
 @app.callback(
