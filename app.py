@@ -1,5 +1,5 @@
 DEBUG=False # switch for many parameters, should be False for deployment
-# DEBUG=True
+DEBUG=True
 
 import pandas as pd
 import numpy as np
@@ -390,18 +390,16 @@ c_map_tab = html.Div([
             className="me-1", size='md',
         ),
         dbc.InputGroup([
-            dbc.InputGroupText('size'),
-            dbc.Select(id='map_dd_size', value='CO2 SC'),
-            dbc.Button(html.I(className="bi bi-x-square"),
-                       size='md', outline=True, color="dark",
-                       id='map_size_reset'),
+            dbc.InputGroupText('size',style={'width': '20%'}),
+            html.Div(dcc.Dropdown(id='map_dd_size', value='CO2 SC'), 
+                     style={'width': '80%'}, className="dash-bootstrap"),
             ], style={'width': '45%'}
         ),
         dbc.InputGroup([
-            dbc.InputGroupText('color'),
-            dbc.Select(id='map_dd_color', value='injectivity ind.'),
-            # dbc.Button(html.I(className="bi bi-x-square"),
-            #            size='md', outline=True, id='map_color_reset'),            
+            dbc.InputGroupText('color',style={'width': '20%'}),
+            html.Div(dcc.Dropdown(id='map_dd_color', value='injectivity ind.', 
+                                  clearable=False), 
+                    style={'width': '80%'}, className="dash-bootstrap"),       
             ], style={'width': '45%'}
         ),         
         ], gap=2, direction="horizontal"),
@@ -1298,13 +1296,13 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
                      'eraseshape', 'toggleSpikelines'])
     return fig, modal_open, modal_msg
 
-@app.callback(
-    Output('map_dd_size', 'value'),
-    Input('map_size_reset', 'n_clicks'),
-    prevent_initial_call=True
-)
-def map_size_reset(n):
-    return None
+# @app.callback(
+#     Output('map_dd_size', 'value'),
+#     Input('map_size_reset', 'n_clicks'),
+#     prevent_initial_call=True
+# )
+# def map_size_reset(n):
+#     return None
 
 @app.callback(
     Output('sc_dd_size', 'value'),
