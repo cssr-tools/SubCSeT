@@ -3,16 +3,16 @@ channels:
   - conda-forge
 dependencies:
  - pip
- - python
+ - python=3.12
  - scikit-learn
  - shapely
  - dash
  - dash-bootstrap-components
- - dash-bootstrap-templates=1.0.8
+ - dash-bootstrap-templates
  - matplotlib
  - numpy
  - pandas
  - plotly
  - python-kaleido
- - nbformat>=4.2.0
+ - nbformat
  
