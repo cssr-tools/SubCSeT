@@ -1,12 +1,11 @@
 DEBUG=False # switch for many parameters, should be False for deployment
-DEBUG=True
+# DEBUG=True
 
 import pandas as pd
 import numpy as np
-import io
 # plotly & dash
 import plotly.express as px
-from plotly.io import write_html, write_image, to_json, to_html, to_image
+from plotly.io import to_html, to_image
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
@@ -22,8 +21,6 @@ from dash import Dash
 from copy import deepcopy
 from sklearn.linear_model import LinearRegression
 import time
-import timeit
-import os
 import re
 from datetime import datetime, timedelta
 import json
@@ -45,7 +42,8 @@ themes_options=[{'label': i, 'value': eval('dbc.themes.'+i.upper())} \
 
 # theme0 = "cosmo"  # sets the theme
 # theme0 = "bootstrap"  # sets the theme
-theme0 = "journal"  # sets the theme
+# theme0 = "journal"  # sets the theme
+theme0 = "sandstone"
 THEME0 = theme0.upper()
 
 # %% Button to change the themes
@@ -456,9 +454,7 @@ c_sc_tab = html.Div([
             dbc.Switch(label='log10',value=False,id='sc_x_log10',
                        style={'padding-top': '0.75vh'}), 
             dbc.Switch(label='log10',value=False,id='sc_y_log10'),  
-        ],
-        # style={'width': '10%'}
-        ),
+        ]),
         dbc.Stack([
             dbc.InputGroup([
                 dbc.InputGroupText('size', style={'width': '20%'}),
