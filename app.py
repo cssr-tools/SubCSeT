@@ -3,10 +3,9 @@ DEBUG=False # switch for many parameters, should be False for deployment
 
 import pandas as pd
 import numpy as np
-import io
 # plotly & dash
 import plotly.express as px
-from plotly.io import write_html, write_image, to_json, to_html, to_image
+from plotly.io import to_html, to_image
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
@@ -22,8 +21,6 @@ from dash import Dash
 from copy import deepcopy
 from sklearn.linear_model import LinearRegression
 import time
-import timeit
-import os
 import re
 from datetime import datetime, timedelta
 import json
@@ -45,7 +42,8 @@ themes_options=[{'label': i, 'value': eval('dbc.themes.'+i.upper())} \
 
 # theme0 = "cosmo"  # sets the theme
 # theme0 = "bootstrap"  # sets the theme
-theme0 = "journal"  # sets the theme
+# theme0 = "journal"  # sets the theme
+theme0 = "sandstone"
 THEME0 = theme0.upper()
 
 # %% Button to change the themes
@@ -390,18 +388,16 @@ c_map_tab = html.Div([
             className="me-1", size='md',
         ),
         dbc.InputGroup([
-            dbc.InputGroupText('size'),
-            dbc.Select(id='map_dd_size', value='CO2 SC'),
-            dbc.Button(html.I(className="bi bi-x-square"),
-                       size='md', outline=True, color="dark",
-                       id='map_size_reset'),
+            dbc.InputGroupText('size',style={'width': '20%'}),
+            html.Div(dcc.Dropdown(id='map_dd_size', value='CO2 SC'), 
+                     style={'width': '80%'}, className="dash-bootstrap"),
             ], style={'width': '45%'}
         ),
         dbc.InputGroup([
-            dbc.InputGroupText('color'),
-            dbc.Select(id='map_dd_color', value='injectivity ind.'),
-            # dbc.Button(html.I(className="bi bi-x-square"),
-            #            size='md', outline=True, id='map_color_reset'),            
+            dbc.InputGroupText('color',style={'width': '20%'}),
+            html.Div(dcc.Dropdown(id='map_dd_color', value='injectivity ind.', 
+                                  clearable=False), 
+                    style={'width': '80%'}, className="dash-bootstrap"),       
             ], style={'width': '45%'}
         ),         
         ], gap=2, direction="horizontal"),
@@ -442,40 +438,35 @@ c_sc_tab = html.Div([
         c_sc_b_update,
         dbc.Stack([
             dbc.InputGroup([
-                dbc.InputGroupText('X'),
-                dbc.Select(id='sc_dd_x',value='depth'),
-                ], # style={'width': '20%'}
-            ),  
+                dbc.InputGroupText('X',style={'width': '10%'}),
+                html.Div(dcc.Dropdown(id='sc_dd_x',value='depth', 
+                                      clearable=False),
+                         style={'width': '90%'}, className="dash-bootstrap"),
+            ]),  
             dbc.InputGroup([
-                dbc.InputGroupText('Y'),
-                dbc.Select(id='sc_dd_y',value='CO2 density RC'),
-                ], #style={'width': '20%'}
-            ),  
-        ]),
+                dbc.InputGroupText('Y',style={'width': '10%'}),
+                html.Div(dcc.Dropdown(id='sc_dd_y',value='CO2 density RC',
+                                      clearable=False), 
+                         style={'width': '90%'}, className="dash-bootstrap"),
+            ])  
+        ],style={'width': '40%'}),
         dbc.Stack([
             dbc.Switch(label='log10',value=False,id='sc_x_log10',
-                       style={'padding-top': '0.75vh'}
-                       ), 
-            dbc.Switch(label='log10',value=False,id='sc_y_log10',
-                    #    style={'padding-top': '0.5vh'}
-                       ),  
+                       style={'padding-top': '0.75vh'}), 
+            dbc.Switch(label='log10',value=False,id='sc_y_log10'),  
         ]),
         dbc.Stack([
             dbc.InputGroup([
                 dbc.InputGroupText('size', style={'width': '20%'}),
-                dbc.Select(id='sc_dd_size',value='CO2 SC'),
-                dbc.Button(html.I(className="bi bi-x-square"), size='md', 
-                        outline=True, color="dark", id='sc_size_reset'), 
-                ], #style={'width': '25%'}
-                ),
+                html.Div(dcc.Dropdown(id='sc_dd_size',value='CO2 SC'),
+                         style={'width': '80%'}, className="dash-bootstrap")
+                ]),
             dbc.InputGroup([
                 dbc.InputGroupText('color', style={'width': '20%'}),
-                dbc.Select(id='sc_dd_color',value='grad_p0'),
-                dbc.Button(html.I(className="bi bi-x-square"), size='md', 
-                        outline=True, color="dark", id='sc_color_reset'),
-                ], #style={'width': '25%'}
-                ),   
-        ]),
+                html.Div(dcc.Dropdown(id='sc_dd_color',value='grad_p0'),
+                         style={'width': '80%'}, className="dash-bootstrap")
+                ]),   
+        ], style={'width': '40%'}),
         ], gap=2, direction="horizontal"),
     c_sc
 ])
@@ -509,11 +500,9 @@ c_para_tab = html.Div([
                ),
         ]),
         dbc.InputGroup([
-            dbc.InputGroupText('color'),
-            dbc.Select(id='para_dd_color', value='p0'),
-            dbc.Button(html.I(className="bi bi-x-square"),
-                        size='md', outline=True, color="dark",
-                        id='para_color_reset'),
+            dbc.InputGroupText('color',style={'width': '20%'}),
+            html.Div(dcc.Dropdown(id='para_dd_color', value='p0'),
+                     style={'width': '80%'}, className="dash-bootstrap")
         ], style={'width': '40%'}), 
     ], direction="horizontal", gap=2),
     dbc.Collapse([], id='para_table_div',is_open=True), 
@@ -1298,37 +1287,6 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
                      'eraseshape', 'toggleSpikelines'])
     return fig, modal_open, modal_msg
 
-@app.callback(
-    Output('map_dd_size', 'value'),
-    Input('map_size_reset', 'n_clicks'),
-    prevent_initial_call=True
-)
-def map_size_reset(n):
-    return None
-
-@app.callback(
-    Output('sc_dd_size', 'value'),
-    Input('sc_size_reset', 'n_clicks'),
-    prevent_initial_call=True
-)
-def sc_size_reset(n):
-    return None
-
-@app.callback(
-    Output('para_dd_color', 'value'),
-    Input('para_color_reset', 'n_clicks'),
-    prevent_initial_call=True
-)
-def para_color_reset(n):
-    return None
-
-@app.callback(
-    Output('sc_dd_color', 'value'),
-    Input('sc_color_reset', 'n_clicks'),
-    prevent_initial_call=True
-)
-def sc_color_reset(n):
-    return None
 
 #%% Theme change callback
 @app.callback(
