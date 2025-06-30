@@ -46,25 +46,6 @@ themes_options=[{'label': i, 'value': eval('dbc.themes.'+i.upper())} \
 theme0 = "sandstone"
 THEME0 = theme0.upper()
 
-# %% Button to change the themes
-c_theme = ThemeChangerAIO(
-    aio_id="theme",
-    radio_props={
-        "value": eval('dbc.themes.'+THEME0),
-        # "options": themes_options
-             },
-    button_props={
-        # "children": [html.I(className="bi bi-palette"),'change theme'],
-        "children": [html.Img(src="/assets/palette.svg"),'change theme'],
-        'outline': True, "color": "dark",
-        'size': 'md',
-        'style': {'width': '100%'}
-    },
-    offcanvas_props={
-        "placement": "start", "scrollable": True, 'style': {'width': '15vw'}
-        }
-)
-
 # %% Utilities
 def replace_none_colors(fig,color='grey'):
     '''replaces None values in FIG dict with the COLOR'''
@@ -127,6 +108,26 @@ c_inp_fldr = dbc.Input(
     value=r'./data/_main.csv'
 )
 
+# %% Button to change the themes
+c_theme = ThemeChangerAIO(
+    aio_id="theme",
+    radio_props={
+        "value": eval('dbc.themes.'+THEME0),
+        # "options": themes_options
+             },
+    button_props={
+        # "children": [html.I(className="bi bi-palette"),'change theme'],
+        "children": [html.Img(src="/assets/palette.svg"),'change theme'],
+        'outline': True, "color": "dark",
+        'size': 'md',
+        'style': {'width': '100%'}
+    },
+    offcanvas_props={
+        "placement": "start", "scrollable": True, 'style': {'width': '15vw'}
+        }
+)
+
+# %% Layout
 c_mtable = DataTable(id='mtable', data=[], selected_rows=[])
 c_mtable = html.Div(c_mtable, id='mtable_div')
 
