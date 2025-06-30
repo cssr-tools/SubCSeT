@@ -1,5 +1,5 @@
 DEBUG=False # switch for many parameters, should be False for deployment
-# DEBUG=True
+DEBUG=True
 
 import pandas as pd
 import numpy as np
@@ -254,9 +254,13 @@ c_settings=dbc.Offcanvas(
                     dbc.InputGroupText("map style",style={'width': '45%'}),
                     dbc.Select(
                         id='select_map_style', value='carto-positron',
-                        options=['open-street-map', 
-                                'carto-positron', 
-                                'carto-darkmatter']
+                        options=['basic', 'carto-darkmatter', 
+                                 'carto-darkmatter-nolabels', 
+                                 'carto-positron', 'carto-positron-nolabels', 
+                                 'carto-voyager', 'carto-voyager-nolabels', 
+                                 'dark', 'light', 'open-street-map', 
+                                 'outdoors', 'satellite', 'satellite-streets',
+                                 'streets', 'white-bg']
                         )]
                 ), width=9
             ),
@@ -1078,17 +1082,6 @@ def update_map(n, color, size,
         unit = info_units[i]['unit'] if i is not None else ''
         labels[i] = i if unit in [''] else f"{i} ({unit})"
 
-    fig=px.scatter_mapbox(
-        df, lat='lat', lon='lon',size=_size, color=color,
-        # hover_data=['field','lat','lon',size,color,'size', *add_to_tooltips],
-        hover_data=['field',size,color,*add_to_tooltips],
-        size_max=size_max, 
-        custom_data=['FactPageUrl'],
-        color_continuous_scale=colorscale,
-        # color_discrete_sequence=px.colors.qualitative.G10,
-        color_discrete_sequence=dclrs, labels=labels
-        )
-
     if (fig0 is not None) and (fig0['layout'].get('mapbox') is not None):
         # print(fig0['layout']['mapbox'])
         zoom = fig0['layout']['mapbox']['zoom']
@@ -1104,7 +1097,16 @@ def update_map(n, color, size,
     
     center = {'lat': ref_lat, 'lon': ref_lon}
     # center = go.layout.mapbox.Center(lat=ref_lat, lon=ref_lon)
-
+    fig=px.scatter_map(
+        df, lat='lat', lon='lon',size=_size, color=color,
+        # hover_data=['field','lat','lon',size,color,'size', *add_to_tooltips],
+        hover_data=['field',size,color,*add_to_tooltips],
+        size_max=size_max, map_style = map_style, center = center, zoom = zoom,
+        custom_data=['FactPageUrl'],
+        color_continuous_scale=colorscale,
+        # color_discrete_sequence=px.colors.qualitative.G10,
+        color_discrete_sequence=dclrs, labels=labels
+        )    
 
     if show_co2_baa:
         for shape in SHAPES:
@@ -1117,7 +1119,7 @@ def update_map(n, color, size,
             lons += (lons[0],)
             lats += (lats[0],)
 
-            fig.add_trace(go.Scattermapbox(
+            fig.add_trace(go.Scattermap(
                 lon=lons, lat=lats, mode='lines', name=name,
                 hovertext=(
                     f"<b>{shape['baaName']}</b><br>"
@@ -1134,11 +1136,11 @@ def update_map(n, color, size,
 
     fig.update_layout(
         template=theme,
-        mapbox={
-            'style': map_style,
-            'center': center,
-            'zoom': zoom,
-        },
+        # mapbox={
+        #     'style': map_style,
+        #     'center': center,
+        #     'zoom': zoom,
+        # },
         # colorbar to the left
         coloraxis_colorbar=dict(x=0.0,  y=1.0, xanchor='left', yanchor='top'),
         #  top-right legend
