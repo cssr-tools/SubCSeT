@@ -1,5 +1,5 @@
 DEBUG=False # switch for many parameters, should be False for deployment
-DEBUG=True
+# DEBUG=True
 
 import pandas as pd
 import numpy as np
@@ -974,7 +974,7 @@ def adjust_norwegian_share(norwegian_share, records, info_units):
     Input('select_dclrs', 'value'),  
     Input('dd_configure_tooltips', 'value'),        
     Input('checkbox_CO2_BAA', 'value'),      
-    State('map_fig', 'figure'),    
+    State("map_fig", "relayoutData"),
     State('mtable', 'selected_rows'),
     State('mtable', 'data'),
     State('theme_store', 'data'),
@@ -986,7 +986,7 @@ def adjust_norwegian_share(norwegian_share, records, info_units):
 def update_map(n, color, size, 
                colorscale, reverse_colorscale, 
                map_style, dclrs, add_to_tooltips, show_co2_baa,
-               fig0, sel_rows, records, theme, info_units, SHAPES, show_warnings):
+               relayoutData, sel_rows, records, theme, info_units, SHAPES, show_warnings):
 
     model_msg, model_open  = '', False
     fig = go.Figure()
@@ -1082,21 +1082,18 @@ def update_map(n, color, size,
         unit = info_units[i]['unit'] if i is not None else ''
         labels[i] = i if unit in [''] else f"{i} ({unit})"
 
-    if (fig0 is not None) and (fig0['layout'].get('mapbox') is not None):
+    if (relayoutData is not None) and (relayoutData.get('map.center') is not None):
         # print(fig0['layout']['mapbox'])
-        zoom = fig0['layout']['mapbox']['zoom']
-        ref_lat, ref_lon = \
-            fig0['layout']['mapbox']['center']['lat'], \
-            fig0['layout']['mapbox']['center']['lon']
+        zoom = relayoutData['map.zoom']
+        center = relayoutData['map.center']
     else:
         # these limits are configured to show all fields in the North sea
         zoom = 5.5  
-        ref_lat, ref_lon = df.loc[df['sea']=='NORTH', ['lat','lon']].mean().values
+        center = df.loc[df['sea']=='NORTH', ['lat','lon']].mean().to_dict()
         # these limits are configures to show all NCS fields
         # ref_lat, ref_lon, zoom = 65.7, 8.280232, 3.7
-    
-    center = {'lat': ref_lat, 'lon': ref_lon}
-    # center = go.layout.mapbox.Center(lat=ref_lat, lon=ref_lon)
+        # center = {'lat': ref_lat, 'lon': ref_lon}
+
     fig=px.scatter_map(
         df, lat='lat', lon='lon',size=_size, color=color,
         # hover_data=['field','lat','lon',size,color,'size', *add_to_tooltips],
@@ -1136,11 +1133,6 @@ def update_map(n, color, size,
 
     fig.update_layout(
         template=theme,
-        # mapbox={
-        #     'style': map_style,
-        #     'center': center,
-        #     'zoom': zoom,
-        # },
         # colorbar to the left
         coloraxis_colorbar=dict(x=0.0,  y=1.0, xanchor='left', yanchor='top'),
         #  top-right legend
