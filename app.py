@@ -134,10 +134,7 @@ c_mtable = html.Div(c_mtable, id='mtable_div')
 
 # %%
 c_map = dcc.Graph(
-    id='map_fig',
-    style={
-        'height': '89vh',
-    },
+    id='map_fig', style={'height': '85vh'},
     config={'displayModeBar': True,'scrollZoom': True}
 )
 
@@ -742,8 +739,8 @@ def initial_setup(path2csv, theme_url):
      ]
     # filtering ... just in case ...
     hidden_columns = list(filter(lambda x: x in df.columns, hidden_columns))
-    print('The following columns are hidden:')
-    print(hidden_columns)
+    # print('The following columns are hidden:')
+    # print(hidden_columns)
     mtable = DataTable(
         id='mtable', columns=clmns,
         data=df.to_dict('records'),
