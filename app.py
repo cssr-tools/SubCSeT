@@ -585,15 +585,9 @@ c_tabs = dbc.Tabs([
 
 app.layout = html.Div([
     dbc.Row([
-        dbc.Col([c_toolbar, c_mtable], width=6,
-                style={'padding-right': '0.5vw'}
-                ),
-        dbc.Col(c_tabs, width=6,
-                # style={'padding-left': '0.25vw'}
-                )
-    ], 
-        className="g-0",
-    ),
+        dbc.Col([c_toolbar, c_mtable], width=6),
+        dbc.Col(c_tabs, width=6)
+    ], className="g-1"),
     dcc.Store(id='theme_store', data=theme0),
     dcc.Store(id='para_store_df', data={}),
     dcc.Store(id='para_store_ranges', data={}), 
@@ -761,7 +755,7 @@ def initial_setup(path2csv, theme_url):
             'height': '90vh',
             # 'height': 'auto',
             # 'width': 'auto',
-            'width': '49.5vw', 
+            # 'width': '49.5vw', 
             # 'width': 'calc(50vw - (50vw - 100%))',
             'overflowX': 'auto', 
             'overflowY': 'auto'
