@@ -43,7 +43,8 @@ themes_options=[{'label': i, 'value': eval('dbc.themes.'+i.upper())} \
 # theme0 = "cosmo"  # sets the theme
 # theme0 = "bootstrap"  # sets the theme
 # theme0 = "journal"  # sets the theme
-theme0 = "sandstone"
+# theme0 = "sandstone"
+theme0 = "cerulean"
 THEME0 = theme0.upper()
 
 # %% Utilities
@@ -253,7 +254,7 @@ c_settings=dbc.Offcanvas(
                 dbc.InputGroup([
                     dbc.InputGroupText("map style",style={'width': '45%'}),
                     dbc.Select(
-                        id='select_map_style', value='carto-positron',
+                        id='select_map_style', value='basic',
                         options=['basic', 'carto-darkmatter', 
                                  'carto-darkmatter-nolabels', 
                                  'carto-positron', 'carto-positron-nolabels', 
