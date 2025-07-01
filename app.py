@@ -134,7 +134,7 @@ c_mtable = html.Div(c_mtable, id='mtable_div')
 
 # %%
 c_map = dcc.Graph(
-    id='map_fig', style={'height': '83vh'},
+    id='map_fig', style={'height': '89vh'},
     config={'displayModeBar': True,'scrollZoom': True}
 )
 
@@ -1134,7 +1134,7 @@ def update_map(n, color, size,
         # legend=dict(groupclick="toggleitem", 
         #             x=0.0, y=0.0, xanchor='left', yanchor='bottom'),                    
         modebar_orientation='v',
-        margin={"r": 30, "t": 0, "l": 0, "b": 5},
+        margin={"r": 30, "t": 0, "l": 0, "b": 30},
         modebar_add=['toggleHover', 'drawline', 'drawopenpath',
                      'drawclosedpath', 'drawcircle', 'drawrect',
                      'eraseshape', 'toggleSpikelines'],
