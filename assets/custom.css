@@ -1,3 +1,7 @@
+/* Piece of CSS to prettify the map attributions */
+/* Thank a lot to the post below for the tips! */
+/* https://community.plotly.com/t/plotly-6-map-attribution-box-positioning/91228 */
+
 /* Move attribution block outside the map */
 .maplibregl-ctrl-bottom-right {
   position: static !important;
