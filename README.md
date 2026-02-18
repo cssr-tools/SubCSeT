@@ -16,6 +16,8 @@ The [**conference paper**](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5
 2. "[preprint_IJGGC_special_issue](https://github.com/cssr-tools/SubCSeT/releases/tag/preprint_IJGGC_special_issue)" features the data, codes as of 31.05.2025, prior to submission to the special issue of the International Journal of Greenhouse Gas Control.
 The preprint is to be found [here](https://github.com/cssr-tools/SubCSeT/blob/main/preprint_IJGGC_special_issue.pdf).
 
+3. [**paper**](https://doi.org/10.1016/j.ijggc.2026.104607) in International Journal of Greenhouse Gas Control: https://doi.org/10.1016/j.ijggc.2026.104607.  
+
 ## Requirements
 The **requirements** are listed in *requirements.txt* (for **pip**) and *requirements.yml* (for **conda**). The environment can be reproduced by:  
 ```

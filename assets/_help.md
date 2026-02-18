@@ -1,18 +1,11 @@
 # About
-This is a web application for screening petroleum reservoirs on the Norwegian Continental Shelf (NCS) for purposes of CO2 storage, developed in [the Centre for Sustainable Subsurface Resources (CSSR)](https://cssr.no/) hosted by the Norwegian Research Centre (NORCE).  
-The app is based on a study presented at the GHGT-17 conference (Calgary, October 2024):  
-* [**e-poster**](https://api.ltb.io/show/ACGES) with a short presentation,  
-* [**conference paper**](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5069175) with more details.  
-* for even more details, preprint submitted to the special issue of the IJGGC: 
-    * [**GitHub**](https://github.com/cssr-tools/SubCSeT/blob/main/preprint_IJGGC_special_issue.pdf) (more readable, recommended)  
-    * [**SSRN**](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5389449)   
-* [**GitHub Repository**](https://github.com/cssr-tools/SubCSeT) with codes and data.  
-
-A short description is also presented below.
-
+This is a web application for screening petroleum reservoirs on the Norwegian Continental Shelf (NCS) for CO2 storage, developed in [the Centre for Sustainable Subsurface Resources (CSSR)](https://cssr.no/), hosted by [NORCE](https://norceresearch.no/).  
+The methodology is to be found in the [**paper**](https://doi.org/10.1016/j.ijggc.2026.104607) published in International Journal of Greenhouse Gas Control (2026.02.18): https://doi.org/10.1016/j.ijggc.2026.104607.  
+The codes and data are available at the project repo at https://github.com/cssr-tools/SubCSeT.  
+A short description is also presented below.  
 Other links:  
-[**Contact the developer via LinkedIn**](https://www.linkedin.com/in/alexey-khrulenko-8021a64a/)  
-[**Report a problem**](https://github.com/cssr-tools/SubCSeT/issues/new)
+* [**Contact the developer via LinkedIn**](https://www.linkedin.com/in/alexey-khrulenko-8021a64a/)  
+* [**Create an issue on GitHub**](https://github.com/cssr-tools/SubCSeT/issues/new)
 
 # Quick start
 The large table in the left half presents data for the NCS fields:  
