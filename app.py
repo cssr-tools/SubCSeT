@@ -37,6 +37,12 @@ themes = [
     "pulse", "quartz", "sandstone", "simplex", "sketchy", "slate",
     "solar", "spacelab", "superhero", "united", "vapor", "yeti", "zephyr"]
 
+map_styles = \
+    ['basic', 'carto-darkmatter', 'carto-darkmatter-nolabels', 
+    'carto-positron', 'carto-positron-nolabels', 'carto-voyager', 
+    'carto-voyager-nolabels', 'dark', 'light', 'open-street-map', 
+    'outdoors', 'satellite', 'satellite-streets', 'streets', 'white-bg']
+
 themes_options=[{'label': i, 'value': eval('dbc.themes.'+i.upper())} \
                 for i in themes]
 
@@ -44,8 +50,12 @@ themes_options=[{'label': i, 'value': eval('dbc.themes.'+i.upper())} \
 # theme0 = "bootstrap"  # sets the theme
 # theme0 = "journal"  # sets the theme
 # theme0 = "sandstone"
-theme0 = "cerulean"
+light_theme = (datetime.today() - datetime(2026,3,3)).days % 3 != 0
+theme0 = "cerulean" if light_theme else "darkly"  # sets the theme
+map_style0 = "basic" if light_theme else "carto-darkmatter"
+
 THEME0 = theme0.upper()
+
 
 # %% Utilities
 def replace_none_colors(fig,color='grey'):
@@ -251,14 +261,8 @@ c_settings=dbc.Offcanvas(
                 dbc.InputGroup([
                     dbc.InputGroupText("map style",style={'width': '45%'}),
                     dbc.Select(
-                        id='select_map_style', value='basic',
-                        options=['basic', 'carto-darkmatter', 
-                                 'carto-darkmatter-nolabels', 
-                                 'carto-positron', 'carto-positron-nolabels', 
-                                 'carto-voyager', 'carto-voyager-nolabels', 
-                                 'dark', 'light', 'open-street-map', 
-                                 'outdoors', 'satellite', 'satellite-streets',
-                                 'streets', 'white-bg']
+                        id='select_map_style', value=map_style0,
+                        options=map_styles
                         )]
                 ), width=9
             ),
