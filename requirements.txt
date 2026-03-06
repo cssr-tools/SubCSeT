@@ -1,6 +1,6 @@
 gunicorn
 scikit-learn
-dash
+dash==3.3.0
 dash-bootstrap-components 
 dash-bootstrap-templates
 kaleido
