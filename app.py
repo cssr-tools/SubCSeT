@@ -984,7 +984,7 @@ def update_map(n, color, size,
                map_style, dclrs, add_to_tooltips, show_co2_baa,
                relayoutData, sel_rows, records, theme, info_units, SHAPES, show_warnings):
 
-    model_msg, model_open  = '', False
+    modal_msg, modal_open  = '', False
     fig = go.Figure()
     if sel_rows is None or sel_rows == []: return fig
 
@@ -1034,20 +1034,20 @@ def update_map(n, color, size,
         # handling NAs (2 ways)
         foo = df[size].isna()
         if foo.any():
-            model_open = True   
+            modal_open = True   
             for f in df.loc[foo, 'field']:
-                  model_msg += f'{f}, '        
-            model_msg = model_msg[:-2]      
+                  modal_msg += f'{f}, '        
+            modal_msg = modal_msg[:-2]      
             ## 1) set to min: ----------
             # model_msg = f'NAs in column SIZE={size} are set to min. Affected field(s):  ' +\
             #   model_msg
             # df['size'] = df['size'].fillna(5)
             ## 2) filtering out: -------
-            model_msg = f'The following field(s) with "{size}"==NaN cannot be displayed: ' +\
-                model_msg
+            modal_msg = f'The following field(s) with "{size}"==NaN cannot be displayed: ' +\
+                modal_msg
             df = df[~foo]
             if not show_warnings: 
-                model_msg, model_open  = '', False
+                modal_msg, modal_open  = '', False
     # legacy block kept just in case
     # for i in df.index:
     #     row = df.loc[i, :]
@@ -1145,7 +1145,7 @@ def update_map(n, color, size,
     )
     fig.update_geos(fitbounds="locations")
 
-    return fig, model_open, model_msg
+    return fig, modal_open, modal_msg
 
 @app.callback(
     Output('sc_fig', 'figure'),  
