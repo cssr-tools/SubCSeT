@@ -986,7 +986,8 @@ def update_map(n, color, size,
 
     modal_msg, modal_open  = '', False
     fig = go.Figure()
-    if sel_rows is None or sel_rows == []: return fig
+    if sel_rows is None or sel_rows == [] or color is None: 
+        return fig, modal_open, modal_msg
 
     if add_to_tooltips is None: add_to_tooltips=[]
 
@@ -1180,8 +1181,8 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
     df = pd.DataFrame(data=records)
     if reverse_colorscale: colorscale += "_r"
 
-    if sel_rows is None or sel_rows == []:
-        return go.Figure()
+    if (sel_rows is None) or (sel_rows == []) or (x is None) or (y is None):
+        return go.Figure(), modal_open, modal_msg
 
     df = df.loc[sel_rows, :]  
     not_none_clms=[i for i in [x, y, size] if i is not None]
