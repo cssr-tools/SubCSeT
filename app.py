@@ -144,7 +144,7 @@ c_mtable = html.Div(c_mtable, id='mtable_div')
 
 # %%
 c_map = dcc.Graph(
-    id='map_fig', style={'height': '91vh'},
+    id='map_fig', style={'height': '90vh'},
     config={'displayModeBar': True,'scrollZoom': True}
 )
 
