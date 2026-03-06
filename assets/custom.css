@@ -1,0 +1,23 @@
+/* A piece of CSS to prettify the map attributions */
+/* Thanks a lot to the post below for the tips! */
+/* https://community.plotly.com/t/plotly-6-map-attribution-box-positioning/91228 */
+
+/* Move attribution block outside the map */
+.maplibregl-ctrl-bottom-right {
+  position: static !important;
+  margin-top: 5px;
+  text-align: left;
+  padding-right: 10px;
+}
+
+/* Prevent it from overlapping map */
+.maplibregl-map > .maplibregl-control-container {
+  position: relative;
+  height: 0;
+  overflow: visible;
+}
+
+/* Hide the triangle button */
+.maplibregl-ctrl-attrib-button {
+  display: none !important;
+}
