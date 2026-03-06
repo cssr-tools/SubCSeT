@@ -1,11 +1,11 @@
 gunicorn
-scikit-learn
+scikit-learn==1.7.2
 dash==3.3.0
-dash-bootstrap-components 
-dash-bootstrap-templates
-kaleido
+dash-bootstrap-components==2.0.4
+dash-bootstrap-templates==2.1.0
+kaleido==1.2.0 
 matplotlib
-numpy
-pandas
+numpy==2.3.5
+pandas==2.3.3
 plotly==6.5.0
 nbformat>=4.2.0
