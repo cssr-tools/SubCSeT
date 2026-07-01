@@ -115,9 +115,13 @@ app = Dash(
 app.title = 'CCS screening tool for NCS'
 server = app.server
 
-c_inp_fldr = dbc.Input(
-    id='inp_fldr', type='text',
-    value=r'./data/_main.csv'
+c_inp_fldr = dcc.Dropdown(
+    id='inp_fldr', 
+    options=[{
+        'label': 'v2024: reserves as of 2023-12-31, other data within 2024 ("_main.csv")',
+        'value': r'./data/_main.csv'}],
+    value=r'./data/_main.csv', 
+    clearable=False, style={'width': '100%'}
 )
 
 # %% Button to change the themes
