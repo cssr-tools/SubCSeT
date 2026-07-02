@@ -1,5 +1,5 @@
 DEBUG=False # switch for many parameters, should be False for deployment
-DEBUG=True
+# DEBUG=True
 
 import pandas as pd
 import numpy as np
@@ -341,8 +341,9 @@ c_settings=dbc.Offcanvas(
         dbc.InputGroup([
             dbc.Button('save fig. as',id='b_save_fig', color="primary"),
             dbc.Select(id='select_save_fig_format',
-                       options=['.png', '.jpeg', '.webp', '.svg', '.pdf', '.html'], 
-                       value='.png', 
+                    #    options=['.html','.png', '.jpeg', '.webp', '.svg', '.pdf'], 
+                        options=['.html'], 
+                       value='.html', 
                        ), 
             dbc.InputGroupText("width (px):"),
             dbc.Input(id='width_save_fig', type='number', value=1000),
