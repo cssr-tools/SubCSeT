@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 # plotly & dash
 import plotly.express as px
-from plotly.io import to_html, to_image
+from plotly.io import to_html
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
@@ -342,10 +342,9 @@ c_settings=dbc.Offcanvas(
         dbc.InputGroup([
             dbc.Button('save fig. as',id='b_save_fig', color="primary"),
             dbc.Select(id='select_save_fig_format',
-                    #    options=['.html','.png', '.jpeg', '.webp', '.svg', '.pdf'], 
-                        options=['.html'], 
-                       value='.html', 
-                       ), 
+                       options=['.png', '.jpeg', '.webp', '.svg', '.html'],
+                       value='.html',
+                       ),
             dbc.InputGroupText("width (px):"),
             dbc.Input(id='width_save_fig', type='number', value=1000),
             dbc.InputGroupText("scale:"),
@@ -364,6 +363,8 @@ c_settings=dbc.Offcanvas(
                    color="success", className='mt-2'),
         dcc.Download("download_fig"),
         dcc.Download("download_csv"),
+        # dummy sink for the clientside figure-export callback
+        dcc.Store(id='save_fig_dummy'),
     ]),
     id='settings', is_open=False, scrollable=True,
     style={'width': '39vw'}
@@ -1592,21 +1593,23 @@ def ts_plus_minus(p,m, records):
     return records
 
 @app.callback(
-    Output("download_fig", 'data'),    
-    Input("b_save_fig", 'n_clicks'),    
+    Output("download_fig", 'data'),
+    Input("b_save_fig", 'n_clicks'),
     State("all_tabs", 'active_tab'),
     State("map_fig", 'figure'),
-    State("sc_fig", 'figure'), 
-    State("para_fig", 'figure'),  
+    State("sc_fig", 'figure'),
+    State("para_fig", 'figure'),
     State("ts_fig", 'figure'),
     State("select_save_fig_format", 'value'),
-    State("width_save_fig", 'value'),  
-    State("select_save_fig_scale", 'value'),        
     prevent_initial_call=True
 )
-def save_current_figure(n, active_tab, map_fig, sc_fig, para_fig, ts_fig, 
-                        format, width, scale):
-    
+def save_current_figure(n, active_tab, map_fig, sc_fig, para_fig, ts_fig,
+                        format):
+    # image formats (.png/.jpeg/.webp/.svg) are exported in the browser by
+    # the clientside callback below (no Kaleido/Chrome needed on the server)
+    if format != '.html':
+        raise PreventUpdate
+
     def clean_marker_colors(fig_dict, default_color="gray"):
         for trace in fig_dict.get("data", []):
             marker = trace.get("marker", {})
@@ -1615,9 +1618,8 @@ def save_current_figure(n, active_tab, map_fig, sc_fig, para_fig, ts_fig,
                 # Replace None values
                 marker["color"] =\
                       [default_color if c is None else c for c in color]
-        return fig_dict    
-    
-    height = 9.00/9.50*width if width is not None else None
+        return fig_dict
+
     if active_tab == 'tab_map':
         # replace None colors with grey
         fig = clean_marker_colors(map_fig)
@@ -1628,36 +1630,63 @@ def save_current_figure(n, active_tab, map_fig, sc_fig, para_fig, ts_fig,
     elif active_tab == 'tab_para':
         filename = 'subcset_para'
         fig = para_fig
-        height = 5/9.5*width if width is not None else None
     elif active_tab == 'tab_ts':
         filename = 'subcset_total_score'
         fig = ts_fig
-        height = 6/9.50*width if width is not None else None
     else:
-        pass
+        raise PreventUpdate
 
     now = datetime.now().strftime('%Y-%m-%d-%H%M%S')
     filename = f'{now}_{filename}{format}'
-        
-    # changed_id = [p['prop_id'] for p in callback_context.triggered][0]
 
-    # this one works fine
-    # return {'content': to_html(fig), 'filename': f'{now}_{filename}.html'}
-    # this one works fine
-    # buffer = io.BytesIO()
-    # write_image(fig, buffer, format=format[1:], 
-    #             scale=1, width=width, height=height
-    #             )
-    # buffer.seek(0)    
-    # return dcc.send_bytes(buffer.read(), filename=filename)
-    # this one works fine
-    if format == '.html':
-        return {'content': to_html(fig), 'filename': filename}
-    else: 
-        return dcc.send_bytes(
-            to_image(fig, format=format[1:], scale=scale, 
-                     width=width, height=height), 
-            filename=filename)        
+    return {'content': to_html(fig), 'filename': filename}
+
+# exports the currently displayed figure as an image, rendered by plotly.js
+# in the user's browser via Plotly.downloadImage.
+# Why clientside: server-side export (plotly.io.to_image) relies on Kaleido,
+# and Kaleido >= 1.0 no longer bundles Chromium - it needs a system-installed
+# Chrome, which Heroku dynos don't have. So image export worked locally but
+# failed on the server. Rendering in the user's browser needs no Chrome (and
+# no Kaleido) on the server at all, so it behaves the same locally and on
+# Heroku. Only .html is still generated server-side (pure Python, no browser).
+app.clientside_callback(
+    """
+    function(n, active_tab, fmt, width, scale) {
+        if (!n || fmt === '.html') {            // server handles .html
+            return window.dash_clientside.no_update;
+        }
+        const tabToGraph = {
+            'tab_map': 'map_fig', 'tab_sc': 'sc_fig',
+            'tab_para': 'para_fig', 'tab_ts': 'ts_fig'
+        };
+        // dcc.Graph's id sits on a wrapper div; Plotly needs the inner
+        // .js-plotly-plot element
+        const wrapper = document.getElementById(tabToGraph[active_tab]);
+        const gd = wrapper && wrapper.querySelector('.js-plotly-plot');
+        if (!gd) { return window.dash_clientside.no_update; }
+        const ratios = {'tab_map': 9.0/9.5, 'tab_sc': 9.0/9.5,
+                        'tab_para': 5.0/9.5, 'tab_ts': 6.0/9.5};
+        const w = width || 1000;
+        const h = Math.round(w * ratios[active_tab]);
+        const now = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+        const names = {'tab_map': 'subcset_map', 'tab_sc': 'subcset_scatter',
+                       'tab_para': 'subcset_para', 'tab_ts': 'subcset_total_score'};
+        Plotly.downloadImage(gd, {
+            format: fmt.slice(1), width: w, height: h,
+            scale: parseFloat(scale) || 1,      // dbc.Select delivers strings
+            filename: now + '_' + names[active_tab]
+        });
+        return window.dash_clientside.no_update;
+    }
+    """,
+    Output("save_fig_dummy", "data"),
+    Input("b_save_fig", "n_clicks"),
+    State("all_tabs", "active_tab"),
+    State("select_save_fig_format", "value"),
+    State("width_save_fig", "value"),
+    State("select_save_fig_scale", "value"),
+    prevent_initial_call=True,
+)
 
 @app.callback(
     Output("download_csv", 'data'),    
