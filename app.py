@@ -118,9 +118,9 @@ server = app.server
 c_inp_fldr = dcc.Dropdown(
     id='inp_fldr', 
     options=[{
-        'label': 'v2024: reserves as of 2023-12-31, other data within 2024 ("_main.csv")',
-        'value': r'./data/_main.csv'}],
-    value=r'./data/_main.csv', 
+        'label': 'v2024: reserves as of 2023-12-31, other data within 2024',
+        'value': r'./data/v2024.csv'}],
+    value=r'./data/v2024.csv', 
     clearable=False, style={'width': '100%'}
 )
 
