@@ -128,7 +128,8 @@ c_inp_fldr = dbc.Select(
 )
 
 c_inp_fldr=dbc.InputGroup(
-    [dbc.InputGroupText("dataset version"), c_inp_fldr, 
+    [dbc.InputGroupText("dataset:", class_name="bg-primary text-white"), 
+     c_inp_fldr, 
     #  dbc.Tooltip('reserves as of 2023.12.31, other data within 2024',target='inp_fldr')
      ], style={'width': '100%'})
 
