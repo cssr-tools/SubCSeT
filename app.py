@@ -115,10 +115,22 @@ app = Dash(
 app.title = 'CCS screening tool for NCS'
 server = app.server
 
-c_inp_fldr = dbc.Input(
-    id='inp_fldr', type='text',
-    value=r'./data/_main.csv'
+# c_inp_fldr = dcc.Dropdown(
+c_inp_fldr = dbc.Select(
+    id='inp_fldr', 
+    options=[{
+        'label': 'v2024 (reserves as of 2023.12.31, other data within 2024)',
+        'value': r'./data/v2024.csv', 'input_id': 'v2024'
+    }],
+    value=r'./data/v2024.csv', 
+    # clearable=False, 
+    # style={'width': '100%'}
 )
+
+c_inp_fldr=dbc.InputGroup(
+    [dbc.InputGroupText("dataset version"), c_inp_fldr, 
+    #  dbc.Tooltip('reserves as of 2023.12.31, other data within 2024',target='inp_fldr')
+     ], style={'width': '100%'})
 
 # %% Button to change the themes
 c_theme = ThemeChangerAIO(
@@ -329,8 +341,9 @@ c_settings=dbc.Offcanvas(
         dbc.InputGroup([
             dbc.Button('save fig. as',id='b_save_fig', color="primary"),
             dbc.Select(id='select_save_fig_format',
-                       options=['.png', '.jpeg', '.webp', '.svg', '.pdf', '.html'], 
-                       value='.png', 
+                    #    options=['.html','.png', '.jpeg', '.webp', '.svg', '.pdf'], 
+                        options=['.html'], 
+                       value='.html', 
                        ), 
             dbc.InputGroupText("width (px):"),
             dbc.Input(id='width_save_fig', type='number', value=1000),
