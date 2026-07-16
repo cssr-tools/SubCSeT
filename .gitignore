@@ -5,6 +5,7 @@ figures/
 
 *.xlsx
 *.html
+!main_v2024.html
 
 *test*.py
 
