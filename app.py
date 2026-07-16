@@ -29,6 +29,7 @@ from utils import generate_rainbow_colors
 import webbrowser
 
 # %% constants
+DATASETS = ['v2024.csv', 'v2026.csv']
 tooltip_delay={'show': 750, 'hide': 0}
 
 themes = [
@@ -118,11 +119,8 @@ server = app.server
 # c_inp_fldr = dcc.Dropdown(
 c_inp_fldr = dbc.Select(
     id='inp_fldr', 
-    options=[{
-        'label': 'v2024 (reserves as of 2023.12.31, other data within 2024)',
-        'value': r'./data/v2024.csv', 'input_id': 'v2024'
-    }],
-    value=r'./data/v2024.csv', 
+    options = [{'label': d, 'value': f'./data/{d}', 'input_id': d.split('.')[0]} for d in DATASETS],
+    value=rf'./data/{DATASETS[-1]}', 
     # clearable=False, 
     # style={'width': '100%'}
 )
@@ -130,8 +128,8 @@ c_inp_fldr = dbc.Select(
 c_inp_fldr=dbc.InputGroup(
     [dbc.InputGroupText("dataset:", class_name="bg-primary text-white"), 
      c_inp_fldr, 
-    #  dbc.Tooltip('reserves as of 2023.12.31, other data within 2024',target='inp_fldr')
-     ], style={'width': '100%'})
+     #  dbc.Tooltip('reserves as of 2023.12.31, other data within 2024',target='inp_fldr')
+     ], style={'width': '50%'})
 
 # %% Button to change the themes
 c_theme = ThemeChangerAIO(

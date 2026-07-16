@@ -39,7 +39,7 @@
     "maturity gas": "maturity of gas production, ratio of the produced gas volume to the original recoverable volume (fraction)",
     "maturity liq.": "maturity of liquid production, ratio of the produced liquid (oil+gas liquids) volume to the original recoverable volume (fraction)",
     "maturity OE": "maturity, ratio of the produced volume to the original recoverable volume expressed in oil equivalent (fraction)",
-    "start year": "year of the first production, for fields without production is assumed 2024+2.0",
+    "start year": "year of the first production, for fields without production is assumed 2026+2.0",
     "prod. age": "years of production to date (excluding downtime)",
     "t10": "time to reach 10% maturity (years)",
     "t25": "time to reach 25% maturity (years)",
