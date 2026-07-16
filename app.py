@@ -93,7 +93,7 @@ def round_to_sign_digits(x, sig_digits=3):
 def extract_number(text):
     # Regular expression pattern to find digits enclosed in square brackets
     pattern = r'\[(\d+)\]'
-    match = re.search(pattern, tedatasetxt)
+    match = re.search(pattern, text)
     if match:
         return int(match.group(1))  # Convert the found number to an integer
     else:
@@ -1663,7 +1663,10 @@ def update_sci(n, records,sel_rows, dataset, theme):
         sdf['v'] = v
 
         fig.add_trace(go.Scatter(
-            x=sdf.t, y=sdf.SC, mode='lines', line={'shape': 'hv', 'color': clr},
+            x=sdf.t, y=sdf.SC, mode='lines', 
+            line={'shape': 'hv', 
+                #   'color': clr
+            },
             name=csv,
             customdata=sdf[['field', 't', 'dSC', 'v']].values,
             hovertemplate=
@@ -1674,7 +1677,7 @@ def update_sci(n, records,sel_rows, dataset, theme):
         ))
 
     fig.update_layout(
-        template=theme,
+        template=theme, font_size=14,
         legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
         yaxis_title='Gt',
         modebar_add=['toggleHover', 'drawline', 'drawopenpath',
