@@ -29,6 +29,7 @@ from utils import generate_rainbow_colors
 import webbrowser
 
 # %% constants
+DATASETS = ['v2024.csv', 'v2026.csv']
 tooltip_delay={'show': 750, 'hide': 0}
 
 themes = [
@@ -115,23 +116,21 @@ app = Dash(
 app.title = 'CCS screening tool for NCS'
 server = app.server
 
-# c_inp_fldr = dcc.Dropdown(
-c_inp_fldr = dbc.Select(
-    id='inp_fldr', 
-    options=[{
-        'label': 'v2024 (reserves as of 2023.12.31, other data within 2024)',
-        'value': r'./data/v2024.csv', 'input_id': 'v2024'
-    }],
-    value=r'./data/v2024.csv', 
+# c_dataset = dcc.Dropdown(
+c_dataset = dbc.Select(
+    id='dataset', 
+    # options = [{'label': d, 'value': f'./data/{d}', 'input_id': d.split('.')[0]} for d in DATASETS],
+    options = DATASETS,
+    value=DATASETS[-1], 
     # clearable=False, 
     # style={'width': '100%'}
 )
 
-c_inp_fldr=dbc.InputGroup(
+c_dataset=dbc.InputGroup(
     [dbc.InputGroupText("dataset:", class_name="bg-primary text-white"), 
-     c_inp_fldr, 
-    #  dbc.Tooltip('reserves as of 2023.12.31, other data within 2024',target='inp_fldr')
-     ], style={'width': '100%'})
+     c_dataset, 
+     #  dbc.Tooltip('reserves as of 2023.12.31, other data within 2024',target='dataset')
+     ], style={'width': '50%'})
 
 # %% Button to change the themes
 c_theme = ThemeChangerAIO(
@@ -435,7 +434,7 @@ c_toolbar = dbc.Stack([
                 delay=tooltip_delay),
     dbc.Tooltip('add selected in chart', target='b_chart_selection',
                 delay=tooltip_delay),
-    c_inp_fldr,
+    c_dataset,
     c_help,
     c_settings
 ],
@@ -538,6 +537,24 @@ c_para_tab = html.Div([
                "overflowY": "auto", #    "border": "2px solid"
                }),           
 ])
+#%% SCI profile
+c_sci_tab = html.Div([
+    dbc.InputGroup([
+        dbc.Button(
+            'update', id='update_sci', n_clicks=0,
+            color='danger', size='md',
+        ),
+        dbc.InputGroupText(
+            'available CO2 storage capacity ind. for '
+            'selected fields vs. estimated P&A times'
+        ),
+    ]),
+    dcc.Graph(
+        id='sci_fig', style={'height': '90vh'},
+        config={'displayModeBar': True}
+    ),
+])
+
 #%% total score
 
 c_ts_table = DataTable(id='ts_table', columns=[], data=[], editable=True)
@@ -599,7 +616,11 @@ c_tabs = dbc.Tabs([
     dbc.Tab(
         c_ts_tab, label='TOTAL SCORE', tab_id='tab_ts',
         active_tab_style={"fontWeight": "bold"}
-        ) 
+        ),
+    dbc.Tab(
+        c_sci_tab, label='SCI PROFILE', tab_id='tab_sci',
+        active_tab_style={"fontWeight": "bold"}
+        )
     ], id='all_tabs', active_tab='tab_map',
 )
 
@@ -647,10 +668,10 @@ className="dbc"
     Output('units_info_store', 'data'),
     Output('shape_store', 'data'),    
     #
-    Input('inp_fldr', 'value'),  
+    Input('dataset', 'value'),  
     State(ThemeChangerAIO.ids.radio("theme"), "value"), 
 )
-def initial_setup(path2csv, theme_url):
+def initial_setup(dataset, theme_url):
 
     with open(r'./assets/_main_columns.json', 'r') as f:
         CLMNS = json.load(f)
@@ -664,7 +685,7 @@ def initial_setup(path2csv, theme_url):
     # keeping only CO2 licenses ...
     SHAPES = [f for f in SHAPES if f['baaName'][:3] in ['EL0', 'EXL']]
 
-    df = pd.read_csv(path2csv)
+    df = pd.read_csv(f'./data/{dataset}')
     
     # all columns
     all_clmns = list(df.columns)
@@ -1301,17 +1322,19 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
     Output('theme_store', 'data'),
     Output('map_fig', 'figure',allow_duplicate=True),
     Output('sc_fig', 'figure', allow_duplicate=True), 
-    Output('para_fig', 'figure', allow_duplicate=True),   
-    Output('ts_fig', 'figure', allow_duplicate=True),   
+    Output('para_fig', 'figure', allow_duplicate=True),
+    Output('ts_fig', 'figure', allow_duplicate=True),
+    Output('sci_fig', 'figure', allow_duplicate=True),
 
     Input(ThemeChangerAIO.ids.radio("theme"), "value"),
     State('map_fig', 'figure'),
-    State('sc_fig', 'figure'),  
-    State('para_fig', 'figure'), 
-    State('ts_fig', 'figure'), 
+    State('sc_fig', 'figure'),
+    State('para_fig', 'figure'),
+    State('ts_fig', 'figure'),
+    State('sci_fig', 'figure'),
     prevent_initial_call=True
 )
-def update_theme(theme_url, fig_map, fig_sc, fig_para, fig_ts):
+def update_theme(theme_url, fig_map, fig_sc, fig_para, fig_ts, fig_sci):
 
     theme_str = template_from_url(theme_url)
 
@@ -1319,7 +1342,7 @@ def update_theme(theme_url, fig_map, fig_sc, fig_para, fig_ts):
     load_figure_template(theme0)
     # load_figure_template(themes)
     t1=time.time()
-    # print(f'load template(s): {t1-t0:.3f} s')  
+    # print(f'load template(s): {t1-t0:.3f} s')
 
     fig_map = replace_none_colors(fig_map)
     fig_map = go.Figure(fig_map).update_layout(template=theme_str)
@@ -1328,9 +1351,10 @@ def update_theme(theme_url, fig_map, fig_sc, fig_para, fig_ts):
     fig_sc = go.Figure(fig_sc).update_layout(template=theme_str)
 
     fig_para = go.Figure(fig_para).update_layout(template=theme_str)
-    fig_ts = go.Figure(fig_ts).update_layout(template=theme_str)    
+    fig_ts = go.Figure(fig_ts).update_layout(template=theme_str)
+    fig_sci = go.Figure(fig_sci).update_layout(template=theme_str)
 
-    return theme_str, fig_map, fig_sc, fig_para, fig_ts
+    return theme_str, fig_map, fig_sc, fig_para, fig_ts, fig_sci
 
 # opens sodir.no field page on click
 @app.callback(
@@ -1593,6 +1617,77 @@ def ts_plus_minus(p,m, records):
     return records
 
 @app.callback(
+    Output('sci_fig', 'figure'),
+    Input('update_sci', 'n_clicks'),
+    Input('mtable', 'data'),        
+    State('mtable', 'selected_rows'),   
+    State('dataset', 'value'),  
+    State('theme_store', 'data'), 
+    prevent_initial_call=True
+)
+def update_sci(n, records,sel_rows, dataset, theme):
+    '''cumulative CO2 storage capacity indicator vs. estimated P&A year,
+    compared across dataset versions'''
+    
+    fig = go.Figure()    
+    if sel_rows is None or sel_rows == []: return fig
+    
+    df0 = pd.DataFrame(data=records)
+    sel_fields = df0.loc[sel_rows, 'field'].to_list()
+    df0 = df0.set_index('field')
+
+    current_year = datetime.now().year
+
+    for csv, clr in zip(DATASETS, generate_rainbow_colors(len(DATASETS))):
+        v = re.search(r'\d+', csv).group(0)
+        # print(dataset, csv)
+        if dataset != csv:
+            df = pd.read_csv(f'./data/{csv}', index_col='field')
+            # print(f'./data/{csv} imported')
+        else:
+            df = df0.copy()
+            # print('df0 reused')
+
+        sdf = df.loc[df.index.intersection(sel_fields), ['est. P&A year', 'CO2 SC']] \
+            .rename(columns={'est. P&A year': 't', 'CO2 SC': 'dSC'})
+
+        sdf.t = sdf.t.fillna(current_year)
+        sdf.dSC = sdf.dSC / 1000
+        sdf = sdf.sort_values(by='t')
+        sdf['SC'] = sdf.dSC.cumsum()
+        sdf = sdf.drop_duplicates(subset='t', keep='last')
+        sdf = sdf[sdf['t'] >= current_year]
+        sdf.loc['DUMMY', 't'] = sdf.t.max() + 5
+        sdf.loc['DUMMY', 'SC'] = sdf.SC.max()
+        sdf = sdf.reset_index()
+        sdf['v'] = v
+
+        fig.add_trace(go.Scatter(
+            x=sdf.t, y=sdf.SC, mode='lines', 
+            line={'shape': 'hv', 
+                #   'color': clr
+            },
+            name=csv,
+            customdata=sdf[['field', 't', 'dSC', 'v']].values,
+            hovertemplate=
+                '<b>%{customdata[0]}</b> (v%{customdata[3]})<br>'
+                'est. shut-down: %{customdata[1]:.0f}<br>'
+                'SCI: %{customdata[2]:.2f} Gt<br>'
+                'total CO₂ SCI: %{y:.2f} Gt<extra></extra>',
+        ))
+
+    fig.update_layout(
+        template=theme, font_size=14,
+        legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
+        yaxis_title='Gt',
+        modebar_add=['toggleHover', 'drawline', 'drawopenpath',
+                     'drawclosedpath', 'drawcircle', 'drawrect',
+                     'eraseshape', 'toggleSpikelines'],        
+    )
+    return fig
+
+
+@app.callback(
     Output("download_fig", 'data'),
     Input("b_save_fig", 'n_clicks'),
     State("all_tabs", 'active_tab'),
@@ -1600,11 +1695,12 @@ def ts_plus_minus(p,m, records):
     State("sc_fig", 'figure'),
     State("para_fig", 'figure'),
     State("ts_fig", 'figure'),
+    State("sci_fig", 'figure'),
     State("select_save_fig_format", 'value'),
     prevent_initial_call=True
 )
 def save_current_figure(n, active_tab, map_fig, sc_fig, para_fig, ts_fig,
-                        format):
+                        sci_fig, format):
     # image formats (.png/.jpeg/.webp/.svg) are exported in the browser by
     # the clientside callback below (no Kaleido/Chrome needed on the server)
     if format != '.html':
@@ -1633,6 +1729,9 @@ def save_current_figure(n, active_tab, map_fig, sc_fig, para_fig, ts_fig,
     elif active_tab == 'tab_ts':
         filename = 'subcset_total_score'
         fig = ts_fig
+    elif active_tab == 'tab_sci':
+        filename = 'subcset_sci_profile'
+        fig = sci_fig
     else:
         raise PreventUpdate
 
@@ -1657,7 +1756,7 @@ app.clientside_callback(
         }
         const tabToGraph = {
             'tab_map': 'map_fig', 'tab_sc': 'sc_fig',
-            'tab_para': 'para_fig', 'tab_ts': 'ts_fig'
+            'tab_para': 'para_fig', 'tab_ts': 'ts_fig', 'tab_sci': 'sci_fig'
         };
         // dcc.Graph's id sits on a wrapper div; Plotly needs the inner
         // .js-plotly-plot element
@@ -1665,12 +1764,13 @@ app.clientside_callback(
         const gd = wrapper && wrapper.querySelector('.js-plotly-plot');
         if (!gd) { return window.dash_clientside.no_update; }
         const ratios = {'tab_map': 9.0/9.5, 'tab_sc': 9.0/9.5,
-                        'tab_para': 5.0/9.5, 'tab_ts': 6.0/9.5};
+                        'tab_para': 5.0/9.5, 'tab_ts': 6.0/9.5, 'tab_sci': 9.0/9.5};
         const w = width || 1000;
         const h = Math.round(w * ratios[active_tab]);
         const now = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
         const names = {'tab_map': 'subcset_map', 'tab_sc': 'subcset_scatter',
-                       'tab_para': 'subcset_para', 'tab_ts': 'subcset_total_score'};
+                       'tab_para': 'subcset_para', 'tab_ts': 'subcset_total_score',
+                       'tab_sci': 'subcset_sci_profile'};
         Plotly.downloadImage(gd, {
             format: fmt.slice(1), width: w, height: h,
             scale: parseFloat(scale) || 1,      // dbc.Select delivers strings
