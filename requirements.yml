@@ -13,6 +13,5 @@ dependencies:
  - numpy
  - pandas
  - plotly
- - python-kaleido
  - nbformat
  
