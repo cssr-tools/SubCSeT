@@ -1,5 +1,5 @@
 DEBUG=False # switch for many parameters, should be False for deployment
-DEBUG=True
+# DEBUG=True
 
 import pandas as pd
 import numpy as np
