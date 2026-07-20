@@ -18,6 +18,7 @@ import dash_bootstrap_components as dbc
 from dash import callback_context
 from dash import dcc
 from dash import Dash
+from dash import no_update
 from copy import deepcopy
 from sklearn.linear_model import LinearRegression
 import time
@@ -127,10 +128,25 @@ c_dataset = dbc.Select(
 )
 
 c_dataset=dbc.InputGroup(
-    [dbc.InputGroupText("dataset:", class_name="bg-primary text-white"), 
-     c_dataset, 
+    [dbc.InputGroupText("dataset:", class_name="bg-primary text-white"),
+     c_dataset,
      #  dbc.Tooltip('reserves as of 2023.12.31, other data within 2024',target='dataset')
-     ], style={'width': '50%'})
+     ], size='md', class_name="mx-auto", style={'width': '45%'})
+
+# single 'update' button with a scope switch:
+#   off -> refresh only the active tab's chart (default)
+#   on  -> refresh every chart at once
+c_update = dbc.InputGroup([
+    dbc.InputGroupText([dbc.Switch(id='update_scope', value=False),"all"],
+        style={'border': '2px solid var(--bs-danger)',
+               'boxSizing': 'border-box'},
+    id='update_scope_text'),
+    dbc.Button('update', id='update_b', n_clicks=0, color='danger'),
+    dbc.Tooltip(
+        'update all tabs or only the current tab',
+        target='update_scope_text', delay=tooltip_delay,
+    ),
+], size='md', className="flex-grow-0 w-auto ms-auto")
 
 # %% Button to change the themes
 c_theme = ThemeChangerAIO(
@@ -404,11 +420,6 @@ def open_settings(n):
 
 c_map_tab = html.Div([
     dbc.Stack([
-        dbc.Button(
-            'update', id='update_map', n_clicks=0,
-            color='danger',
-            className="me-1", size='md',
-        ),
         dbc.InputGroup([
             dbc.InputGroupText('size',style={'width': '20%'}),
             html.Div(dcc.Dropdown(id='map_dd_size', value='CO2 SC'), 
@@ -426,27 +437,22 @@ c_map_tab = html.Div([
     c_map, # map itself
 ])
 
-c_toolbar = dbc.Stack([
-    c_toolbar,    
+c_toolbar = html.Div([
+    # only the items that take up horizontal space go in the Stack, so
+    # ms-auto on c_update has a clean flex row to push against
+    dbc.Stack([c_toolbar, c_dataset, c_update],
+        direction="horizontal", gap=1, class_name="w-100"),
+    # zero-width / overlay elements live outside the flex row
     dbc.Tooltip('add all filtered rows to selection', target='b_select',
                 delay=tooltip_delay),
     dbc.Tooltip('deselect all', target='b_deselect',
                 delay=tooltip_delay),
     dbc.Tooltip('add selected in chart', target='b_chart_selection',
                 delay=tooltip_delay),
-    c_dataset,
     c_help,
-    c_settings
-],
-    direction="horizontal", gap=1
-)
+    c_settings,
+])
 #%% scatter plot
-c_sc_b_update = dbc.Button(
-    'update', id='update_sc', n_clicks=0,
-    color='danger', className="me-1", size='md',
-    # style={'width': '10%'}
-)
-
 c_sc = dcc.Graph(
     id='sc_fig',
     style={
@@ -457,7 +463,6 @@ c_sc = dcc.Graph(
 
 c_sc_tab = html.Div([
     dbc.Stack([
-        c_sc_b_update,
         dbc.Stack([
             dbc.InputGroup([
                 dbc.InputGroupText('X',style={'width': '10%'}),
@@ -495,10 +500,6 @@ c_sc_tab = html.Div([
 #%% Parallel plot
 c_para_tab = html.Div([
     dbc.Stack([
-        dbc.Button(
-            'update', id='para_update', n_clicks=0,
-            color='danger', className="me-1", size='md',
-        ),   
         dbc.ButtonGroup([
             dbc.Button(
                 html.I(className="bi bi-plus"),
@@ -540,10 +541,6 @@ c_para_tab = html.Div([
 #%% SCI profile
 c_sci_tab = html.Div([
     dbc.InputGroup([
-        dbc.Button(
-            'update', id='update_sci', n_clicks=0,
-            color='danger', size='md',
-        ),
         dbc.InputGroupText(
             'available CO2 storage capacity ind. for '
             'selected fields vs. estimated P&A times'
@@ -562,10 +559,6 @@ c_ts_table_div = html.Div(c_ts_table, id='ts_table_div')
 
 c_ts_tab=html.Div([
     dbc.Stack([
-        dbc.Button(
-            'update', id='ts_update', n_clicks=0,
-            color='danger', className="me-1", size='md',
-        ), 
         dbc.ButtonGroup([
             dbc.Button(
                 html.I(className="bi bi-plus"),
@@ -633,8 +626,17 @@ app.layout = html.Div([
     dcc.Store(id='para_store_df', data={}),
     dcc.Store(id='para_store_ranges', data={}), 
     dcc.Store(id='units_info_store', data={}),
-    dcc.Store(id='shape_store', data={}),    
-    html.Div(id='dummy_output', hidden=True)
+    dcc.Store(id='shape_store', data={}),
+    html.Div(id='dummy_output', hidden=True),
+    # hidden per-tab update triggers, driven by the single 'update_b' button
+    # in the toolbar (see route_update). 
+    html.Div([
+        dbc.Button(id='update_map', n_clicks=0),
+        dbc.Button(id='update_sc', n_clicks=0),
+        dbc.Button(id='para_update', n_clicks=0),
+        dbc.Button(id='ts_update', n_clicks=0),
+        dbc.Button(id='update_sci', n_clicks=0),
+    ], hidden=True),
 ],
 style={
     # 'display': 'grid', 
@@ -646,6 +648,44 @@ style={
     },
 className="dbc"
 )
+
+
+# maps each tab to the hidden update button that refreshes its chart
+TAB_TO_UPDATE = {
+    'tab_map': 0,
+    'tab_sc': 1,
+    'tab_para': 2,
+    'tab_ts': 3,
+    'tab_sci': 4,
+}
+
+@app.callback(
+    Output('update_map', 'n_clicks', allow_duplicate=True),
+    Output('update_sc', 'n_clicks', allow_duplicate=True),
+    Output('para_update', 'n_clicks', allow_duplicate=True),
+    Output('ts_update', 'n_clicks', allow_duplicate=True),
+    Output('update_sci', 'n_clicks', allow_duplicate=True),
+    Input('update_b', 'n_clicks'),
+    State('all_tabs', 'active_tab'),
+    State('update_scope', 'value'),
+    State('update_map', 'n_clicks'),
+    State('update_sc', 'n_clicks'),
+    State('para_update', 'n_clicks'),
+    State('ts_update', 'n_clicks'),
+    State('update_sci', 'n_clicks'),
+    prevent_initial_call=True,
+)
+def route_update(n, active_tab, update_all_tabs, *current):
+    '''bumps the hidden update button(s) so the single toolbar button refreshes
+    either just the active tab's chart (switch off) or every chart (switch on)'''
+    if update_all_tabs:
+        return tuple((c or 0) + 1 for c in current)
+    idx = TAB_TO_UPDATE.get(active_tab)
+    if idx is None:
+        raise PreventUpdate
+    out = [no_update] * 5
+    out[idx] = (current[idx] or 0) + 1
+    return tuple(out)
 
 
 @app.callback(
@@ -1183,6 +1223,8 @@ def update_map(n, color, size,
     )
     fig.update_geos(fitbounds="locations")
 
+
+    print('---------- map update -----------')
     return fig, modal_open, modal_msg
 
 @app.callback(
@@ -1314,6 +1356,8 @@ def update_sc(n, x, y, color, size, colorscale, reverse_colorscale, dclrs,
         modebar_add=['toggleHover', 'drawline', 'drawopenpath',
                      'drawclosedpath', 'drawcircle', 'drawrect',
                      'eraseshape', 'toggleSpikelines'])
+    
+    print('---------- SC plot update -----------')
     return fig, modal_open, modal_msg
 
 
@@ -1432,7 +1476,7 @@ def para_update(n, color, colorscale, reverse_colorscale,
         color=color, color_continuous_scale=colorscale, template=theme
         )
     fig = fig.update_layout(font_size=14)
-
+    print('---------- paraplot update -----------')
     return fig, df.to_dict('records')
 
 @app.callback(
@@ -1591,6 +1635,8 @@ def ts_update(n, use_only_selected,
         xaxis=dict(title='total score and its components', side='top'),
         legend=dict(x=1.0, y=0.0, xanchor='right', yanchor='bottom')
         )
+    
+    print('---------- TS update -----------')
     return df.to_dict('records'), fig
 
 
@@ -1684,6 +1730,8 @@ def update_sci(n, records,sel_rows, dataset, theme):
                      'drawclosedpath', 'drawcircle', 'drawrect',
                      'eraseshape', 'toggleSpikelines'],        
     )
+    
+    print('---------- SCI update -----------')
     return fig
 
 
