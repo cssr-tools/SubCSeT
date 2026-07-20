@@ -548,12 +548,6 @@ c_para_tab = html.Div([
 ])
 #%% SCI profile
 c_sci_tab = html.Div([
-    dbc.InputGroup([
-        dbc.InputGroupText(
-            'available CO2 storage capacity ind. for '
-            'selected fields vs. estimated P&A times'
-        ),
-    ]),
     dcc.Graph(
         id='sci_fig', style={'height': '90vh'},
         config={'displayModeBar': True}
@@ -1681,7 +1675,11 @@ def update_sci(n, records,sel_rows, dataset, theme):
     '''cumulative CO2 storage capacity indicator vs. estimated P&A year,
     compared across dataset versions'''
     
-    fig = go.Figure()    
+    fig = go.Figure()
+    # title moved here from the tab's InputGroupText so it lives on the chart
+    fig.update_layout(title_text=(
+        'available CO2 storage capacity ind. for '
+        'selected fields vs. estimated P&A times'))
     if sel_rows is None or sel_rows == []: return fig
     
     df0 = pd.DataFrame(data=records)
