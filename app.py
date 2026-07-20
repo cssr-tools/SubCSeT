@@ -56,7 +56,8 @@ themes_options=[{'label': i, 'value': eval('dbc.themes.'+i.upper())} \
 light_theme = True
 # theme0 = "cerulean" if light_theme else "cyborg"  # sets the theme
 theme0 = "sandstone" if light_theme else "cyborg"  # sets the theme
-map_style0 = "basic" if light_theme else "carto-darkmatter"
+# map_style0 = "basic" if light_theme else "carto-darkmatter"
+map_style0 = "light" if light_theme else "carto-darkmatter"
 
 THEME0 = theme0.upper()
 
