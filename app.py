@@ -801,7 +801,7 @@ def initial_setup(dataset, theme_url):
          Format(precision=1, scheme=Scheme.percentage)),
         # timing / P&A columns: 1 decimal
         (['t10', 't25', 't50', 't75', 't90', 't95', 't100', 'est. P&A year',\
-          'start year', 'est. total lifetime', 'est. rem. lifetime'],
+          'start year', 'est. total lifetime', 'est. rem. lifetime', 'prod. age'],
          Format(precision=1, scheme=Scheme.fixed)),
         # recovery factors: 2 decimals
         (['RF oil', 'RF liq.', 'RF gas', 'RF OE'],
