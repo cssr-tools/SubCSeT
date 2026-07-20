@@ -1,5 +1,5 @@
 DEBUG=False # switch for many parameters, should be False for deployment
-DEBUG=True
+# DEBUG=True
 
 import pandas as pd
 import numpy as np
@@ -54,7 +54,8 @@ themes_options=[{'label': i, 'value': eval('dbc.themes.'+i.upper())} \
 # theme0 = "sandstone"
 # light_theme = (datetime.today() - datetime(2026,3,3)).days % 3 != 0
 light_theme = True
-theme0 = "cerulean" if light_theme else "cyborg"  # sets the theme
+# theme0 = "cerulean" if light_theme else "cyborg"  # sets the theme
+theme0 = "sandstone" if light_theme else "cyborg"  # sets the theme
 map_style0 = "basic" if light_theme else "carto-darkmatter"
 
 THEME0 = theme0.upper()
