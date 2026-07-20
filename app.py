@@ -1,5 +1,5 @@
 DEBUG=False # switch for many parameters, should be False for deployment
-# DEBUG=True
+DEBUG=True
 
 import pandas as pd
 import numpy as np
@@ -137,9 +137,17 @@ c_dataset=dbc.InputGroup(
 #   off -> refresh only the active tab's chart (default)
 #   on  -> refresh every chart at once
 c_update = dbc.InputGroup([
-    dbc.InputGroupText([dbc.Switch(id='update_scope', value=False),"all"],
-        style={'border': '2px solid var(--bs-danger)',
-               'boxSizing': 'border-box'},
+    dbc.InputGroupText([
+        dbc.Switch(id='update_scope', value=False,
+            # strip the .form-check default min-height/margins so the switch
+            # doesn't make this InputGroupText (and the whole update group)
+            # taller than the dataset group
+            style={'minHeight': 0, 'marginBottom': 0},
+            input_style={'marginTop': 0}),
+        "all"],
+        # inset box-shadow instead of a border: gives the same red outline
+        # without adding height, so the group matches the dataset/toolbar
+        style={'boxShadow': 'inset 0 0 0 1px var(--bs-danger)'},
     id='update_scope_text'),
     dbc.Button('update', id='update_b', n_clicks=0, color='danger'),
     dbc.Tooltip(
@@ -841,9 +849,9 @@ def initial_setup(dataset, theme_url):
             'overflowX': 'auto', 
             'overflowY': 'auto'
         },   
-        style_cell={'fontSize': 14, 
-                    'textAlign': 'center',
-                    'whiteSpace': 'normal'}
+        style_cell={'fontSize': 12, 'textAlign': 'center','whiteSpace': 'normal'},
+        # header, zebra striping and row hover are in assets/custom.css
+        # (scoped to #mtable, theme-aware via Bootstrap --bs-* variables)
     )
     #%% para_table
     clmns = [{'name': i, 'id': i} \
