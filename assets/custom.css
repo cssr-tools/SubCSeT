@@ -36,3 +36,15 @@
     border-top: 1px solid rgba(var(--bs-danger-rgb), 1) !important;
     border-bottom: 1px solid rgba(var(--bs-danger-rgb), 1) !important;
 }
+
+/* config-table dropdowns: drop the grey frame so the dropdown blends into
+   the cell, and darken the pale caret so it follows the theme text colour */
+#para_table .Select-control,
+#ts_table .Select-control {
+    border: none !important;
+    background-color: transparent !important;
+}
+#para_table .Select-arrow,
+#ts_table .Select-arrow {
+    border-top-color: var(--bs-body-color) !important;
+}

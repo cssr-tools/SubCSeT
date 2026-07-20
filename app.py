@@ -898,14 +898,12 @@ def initial_setup(dataset, theme_url):
     para_table = DataTable(
         id='para_table', columns=clmns, data=pdata,
         dropdown=dropdowns, editable=True,
-        style_table={
-            'width': '47vw',
-            'maxHeight': '23vh',
-            'overflowY': 'auto'
-            },
-        style_cell={'fontSize': 14, 
+        # no maxHeight/overflow (like ts_table) so open dropdowns overlay
+        # freely instead of being clipped inside a scroll container
+        style_table={'width': '47vw'},
+        style_cell={'fontSize': 14,
                     'textAlign': 'center',
-                    'whiteSpace': 'normal'} 
+                    'whiteSpace': 'normal'}
     )
 
     #%% total score table
