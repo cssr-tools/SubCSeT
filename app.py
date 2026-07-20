@@ -793,6 +793,34 @@ def initial_setup(dataset, theme_url):
             Format(precision=3, scheme=Scheme.decimal_or_exponent)
         clmns[i]['type'] = 'numeric'
 
+    # per-group number formatting: (columns, Format) pairs. Applied after the
+    # loop above, so overrides (e.g. H2 SC) win over the precision-3 default.
+    fmt_groups = [
+        # Norwegian share: stored as a 0-1 fraction, shown as percent, 2 digits
+        (['norwegian share'],
+         Format(precision=1, scheme=Scheme.percentage)),
+        # timing / P&A columns: 1 decimal
+        (['t10', 't25', 't50', 't75', 't90', 't95', 't100', 'est. P&A year',\
+          'start year', 'est. total lifetime', 'est. rem. lifetime'],
+         Format(precision=1, scheme=Scheme.fixed)),
+        # recovery factors: 2 decimals
+        (['RF oil', 'RF liq.', 'RF gas', 'RF OE'],
+         Format(precision=2, scheme=Scheme.fixed)),
+        # 2 decimals
+        (['H2 SC', 'subsea index'],
+         Format(precision=2, scheme=Scheme.fixed)),
+        (['STOIIP','GIIP','in-place ass. liquid','in-place ass. gas',\
+          'in-place free gas','in-place OE'],\
+           Format(precision=2, scheme=Scheme.fixed)),
+    ]
+    for cols, fmt in fmt_groups:
+        for col in cols:
+            if col not in df.columns:
+                continue
+            i = df.columns.get_loc(key=col)
+            clmns[i]['format'] = fmt
+            clmns[i]['type'] = 'numeric'
+
     # preselected_rows = df[df['sea'] == 'NORTH'].index.to_list()
     preselected_rows = df.index.to_list()
 
