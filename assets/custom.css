@@ -48,3 +48,46 @@
 #ts_table .Select-arrow {
     border-top-color: var(--bs-body-color) !important;
 }
+
+/* ------------------------------------------------------------------ *
+ * group separators (#mtable): box each top-level header group with a
+ * border on its left AND right edges. Targets the columns by
+ * data-dash-column so the border reaches EVERY merged-header sub-row
+ * (group row, sub-name, unit, filter) and the body cells alike -- which
+ * style_header_conditional could not do. The column lists match the
+ * FIRST and LAST column of each group in assets/_main_columns.json.
+ * ------------------------------------------------------------------ */
+
+/* left edge: first column of each group */
+#mtable [data-dash-column="sea"],
+#mtable [data-dash-column="norwegian share"],
+#mtable [data-dash-column="rec. oil"],
+#mtable [data-dash-column="rem. oil"],
+#mtable [data-dash-column="STOIIP"],
+#mtable [data-dash-column="RF oil"],
+#mtable [data-dash-column="maturity oil"],
+#mtable [data-dash-column="t10"],
+#mtable [data-dash-column="prod. age"],
+#mtable [data-dash-column="rem. OE prod. years"],
+#mtable [data-dash-column="peak year"],
+#mtable [data-dash-column="well num"],
+#mtable [data-dash-column="subsea index"],
+#mtable [data-dash-column="lat"],
+#mtable [data-dash-column="depth min"],
+#mtable [data-dash-column="depth"],
+#mtable [data-dash-column="oil PV0"],
+#mtable [data-dash-column="rec. oil PV"],
+#mtable [data-dash-column="CO2 SC"],
+#mtable [data-dash-column="CO2 SC/well num"],
+#mtable [data-dash-column="CO2 density RC"],
+#mtable [data-dash-column="injectivity ind."],
+#mtable [data-dash-column="total score"] {
+    /* border-left: 2px solid var(--bs-secondary-color) !important; */
+    border-left: 1.5px solid !important;
+}
+
+/* right edge:  */
+#mtable [data-dash-column="total score"] {
+    /* border-right: 2px solid var(--bs-secondary-color) !important; */
+    border-right: 1.5px solid !important;
+}

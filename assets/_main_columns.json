@@ -288,8 +288,8 @@
   "48"
  ],
  "start year": [
+  "production",
   "start",
-  "year",
   "years",
   "49"
  ],
@@ -314,7 +314,7 @@
  "est. P&A year": [
   "lifetime estimates",
   "P&A",
-  "year",
+  "years",
   "53"
  ],
  "peak year": [
@@ -522,7 +522,7 @@
   "87"
  ],
  "CO2 SC/well num": [
-  "CO2 SC/well",
+  "CO2 SCI/well",
   "",
   "Mt/well",
   "88"
