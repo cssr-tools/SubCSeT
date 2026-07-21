@@ -60,7 +60,7 @@
 
 /* left edge: first column of each group */
 #mtable [data-dash-column="sea"],
-#mtable [data-dash-column="norwegian share"],
+/* #mtable [data-dash-column="norwegian share"], */
 #mtable [data-dash-column="rec. oil"],
 #mtable [data-dash-column="rem. oil"],
 #mtable [data-dash-column="STOIIP"],
@@ -83,11 +83,15 @@
 #mtable [data-dash-column="injectivity ind."],
 #mtable [data-dash-column="total score"] {
     /* border-left: 2px solid var(--bs-secondary-color) !important; */
-    border-left: 1.5px solid !important;
+    border-left: 1.5px solid var(--bs-secondary-color) !important;
+    /* border-left: 2px solid var(--bs-primary-border-subtle) !important;     */
+    /* border-left: var(--bs-primary-border) !important;     */
+    /* border-left: 1.5px solid !important; */
 }
 
 /* right edge:  */
 #mtable [data-dash-column="total score"] {
-    /* border-right: 2px solid var(--bs-secondary-color) !important; */
-    border-right: 1.5px solid !important;
+    border-right: 1.5px solid var(--bs-secondary-color) !important;
+    /* border-right: 1.5px solid var(--bs-primary-border-subtle) !important; */
+    /* border-right: 1.5px solid !important; */
 }
