@@ -8,7 +8,7 @@ nist_tables/
 *.html
 !main_v2024.html
 
-*test*.py
+*test*.*
 
 *.ipynb
 !main.ipynb
