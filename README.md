@@ -19,7 +19,7 @@ The preprint is to be found [here](https://github.com/cssr-tools/SubCSeT/blob/ma
 3. ["IJGGC paper"](https://github.com/cssr-tools/SubCSeT/releases/tag/IJGGC_paper): data and codes as of [**publication**](https://doi.org/10.1016/j.ijggc.2026.104607) in the International Journal of Greenhouse Gas Control (2026.02.18, https://doi.org/10.1016/j.ijggc.2026.104607).  
 
 ### Experimental feature
-This branch contains an energy efficiency indicator to track the specific energy required to inject CO2. Description and preliminary conclusions are to be found in `energy-efficiency-indicator.ipynb`. 
+This branch contains an energy efficiency indicator to track the specific energy required to inject CO2. Description, working notes and preliminary conclusions are to be found in `energy-efficiency-indicator.ipynb`. 
 `v2026+EEI.csv` contains the estimated wellhead pressure (`WHP20`) and the indicator itself (`EEI`). 
 This extended dataset can be visualized with `app.py` (run locally) or with a third-party tool, for instance, https://kepler.gl/.
 
