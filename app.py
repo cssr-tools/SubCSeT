@@ -31,6 +31,7 @@ import webbrowser
 
 # %% constants
 DATASETS = ['v2024.csv', 'v2026.csv']
+# DATASETS += ['v2026+EEI.csv'] # for tests
 tooltip_delay={'show': 750, 'hide': 0}
 
 themes = [
@@ -723,7 +724,14 @@ def initial_setup(dataset, theme_url):
 
     with open(r'./assets/_help_columns.json', 'r') as f:
         HELP_CLMNS = json.load(f)
-    
+    # ~~~~for tests~~~~~~~~
+    # CLMNS['WHP20'] = ['WHP est.', "20 degC", 'bar',"92"]
+    # HELP_CLMNS['whp20'] =\
+    #     'rough estimate of injection pressure @BHP=p0 and degC=20'
+    # CLMNS['EEI'] = ['energy','eff. ind.', 'MJ/t', "93"]
+    # HELP_CLMNS['EEI'] =\
+    #     'estimate of work required to isothermally compress CO2 to WHP @20 degC'
+    # ~~~~~~~~~~~~~~~~~~~~
     # uploading shapes to visualize CO2 expl. and storage licenses
     with open(r'./assets/baa_shapes.json', "r") as f:
         SHAPES  = json.load(f)      
@@ -1720,7 +1728,7 @@ def update_sci(n, records,sel_rows, dataset, theme):
     current_year = datetime.now().year
 
     for csv, clr in zip(DATASETS, generate_rainbow_colors(len(DATASETS))):
-        v = re.search(r'\d+', csv).group(0)
+        # v = re.search(r'\d+', csv).group(0)
         # print(dataset, csv)
         if dataset != csv:
             df = pd.read_csv(f'./data/{csv}', index_col='field')
@@ -1741,7 +1749,7 @@ def update_sci(n, records,sel_rows, dataset, theme):
         sdf.loc['DUMMY', 't'] = sdf.t.max() + 5
         sdf.loc['DUMMY', 'SC'] = sdf.SC.max()
         sdf = sdf.reset_index()
-        sdf['v'] = v
+        sdf['v'] = csv
 
         fig.add_trace(go.Scatter(
             x=sdf.t, y=sdf.SC, mode='lines', 
@@ -1751,7 +1759,7 @@ def update_sci(n, records,sel_rows, dataset, theme):
             name=csv,
             customdata=sdf[['field', 't', 'dSC', 'v']].values,
             hovertemplate=
-                '<b>%{customdata[0]}</b> (v%{customdata[3]})<br>'
+                '<b>%{customdata[0]}</b> (%{customdata[3]})<br>'
                 'est. shut-down: %{customdata[1]:.0f}<br>'
                 'SCI: %{customdata[2]:.2f} Gt<br>'
                 'total CO₂ SCI: %{y:.2f} Gt<extra></extra>',
