@@ -12,3 +12,4 @@ nist_tables/
 
 *.ipynb
 !main.ipynb
+!energy-efficiency-indicator.ipynb
